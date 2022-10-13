@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "cpu.h"
 #include "mmu.h"
 #include "rom.h"
+#include "cpu.h"
 
 struct CPU {
 	uint8_t H;
@@ -24,44 +24,44 @@ struct CPU {
 struct CPU c;
 
 void set_AF(uint16_t x) {
-	c.F = x & 0xFF;
-	c.A = x >> 8;
+	c.F = (uint8_t) x; // get lower octet
+	c.A = (uint8_t) (x >> 8); // get higher octet
 }
 
-uint16_t get_AF() {
+uint16_t get_AF(void) {
 	return (c.A << 8) | c.F;
 }
 
 void set_BC(uint16_t x) {
-	c.C = x & 0xFF;
-	c.B = x >> 8;
+	c.C = (uint8_t) x;
+	c.B = (uint8_t) (x >> 8);
 }
 
-uint16_t get_BC() {
+uint16_t get_BC(void) {
 	return (c.B << 8) | c.C;
 }
 
 void set_DE(uint16_t x) {
-	c.E = x & 0xFF;
-	c.D = x >> 8;
+	c.E = (uint8_t) x;
+	c.D = (uint8_t) (x >> 8);
 }
 
-uint16_t get_DE() {
+uint16_t get_DE(void) {
 	return (c.D << 8) | c.E;
 }
 
 void set_HL(uint16_t x) {
-	c.L = x & 0xFF;
-	c.H = x >> 8;
+	c.L = (uint8_t) x;
+	c.H = (uint8_t) (x >> 8);
 }
 
-uint16_t get_HL() {
+uint16_t get_HL(void) {
 	return (c.H << 8) | c.L;
 }
 
 /* ------------------ Flags */
 
-uint8_t get_Z() { 
+uint8_t get_Z(void) { 
 	return (c.F & 0x80); // 0x80 sets 8th bit to 1
 }
 
@@ -69,7 +69,7 @@ void set_Z(uint8_t bit) {
 	c.F = (c.F & 0x7F) | (bit << 7); // 0x7F sets 8th bit to 0
 }
 
-uint8_t get_N() { 
+uint8_t get_N(void) { 
 	return (c.F & 0x40); // 0x40 sets 7th bit to 1
 }
 
@@ -77,7 +77,7 @@ void set_N(uint8_t bit) {
 	c.F = (c.F & 0xBF) | (bit << 6); // 0xBF sets 7th bit to 0
 }
 
-uint8_t get_H() { 
+uint8_t get_H(void) { 
 	return (c.F & 0x20); // 0x20 sets 6th bit to 1
 }
 
@@ -85,7 +85,7 @@ void set_H(uint8_t bit) {
 	c.F = (c.F & 0xDF) | (bit << 5); // 0xDF sets 6th bit to 0
 }
 
-uint8_t get_C() { 
+uint8_t get_C(void) { 
 	return (c.F & 0x10); // 0x10 sets 5th bit to 1
 }
 
@@ -140,15 +140,15 @@ void cpu_init(void) {
 	c.cycle_count = 0;
 }
 
-uint16_t cpu_get_cycle_count() {
+uint16_t cpu_get_cycle_count(void) {
 	return c.cycle_count;
 }
 
-uint16_t cpu_get_PC() {
+uint16_t cpu_get_PC(void) {
 	return c.PC;
 }
 
-void cpu_print_registers() {
+void cpu_print_registers(void) {
 	printf("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d\n",
 					c.PC, c.A, c.F, c.B, c.C, c.D, c.E, c.H, c.L, c.SP, c.cycle_count);
 }
@@ -163,7 +163,7 @@ uint16_t cpu_get_two_bytes(uint16_t addr) {
 }
 
 
-uint8_t cpu_step() {
+uint8_t cpu_step(void) {
 	uint8_t instruction = mmu_get_byte(c.PC);
 
  	printf("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X\n", 
@@ -174,6 +174,7 @@ uint8_t cpu_step() {
 	// 16 bit helper variable
 	uint16_t i = 0;
 
+	
 	switch(instruction) {
 		case 0x00:			/* NOP */
 			c.cycle_count++;
@@ -219,7 +220,7 @@ uint8_t cpu_step() {
 			break;
 		case 0x20:
 			if(!!((c.F & 0x80)) == 0) {
-				c.PC += (uint8_t) mmu_get_byte(c.PC) + 1;
+				c.PC += (uint8_t) (mmu_get_byte(c.PC) + 1);
 				c.cycle_count += 3;
 			} else {
 				c.PC += 1;

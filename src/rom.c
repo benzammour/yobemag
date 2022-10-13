@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include <string.h>
 
-static char *cartridge_types[] = {
+const char *cartridge_types[0xFF+1] = {
 	[0x00] = "ROM ONLY",
 	[0x01] = "MBC1",
 	[0x02] = "MBC1+RAM",
@@ -39,7 +39,7 @@ static char *cartridge_types[] = {
 	[0xFF] = "HuC1+RAM+BATTERY",
 };
 
-static char *rom_sizes[] = {
+const char *rom_sizes[] = {
 	[0x00] = "32KByte (no ROM banking)",
 	[0x01] = "64KByte (4 banks)",
 	[0x02] = "64KByte (4 banks)",
@@ -55,7 +55,7 @@ static char *rom_sizes[] = {
 };
 
 
-uint8_t *bytes;
+uint8_t *rom_bytes;
 
 uint8_t rom_setup(uint8_t *rom_data) {
     char title[17];
@@ -71,7 +71,7 @@ uint8_t rom_setup(uint8_t *rom_data) {
     uint8_t romsize_index = rom_data[0x148];
     printf("Cartridge rom size: %s (%02x)\n", rom_sizes[romsize_index], romsize_index);
 
-	bytes = rom_data;
+	rom_bytes = rom_data;
 
     return 0;
 }
@@ -90,7 +90,7 @@ uint8_t rom_load(const char *filename) {
 	if(fstat(f, &st) == -1)
 		return 1;
 
-	rom_size = st.st_size;
+	rom_size = (size_t) st.st_size;
 
 	bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
 	if(!bytes)
@@ -99,6 +99,6 @@ uint8_t rom_load(const char *filename) {
     return rom_setup(bytes);
 }
 
-uint8_t *get_rom_bytes() {
-	return bytes;
+uint8_t *get_rom_bytes(void) {
+	return rom_bytes;
 }

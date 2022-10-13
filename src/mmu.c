@@ -22,7 +22,7 @@ static const uint8_t bootrom[256] = {
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
 };
 
-uint8_t mem_init() {
+uint8_t mem_init(void) {
     uint8_t *rom_bytes = get_rom_bytes();
 
 	mem = calloc(1, 0x10000);
@@ -55,6 +55,6 @@ uint16_t mmu_get_two_bytes(uint16_t addr) {
 }
 
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {
-	mmu_write_byte(dest_addr, (value & 0xFF));
-    mmu_write_byte(dest_addr + 1, value >> 8);
+	mmu_write_byte(dest_addr, ((uint8_t) value));
+    mmu_write_byte(dest_addr + 1, (uint8_t) (value >> 8));
 }

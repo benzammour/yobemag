@@ -5,7 +5,7 @@
 #include "rom.h"
 #include "mmu.h"
 
-int main() {
+int main(void) {
 	uint8_t ret = rom_load("./roms/hello-world.gb");
 	if (ret) {
 		fprintf(stderr, "Failed to load ROM\n");

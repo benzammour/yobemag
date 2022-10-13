@@ -7,7 +7,7 @@ static SDL_Window *window;
 static SDL_Surface *surface;
 
 
-uint8_t lcd_load() {
+uint8_t lcd_load(void) {
 	SDL_Init(SDL_INIT_EVERYTHING);
 
 	window = SDL_CreateWindow(
@@ -23,7 +23,7 @@ uint8_t lcd_load() {
 	return 0;
 }
 
-uint8_t lcd_step() {
+uint8_t lcd_step(void) {
 	SDL_Event e;
 	const uint8_t *keystates;
 
