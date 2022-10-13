@@ -57,3 +57,11 @@ yobemag
 *.rom
 *.gb
 *.code-workspace
+
+# Build
+build/
+cmake-build-debug/
+cmake-build-release/
+
+# IntelliJ
+.idea/
