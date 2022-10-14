@@ -6,11 +6,11 @@
 #include <stdio.h>
 
 
-uint8_t mem_init();
+uint8_t mem_init(void);
 
-uint8_t mmu_get_byte(uint16_t addr);
+__attribute__((pure)) uint8_t mmu_get_byte(uint16_t addr);
 void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr);
-uint16_t mmu_get_two_bytes(uint16_t addr);
+__attribute__((pure)) uint16_t mmu_get_two_bytes(uint16_t addr);
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value);
 
 #endif
