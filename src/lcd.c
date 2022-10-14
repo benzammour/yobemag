@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include "lcd.h"
 
 
@@ -25,9 +24,9 @@ uint8_t lcd_load(void) {
 
 uint8_t lcd_step(void) {
     SDL_Event e;
-    const uint8_t *keystates;
+    const uint8_t *key_states;
 
-    keystates = SDL_GetKeyboardState(NULL);
+	key_states = SDL_GetKeyboardState(NULL);
 
     while(SDL_PollEvent(&e)) {
         if(e.type == SDL_QUIT) {
@@ -35,12 +34,12 @@ uint8_t lcd_step(void) {
         }
     }
 
-    if(keystates[SDL_SCANCODE_Q]) {
+    if(key_states[SDL_SCANCODE_Q]) {
         return 1;
     }
 
 
-    if(keystates[SDL_SCANCODE_A]) {
+    if(key_states[SDL_SCANCODE_A]) {
         printf("a");
     }
 

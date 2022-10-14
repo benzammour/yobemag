@@ -36,7 +36,7 @@ void set_AF(uint16_t x) {
 }
 
 uint16_t get_AF(void) {
-    return (c.A << 8) | c.F;
+    return (uint16_t) ((c.A << 8) | c.F);
 }
 
 void set_BC(uint16_t x) {
@@ -45,7 +45,7 @@ void set_BC(uint16_t x) {
 }
 
 uint16_t get_BC(void) {
-    return (c.B << 8) | c.C;
+    return (uint16_t) ((c.B << 8) | c.C);
 }
 
 void set_DE(uint16_t x) {
@@ -54,7 +54,7 @@ void set_DE(uint16_t x) {
 }
 
 uint16_t get_DE(void) {
-    return (c.D << 8) | c.E;
+    return (uint16_t) ((c.D << 8) | c.E);
 }
 
 void set_HL(uint16_t x) {
@@ -63,7 +63,7 @@ void set_HL(uint16_t x) {
 }
 
 uint16_t get_HL(void) {
-    return (c.H << 8) | c.L;
+    return (uint16_t) ((c.H << 8) | c.L);
 }
 
 /* ------------------ Flags */
@@ -73,7 +73,7 @@ uint8_t get_Z(void) {
 }
 
 void set_Z(uint8_t bit) { 
-    c.F = (c.F & 0x7F) | (bit << 7); // 0x7F sets 8th bit to 0
+    c.F = (uint8_t) ((c.F & 0x7F) | (bit << 7)); // 0x7F sets 8th bit to 0
 }
 
 uint8_t get_N(void) { 
@@ -81,7 +81,7 @@ uint8_t get_N(void) {
 }
 
 void set_N(uint8_t bit) { 
-    c.F = (c.F & 0xBF) | (bit << 6); // 0xBF sets 7th bit to 0
+    c.F = (uint8_t) ((c.F & 0xBF) | (bit << 6)); // 0xBF sets 7th bit to 0
 }
 
 uint8_t get_H(void) { 
@@ -89,7 +89,7 @@ uint8_t get_H(void) {
 }
 
 void set_H(uint8_t bit) { 
-    c.F = (c.F & 0xDF) | (bit << 5); // 0xDF sets 6th bit to 0
+    c.F = (uint8_t) ((c.F & 0xDF) | (bit << 5)); // 0xDF sets 6th bit to 0
 }
 
 uint8_t get_C(void) { 
@@ -97,7 +97,7 @@ uint8_t get_C(void) {
 }
 
 void set_C(uint8_t bit) { 
-    c.F = (c.F & 0xEF) | (bit << 4); // 0xEF sets 5th bit to 0
+    c.F = (uint8_t) ((c.F & 0xEF) | (bit << 4)); // 0xEF sets 5th bit to 0
 }
 
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
