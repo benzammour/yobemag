@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include <string.h>
 
-const char *cartridge_types[0xFF+1] = {
+static const char *cartridge_types[0xFF+1] = {
     [0x00] = "ROM ONLY",
     [0x01] = "MBC1",
     [0x02] = "MBC1+RAM",
@@ -39,7 +39,7 @@ const char *cartridge_types[0xFF+1] = {
     [0xFF] = "HuC1+RAM+BATTERY",
 };
 
-const char *rom_sizes[] = {
+static const char *rom_sizes[] = {
     [0x00] = "32KByte (no ROM banking)",
     [0x01] = "64KByte (4 banks)",
     [0x02] = "64KByte (4 banks)",
@@ -55,7 +55,7 @@ const char *rom_sizes[] = {
 };
 
 
-uint8_t *rom_bytes;
+static uint8_t *rom_bytes;
 
 uint8_t rom_setup(uint8_t *rom_data) {
     char title[17];

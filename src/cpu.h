@@ -18,6 +18,7 @@ typedef struct cpu {
     uint16_t SP;
     uint16_t PC;
     uint16_t cycle_count;
+    uint8_t opcode;
 } cpu;
 
 extern cpu c;
@@ -117,14 +118,6 @@ void OPC_LD_L_H(void);
 void OPC_LD_L_L(void);
 void OPC_LD_L_HL(void);
 void OPC_LD_L_A(void);
-void OPC_LD_HL_A(void);
-void OPC_LD_HL_B(void);
-void OPC_LD_HL_C(void);
-void OPC_LD_HL_D(void);
-void OPC_LD_HL_E(void);
-void OPC_LD_HL_H(void);
-void OPC_LD_HL_L(void);
-void OPC_HALT(void);
 void OPC_LD_A_B(void);
 void OPC_LD_A_C(void);
 void OPC_LD_A_D(void);

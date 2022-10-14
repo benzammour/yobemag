@@ -7,15 +7,16 @@ typedef void (*op_function)(void);
 // Function is used for instruction array initialization, not recognized by compiler
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
-static void ILLEGAL_OPCODE(void) {
-    fprintf(stderr, "Unallowed OP Code!\n");
+static void UNKNOWN_OPCODE(void) {
+    fprintf(stderr, "Unallowed/Unimplemented OP Code: 0x%x\n", c.opcode);
 }
 #pragma GCC diagnostic pop
 
-op_function instr_lookup[0xFF + 1] = { [0 ... 0xFF] = ILLEGAL_OPCODE };
-op_function cb_prefixed_lookup[0xFF + 1] = { [0 ... 0xFF] = ILLEGAL_OPCODE };
+static op_function instr_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
+static op_function cb_prefixed_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
 
 cpu c = {
+    0,
     0,
     0,
     0,
@@ -204,14 +205,6 @@ void optable_init(void) {
     instr_lookup[0x6D] = OPC_LD_L_L;
     instr_lookup[0x6E] = OPC_LD_L_HL;
     instr_lookup[0x6F] = OPC_LD_L_A;
-    instr_lookup[0x70] = OPC_LD_HL_B;
-    instr_lookup[0x71] = OPC_LD_HL_C;
-    instr_lookup[0x72] = OPC_LD_HL_D;
-    instr_lookup[0x73] = OPC_LD_HL_E;
-    instr_lookup[0x74] = OPC_LD_HL_H;
-    instr_lookup[0x75] = OPC_LD_HL_L;
-    instr_lookup[0x76] = OPC_HALT;
-    instr_lookup[0x77] = OPC_LD_HL_A;
     instr_lookup[0x78] = OPC_LD_A_B;
     instr_lookup[0x79] = OPC_LD_A_C;
     instr_lookup[0x7A] = OPC_LD_A_D;
@@ -230,7 +223,7 @@ void optable_init(void) {
     // TODO: 0xAF
     // TODO: 0xC3
 
-    cb_prefixed_lookup[0x0] = ILLEGAL_OPCODE;
+    cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
 }
 
 
@@ -268,16 +261,17 @@ uint16_t cpu_get_two_bytes(uint16_t addr) {
 }
 
 uint8_t cpu_step(void) {
-    uint8_t instruction = mmu_get_byte(c.PC);
+    c.opcode = mmu_get_byte(c.PC);
+
 
      printf("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X\n", 
-            c.PC, instruction,
+            c.PC, c.opcode,
             mmu_get_byte(c.PC + 1), mmu_get_byte(c.PC + 2), c.A, c.B, c.C, c.D, c.E);
 
     c.PC++;
     
-    // Get and Execute Instruction 
-    (*(instr_lookup[instruction]))();
+    // Get and Execute c.opcode 
+    (*(instr_lookup[c.opcode]))();
 
     return 0;
 }
@@ -564,38 +558,6 @@ void OPC_LD_L_HL(void) {
 
 void OPC_LD_L_A(void) { 
     LD_REG_REG(&c.L, c.A);
-}
-
-void OPC_LD_HL_B(void) { 
-
-}
-
-void OPC_LD_HL_C(void) { 
-
-}
-
-void OPC_LD_HL_D(void) { 
-
-}
-
-void OPC_LD_HL_E(void) { 
-
-}
-
-void OPC_LD_HL_H(void) {
-
-}
-
-void OPC_LD_HL_L(void) {
-
-}
-
-void OPC_HALT(void) {
-
-}
-
-void OPC_LD_HL_A(void) {
-
 }
 
 void OPC_LD_A_B(void) { 
