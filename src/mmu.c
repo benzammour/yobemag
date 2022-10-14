@@ -25,36 +25,36 @@ static const uint8_t bootrom[256] = {
 uint8_t mem_init(void) {
     uint8_t *rom_bytes = get_rom_bytes();
 
-	mem = calloc(1, 0x10000);
+    mem = calloc(1, 0x10000);
 
-	memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
-	memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
+    memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
+    memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
 
-	return 0;
+    return 0;
 }
 
 uint8_t mmu_get_byte(uint16_t addr) {
-	if (addr < 0x100) {
-		return bootrom[addr];
+    if (addr < 0x100) {
+        return bootrom[addr];
     }
 
-	return mem[addr];
+    return mem[addr];
 }
 
 void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr) {
-	if (dest_addr < 0x8000) {
-		return;
+    if (dest_addr < 0x8000) {
+        return;
     }
 
     // TODO: implement further writing
-	source_addr = source_addr; // useless operation to escape -Werror flag
+    source_addr = source_addr; // useless operation to escape -Werror flag
 }
 
 uint16_t mmu_get_two_bytes(uint16_t addr) {
-	return mmu_get_byte(addr) | (mmu_get_byte(addr + 1) << 8);;
+    return mmu_get_byte(addr) | (mmu_get_byte(addr + 1) << 8);;
 }
 
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {
-	mmu_write_byte(dest_addr, ((uint8_t) value));
+    mmu_write_byte(dest_addr, ((uint8_t) value));
     mmu_write_byte(dest_addr + 1, (uint8_t) (value >> 8));
 }
