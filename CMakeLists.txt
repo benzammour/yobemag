@@ -44,6 +44,9 @@ add_compile_options(-O${OPTIMIZE})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     add_compile_options(
         -Weverything
+        -Wno-declaration-after-statement
+        -Wno-padded
+        -Wno-gnu-designator
         -ferror-limit=0)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
     add_compile_options(

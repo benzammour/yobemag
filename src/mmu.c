@@ -1,7 +1,7 @@
 #include "mmu.h"
 #include "rom.h"
 
-uint8_t *mem;
+static uint8_t *mem;
 
 static const uint8_t bootrom[256] = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
@@ -47,11 +47,11 @@ void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr) {
     }
 
     // TODO: implement further writing
-    source_addr = source_addr; // useless operation to escape -Werror flag
+	(void) source_addr;
 }
 
 uint16_t mmu_get_two_bytes(uint16_t addr) {
-    return mmu_get_byte(addr) | (mmu_get_byte(addr + 1) << 8);;
+    return (uint16_t) (mmu_get_byte(addr) | (mmu_get_byte(addr + 1) << 8));
 }
 
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {

@@ -1,55 +1,64 @@
-#ifndef CPU_H
-#define CPU_H
+#ifndef YOBEMAG_CPU_H
+#define YOBEMAG_CPU_H
+
 #include <stdint.h>
 
-typedef struct cpu {
-    uint8_t H;
-    uint8_t L;
+typedef enum flag {
+	/*
+	 * Carry flag
+	 */
+	C_FLAG = 4,
+	/*
+	 * Half carry flag
+	 */
+	H_FLAG = 5,
+	/*
+	 * Subtract flag
+	 */
+	N_FLAG = 6,
+	/*
+	 * Zero flag
+	 */
+	Z_FLAG = 7,
+} Flag;
 
-    uint8_t D;
-    uint8_t E;
+typedef union Register {
+	struct {
+		uint8_t high; // A, D, D, H
+		uint8_t low; // F, C, E, L
+	} bytes;
+	uint16_t word;
+} Register;
 
-    uint8_t B;
-    uint8_t C;
-
-    uint8_t A;
-    uint8_t F;
+typedef struct CPU {
+	Register HL;
+	Register DE;
+	Register BC;
+	Register AF;
 
     uint16_t SP;
     uint16_t PC;
-    uint16_t cycle_count;
-    uint8_t opcode;
-} cpu;
 
-extern cpu c;
+    uint16_t cycle_count;
+
+    uint8_t opcode;
+} CPU;
+
+extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
 uint8_t cpu_step(void);
 
-__attribute__((pure)) uint16_t get_AF(void);
-__attribute__((pure)) uint16_t get_BC(void);
-__attribute__((pure)) uint16_t get_DE(void);
-__attribute__((pure)) uint16_t get_HL(void);
-__attribute__((pure)) uint8_t get_Z(void);
-__attribute__((pure)) uint8_t get_N(void);
-__attribute__((pure)) uint8_t get_H(void);
-__attribute__((pure)) uint8_t get_C(void);
+
 __attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
-void set_Z(uint8_t bit);
-void set_N(uint8_t bit);
-void set_H(uint8_t bit);
-void set_C(uint8_t bit);
+
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
 void LD_8(uint8_t *addr);
 void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);
 void REG_INC(uint8_t *reg);
-void set_AF(uint16_t x);
-void set_BC(uint16_t x);
-void set_DE(uint16_t x);
-void set_HL(uint16_t x);
 
 void optable_init(void);
 
@@ -129,4 +138,4 @@ void OPC_LD_A_A(void);
 
 uint16_t cpu_get_two_bytes(uint16_t addr);
 
-#endif
+#endif //YOBEMAG_CPU_H
