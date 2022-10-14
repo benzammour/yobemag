@@ -30,7 +30,7 @@ typedef union Register {
 	uint16_t word;
 } Register;
 
-typedef struct cpu {
+typedef struct CPU {
 	Register HL;
 	Register DE;
 	Register BC;
@@ -42,9 +42,9 @@ typedef struct cpu {
     uint16_t cycle_count;
 
     uint8_t opcode;
-} Cpu;
+} CPU;
 
-extern Cpu cpu;
+extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);

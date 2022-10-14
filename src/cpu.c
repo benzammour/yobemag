@@ -16,7 +16,7 @@ static void UNKNOWN_OPCODE(void) {
 static op_function instr_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
 static op_function cb_prefixed_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
 
-Cpu cpu = {
+CPU cpu = {
     .HL.word = 0,
     .DE.word = 0,
     .BC.word = 0,
@@ -216,6 +216,7 @@ uint8_t cpu_step(void) {
 			cpu.PC, cpu.opcode,
 			mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), cpu.AF.bytes.high, cpu.BC.bytes.high, cpu.BC.bytes.low, cpu.DE.bytes.high, cpu.DE.bytes.low);
 
+	// TODO: This should probably go behind instruction execution
     cpu.PC++;
     
     // Get and Execute c.opcode 
@@ -243,7 +244,7 @@ void OPC_LD_BC_A(void) {
 }
 
 void OPC_INC_BC(void) {
-    cpu.BC.word = cpu.BC.word+1;
+    ++cpu.BC.word;
 	cpu.cycle_count += 2;
 }
 
