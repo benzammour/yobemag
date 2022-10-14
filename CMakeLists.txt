@@ -17,7 +17,7 @@ add_executable(${PRODUCT_NAME} ${SRC_FILES})
 add_subdirectory(test)
 
 message("[${MSG_PREFIX}] Using ${CMAKE_GENERATOR}")
-message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER}")
+message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER} version ${CMAKE_C_COMPILER_VERSION}")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
     message("[${MSG_PREFIX}] Using -g")
