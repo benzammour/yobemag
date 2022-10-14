@@ -3,20 +3,18 @@ project(YOBEMAG C)
 
 set(PRODUCT_NAME yobemag)
 string(TOUPPER ${PRODUCT_NAME} MSG_PREFIX)
-set(CMAKE_C_STANDARD 17)
-
 message("[${MSG_PREFIX}] Using ${CMAKE_GENERATOR}")
+
+set(CMAKE_C_STANDARD_REQUIRED ON)
+message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER}")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
     message("[${MSG_PREFIX}] Using -g")
     add_compile_options(-g)
-endif()
+endif ()
 
 add_compile_options(
-        -std=c17
-
-        ### WARNINGS
-        # Standard GCC warnings: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+        # Standard GCC/Clang warnings
         -Wall
         -Wextra
         -Werror
@@ -24,7 +22,6 @@ add_compile_options(
         -Wshadow
         -Wcast-align
         -Wconversion
-        -Wlogical-op
         -Wdouble-promotion
         -fstack-protector -Wstack-protector
         -Wredundant-decls
@@ -32,15 +29,10 @@ add_compile_options(
         -Wmissing-declarations
         -Wmissing-prototypes
         -Wstrict-prototypes
-        -Wno-aggressive-loop-optimizations
-        -Wjump-misses-init
         -Wwrite-strings
         -Wcast-qual
         -Wundef
-        -funsafe-loop-optimizations -Wunsafe-loop-optimizations
         -Wfloat-equal
-        -Wtrampolines
-        -Warray-bounds=2
         -Wstrict-overflow=4
         -Wswitch-enum
         -Wswitch-default
@@ -52,22 +44,20 @@ message("[${MSG_PREFIX}] Using -O${OPTIMIZE}")
 add_compile_options(-O${OPTIMIZE})
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    message("[${MSG_PREFIX}] Using clang")
     add_compile_options(
             -Weverything
-            -Wno-unknown-warning-option
-            -Wno-format-nonliteral
             -ferror-limit=0
     )
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    message("[${MSG_PREFIX}] Using gcc")
     add_compile_options(
             ### WARNINGS
             # Standard GCC warnings: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
-            -Werror
             -Wlogical-op
+            -Warray-bounds=2
             -Wjump-misses-init
             -Wunsafe-loop-optimizations
+            -Wno-aggressive-loop-optimizations
+            -Wjump-misses-init
             -Wtrampolines
             -Wsuggest-attribute=cold
             -Wsuggest-attribute=malloc
@@ -75,14 +65,21 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GN
             -Wsuggest-attribute=const
             -Wsuggest-attribute=noreturn
             -Wsuggest-attribute=format
-            -Wformat=1
             -fmax-errors=0
     )
-endif()
+endif ()
 
 include_directories(src)
-file(GLOB_RECURSE SRC_FILES "src/*.c")
+set(SRC_FILES
+        src/cpu.c
+        src/main.c
+        src/mmu.c
+        src/lcd.c
+        src/rom.c
+        )
 
 add_executable(${PRODUCT_NAME} ${SRC_FILES})
+
+set_property(TARGET ${PRODUCT_NAME} PROPERTY C_STANDARD 17)
 
 target_link_libraries(${PRODUCT_NAME} PUBLIC -lm -lSDL2 -pthread)
