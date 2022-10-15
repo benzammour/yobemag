@@ -73,7 +73,9 @@ set(SRC_FILES
     src/main.c
     src/mmu.c
     src/lcd.c
-    src/rom.c)
+    src/rom.c
+    src/logging.c
+    src/cli.c)
 
 add_executable(${PRODUCT_NAME} ${SRC_FILES})
 
