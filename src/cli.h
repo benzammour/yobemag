@@ -1,5 +1,5 @@
-#ifndef _CRETRO_SRC_CLI_H_
-#define _CRETRO_SRC_CLI_H_
+#ifndef YOBEMAG_CLI_H
+#define YOBEMAG_CLI_H
 
 #include <stdint.h>
 
