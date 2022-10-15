@@ -3,6 +3,10 @@
 #include "rom.h"
 #include "cpu.h"
 
+#define LO_NIBBLE_MASK (0x0F)
+//#define HI_NIBBLE_MASK (0xF0)
+#define BYTE_MASK (0xFF)
+
 typedef void (*op_function)(void);
 
 // Function is used for instruction array initialization, not recognized by compiler
@@ -161,6 +165,18 @@ void optable_init(void) {
     instr_lookup[0x7D] = OPC_LD_A_L;
     instr_lookup[0x7E] = OPC_LD_A_HL;
     instr_lookup[0x7F] = OPC_LD_A_A;
+
+	// 8-bit ALU: ADD A,n
+	instr_lookup[0x80] = OPC_ADD_A_B;
+	instr_lookup[0x81] = OPC_ADD_A_C;
+	instr_lookup[0x82] = OPC_ADD_A_D;
+	instr_lookup[0x83] = OPC_ADD_A_E;
+	instr_lookup[0x84] = OPC_ADD_A_H;
+	instr_lookup[0x85] = OPC_ADD_A_L;
+	instr_lookup[0x86] = OPC_ADD_A_HL;
+	instr_lookup[0x87] = OPC_ADD_A_A;
+	instr_lookup[0xC6] = OPC_ADD_A_d8;
+
     // TODO: 0xA8
     // TODO: 0xA9
     // TODO: 0xAA
@@ -216,11 +232,10 @@ uint8_t cpu_step(void) {
 			cpu.PC, cpu.opcode,
 			mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), cpu.AF.bytes.high, cpu.BC.bytes.high, cpu.BC.bytes.low, cpu.DE.bytes.high, cpu.DE.bytes.low);
 
-	// TODO: This should probably go behind instruction execution
-    cpu.PC++;
-    
-    // Get and Execute c.opcode 
+    // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
+
+	cpu.PC++;
 
     return 0;
 }
@@ -541,4 +556,68 @@ void OPC_LD_A_HL(void) {
 void OPC_LD_A_A(void) { 
     LD_REG_REG(&cpu.AF.bytes.high, cpu.AF.bytes.high);
     cpu.cycle_count++;
+}
+
+/******************************************************
+ *** 8-BIT ALU                                      ***
+ ******************************************************/
+
+static void ADD_A_n(uint8_t n) {
+	uint8_t A = cpu.AF.bytes.high;
+	uint8_t A_nibble = A & LO_NIBBLE_MASK;
+	uint8_t n_nibble = n & LO_NIBBLE_MASK;
+	uint_fast16_t result = A + n;
+
+	clear_flag_register();
+	set_flag(result > BYTE_MASK, C_FLAG);
+	set_flag(A_nibble + n_nibble > LO_NIBBLE_MASK, H_FLAG);
+	set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
+
+	cpu.AF.bytes.high = (uint8_t) result;
+}
+
+void OPC_ADD_A_A(void) {
+	ADD_A_n(cpu.AF.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_B(void) {
+	ADD_A_n(cpu.BC.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_C(void) {
+	ADD_A_n(cpu.BC.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_D(void) {
+	ADD_A_n(cpu.DE.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_E(void) {
+	ADD_A_n(cpu.DE.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_H(void) {
+	ADD_A_n(cpu.HL.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_L(void) {
+	ADD_A_n(cpu.HL.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_ADD_A_HL(void) {
+	ADD_A_n(mmu_get_byte(cpu.HL.word));
+	cpu.cycle_count += 8;
+}
+
+void OPC_ADD_A_d8(void) {
+	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+	ADD_A_n(immediate);
+	cpu.cycle_count += 8;
 }

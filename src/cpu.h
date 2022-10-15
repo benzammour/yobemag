@@ -138,4 +138,37 @@ void OPC_LD_A_A(void);
 
 uint16_t cpu_get_two_bytes(uint16_t addr);
 
+/******************************************************
+ *** 8-BIT ALU                                      ***
+ ******************************************************/
+
+void OPC_ADD_A_A(void);
+
+void OPC_ADD_A_B(void);
+
+void OPC_ADD_A_C(void);
+
+void OPC_ADD_A_D(void);
+
+void OPC_ADD_A_E(void);
+
+void OPC_ADD_A_H(void);
+
+void OPC_ADD_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 		  then adds the fetched byte to A.
+ */
+void OPC_ADD_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 		  then adds the fetched byte to A.
+ *
+ * @warning PC cannot be incremented before this operation is completed
+ * 			since it reads the data from the opcode itself.
+ */
+void OPC_ADD_A_d8(void);
+
 #endif //YOBEMAG_CPU_H
