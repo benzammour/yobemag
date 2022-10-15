@@ -5,7 +5,7 @@
 
 #include "cli.h"
 
-typedef enum log_level {
+typedef enum LoggingLevel {
     DEBUG,
     INFO,
     WARNING,
