@@ -165,6 +165,18 @@ void optable_init(void) {
     instr_lookup[0x7D] = OPC_LD_A_L;
     instr_lookup[0x7E] = OPC_LD_A_HL;
     instr_lookup[0x7F] = OPC_LD_A_A;
+
+	// 8-bit ALU: ADD A,n
+	instr_lookup[0x80] = OPC_ADD_A_B;
+	instr_lookup[0x81] = OPC_ADD_A_C;
+	instr_lookup[0x82] = OPC_ADD_A_D;
+	instr_lookup[0x83] = OPC_ADD_A_E;
+	instr_lookup[0x84] = OPC_ADD_A_H;
+	instr_lookup[0x85] = OPC_ADD_A_L;
+	instr_lookup[0x86] = OPC_ADD_A_HL;
+	instr_lookup[0x87] = OPC_ADD_A_A;
+	instr_lookup[0xC6] = OPC_ADD_A_d8;
+
     // TODO: 0xA8
     // TODO: 0xA9
     // TODO: 0xAA
