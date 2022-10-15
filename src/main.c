@@ -7,7 +7,7 @@
 #include "cli.h"
 #include "logging.h"
 
-int main(int argc, char** argv) {
+int main(const int argc, char **const argv) {
     CLIArguments* args = cli_config_default();
     
     if (cli_config_handle(args, argc, argv)) {
@@ -53,9 +53,10 @@ int main(int argc, char** argv) {
 
         x++;
     }
-
     LOG_INFO("Total number of interations: %d", x);
+
     SDL_Quit();
+    cli_config_destroy(args);
 
     return 0;
 }

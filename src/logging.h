@@ -13,9 +13,9 @@ typedef enum LoggingLevel {
     FATAL
 } LoggingLevel;
 
-void log_str(LoggingLevel dbg_lvl, const char* dbg_lvl_str, FILE* stream, const char* msg, ...);
+void log_str(const LoggingLevel dbg_lvl, const char* const dbg_lvl_str, FILE *const stream, const char* const msg, ...);
 
-void log_set_lvl(const CLIArguments* conf);
+void log_set_lvl(CLIArguments *const conf);
 
 #define LOG_DEBUG(msg, ...)     log_str(DEBUG, "DEBUG", stdout, msg, ##__VA_ARGS__)
 #define LOG_INFO(msg, ...)      log_str(INFO, "INFO", stdout, msg, ##__VA_ARGS__)

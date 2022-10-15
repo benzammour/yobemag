@@ -1,6 +1,3 @@
-#include "cli.h"
-#include "logging.h"
-
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,6 +5,9 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <errno.h>
+
+#include "cli.h"
+#include "logging.h"
 
 /******************************************************
  *** LOCAL DEFINES                                  ***
@@ -25,7 +25,7 @@ static const char* usage_str = "yobemag [-d <0..4>] <ROM>";
  *** LOCAL METHODS                                  ***
  ******************************************************/
 
-static int safe_strtol(const char* str_to_conv, int* store_into) {
+static int safe_strtol(const char* const str_to_conv, int* const store_into) {
     char* end;
     const long strtol_in = strtol(str_to_conv, &end, 10);
 
@@ -56,18 +56,18 @@ static int safe_strtol(const char* str_to_conv, int* store_into) {
 CLIArguments* cli_config_default(void) {
     CLIArguments* conf = malloc(sizeof(CLIArguments));
 
-    conf->debug = FATAL;
+    conf->logging_level = (int) FATAL;
     conf->us_delay = 0;
     conf->rom_path = "";
 
     return conf;
 }
 
-void cli_config_destroy(CLIArguments *conf) {
+void cli_config_destroy(CLIArguments *const conf) {
     free(conf);
 }
 
-int cli_config_handle(CLIArguments* const conf, int argc, char **argv) {
+int cli_config_handle(CLIArguments* const conf, int const argc, char **const argv) {
     int c;
 
     if (argc < 2) {
@@ -84,7 +84,7 @@ int cli_config_handle(CLIArguments* const conf, int argc, char **argv) {
                 if (safe_strtol(optarg, &strtol_in))
                     return EXIT_FAILURE;
 
-                conf->debug = strtol_in;
+                conf->logging_level = strtol_in;
                 log_set_lvl(conf);
                 break;
             default:

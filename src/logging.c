@@ -22,8 +22,8 @@ static LoggingLevel min_dbg_lvl = FATAL;
  *** EXPOSED METHODS                                ***
  ******************************************************/
 
-void log_set_lvl(const CLIArguments* conf) {
-    min_dbg_lvl = (LoggingLevel) conf->debug;
+void log_set_lvl(CLIArguments *const conf) {
+    min_dbg_lvl = (LoggingLevel) conf->logging_level;
 
     // minimum debug level cannot be higher than fatal
     if (min_dbg_lvl > FATAL)
@@ -36,7 +36,8 @@ void log_set_lvl(const CLIArguments* conf) {
     LOG_INFO("Log level initialized to %d.", min_dbg_lvl);
 }
 
-__attribute__((format(printf, 4, 5))) void log_str(LoggingLevel dbg_lvl, const char* dbg_lvl_str, FILE* stream, const char *msg, ...) {
+__attribute__((format(printf, 4, 5)))
+void log_str(LoggingLevel const dbg_lvl, const char *const dbg_lvl_str, FILE *const stream, const char *const msg, ...) {
     if (dbg_lvl < min_dbg_lvl) return;
 
     va_list args;
