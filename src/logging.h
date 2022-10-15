@@ -23,4 +23,4 @@ void log_set_lvl(const CLIArguments* conf);
 #define LOG_ERROR(msg, ...)     log_str(ERROR, "ERROR", stderr, msg, ##__VA_ARGS__)
 #define LOG_FATAL(msg, ...)     log_str(FATAL, "FATAL", stderr, msg, ##__VA_ARGS__)
 
-#endif /* _CH8_SRC_DEBUG_H_ */
+#endif //YOBEMAG_LOGGING_H
