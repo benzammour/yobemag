@@ -40,7 +40,7 @@ uint8_t lcd_step(void) {
 
 
     if(key_states[SDL_SCANCODE_A]) {
-        printf("a");
+        LOG_DEBUG("a");
     }
 
     return 0;

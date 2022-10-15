@@ -63,13 +63,13 @@ uint8_t rom_setup(uint8_t *rom_data) {
     memcpy(title, &rom_data[0x134], 16);
     title[16] = '\0';
     
-    printf("Rom title: %s\n", title);
+    LOG_INFO("Rom title: %s", title);
 
     uint8_t type = rom_data[0x147];
-    printf("Cartridge type: %s (%02x)\n", cartridge_types[type], type);
+    LOG_INFO("Cartridge type: %s (%02x)", cartridge_types[type], type);
 
     uint8_t romsize_index = rom_data[0x148];
-    printf("Cartridge rom size: %s (%02x)\n", rom_sizes[romsize_index], romsize_index);
+    LOG_INFO("Cartridge rom size: %s (%02x)", rom_sizes[romsize_index], romsize_index);
 
     rom_bytes = rom_data;
 
