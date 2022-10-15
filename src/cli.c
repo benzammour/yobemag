@@ -19,7 +19,7 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
-static const char* usage_str = "yobemag [-d <0..4>] <ROM>";
+static const char* usage_str = "yobemag [-l <0..4>] <ROM>";
 
 /******************************************************
  *** LOCAL METHODS                                  ***
@@ -78,9 +78,9 @@ int cli_config_handle(CLIArguments* const conf, int const argc, char **const arg
 
     // parse all options first
     int strtol_in;
-    while ((c = getopt(argc, argv, "d:")) != -1) {
+    while ((c = getopt(argc, argv, "l:")) != -1) {
         switch (c) {
-            case 'd':
+            case 'l':
                 if (safe_strtol(optarg, &strtol_in))
                     return EXIT_FAILURE;
 
