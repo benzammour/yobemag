@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-typedef struct arg_conf {
+typedef struct CLIArguments {
     int debug;
     int us_delay;
     const char* rom_path;
