@@ -48,7 +48,7 @@ extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
-uint8_t cpu_step(void);
+ErrorCode cpu_step(void);
 
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);

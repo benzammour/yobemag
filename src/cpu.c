@@ -224,7 +224,7 @@ uint16_t cpu_get_two_bytes(uint16_t addr) {
     return value;
 }
 
-uint8_t cpu_step(void) {
+ErrorCode cpu_step(void) {
 	cpu.opcode = mmu_get_byte(cpu.PC);
 
 
@@ -237,7 +237,7 @@ uint8_t cpu_step(void) {
 
 	cpu.PC++;
 
-    return 0;
+    return ERR_SUCCESS;
 }
 
 // OP-Codes

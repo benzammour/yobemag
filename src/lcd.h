@@ -4,8 +4,9 @@
 #include <stdint.h>
 #include <SDL2/SDL.h>
 
+#include "errcodes.h"
 
-uint8_t lcd_load(void);
-uint8_t lcd_step(void);
+ErrorCode lcd_load(void);
+ErrorCode lcd_step(void);
 
 #endif //YOBEMAG_LCD_H

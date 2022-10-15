@@ -1,30 +1,32 @@
 #include <stdio.h>
 #include <stdint.h>
+
 #include "lcd.h"
 #include "cpu.h"
 #include "rom.h"
 #include "mmu.h"
+#include "errcodes.h"
 
 int main(void) {
-    uint8_t ret = rom_load("./roms/hello-world.gb");
+    ErrorCode ret = rom_load("./roms/hello-world.gb");
     if (ret) {
         fprintf(stderr, "Failed to load ROM\n");
-        exit(-1);
+        exit((int)ret);
     }
     printf("Successfully initialized ROM\n");
 
     ret = mem_init();
     if (ret) {
         fprintf(stderr, "Failed to initialize MMU\n");
-        exit(-2);
+        exit((int)ret);
     }
     printf("Successfully initialized MMU\n");
-    
+
 
     ret = lcd_load();
     if (ret) {
         fprintf(stderr, "Failed to initialize LCD\n");
-        exit(-3);
+        exit((int)ret);
     }
     printf("Successfully initialized LCD\n");
 
