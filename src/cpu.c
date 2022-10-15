@@ -196,6 +196,17 @@ static void optable_init(void) {
     instr_lookup[0x9F] = OPC_SBC_A_A;
     instr_lookup[0xDE] = OPC_SBC_A_d8;
 
+	// 8-bit ALU: ADC A,n
+	instr_lookup[0x88] = OPC_ADC_A_B;
+	instr_lookup[0x89] = OPC_ADC_A_C;
+	instr_lookup[0x8A] = OPC_ADC_A_D;
+	instr_lookup[0x8B] = OPC_ADC_A_E;
+	instr_lookup[0x8C] = OPC_ADC_A_H;
+	instr_lookup[0x8D] = OPC_ADC_A_L;
+	instr_lookup[0x8E] = OPC_ADC_A_HL;
+	instr_lookup[0x8F] = OPC_ADC_A_A;
+	instr_lookup[0xCE] = OPC_ADC_A_d8;
+
     // TODO: 0xA8
     // TODO: 0xA9
     // TODO: 0xAA
@@ -254,6 +265,9 @@ void cpu_step(void) {
 
     // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
+
+	// We cannot know (here) the exact number of increments that the PC and cycle count need,
+	// hence the instructions themselves do it
 }
 
 // OP-Codes
@@ -595,47 +609,140 @@ static void ADD_A_n(uint8_t n) {
 void OPC_ADD_A_A(void) {
     ADD_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_B(void) {
     ADD_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_C(void) {
     ADD_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_D(void) {
     ADD_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_E(void) {
     ADD_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_H(void) {
     ADD_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_L(void) {
     ADD_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_HL(void) {
     ADD_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
+	cpu.PC += 1;
 }
 
 void OPC_ADD_A_d8(void) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     ADD_A_n(immediate);
     cpu.cycle_count += 8;
+	cpu.PC += 2;
+}
+
+// GCC complains about the rhs of "uint_fast16_t result = A + n + c_flag" being a _signed_ int
+// Likely a false positive of the warning
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+static void ADC_A_n(uint8_t n) {
+	uint8_t A = cpu.AF.bytes.high;
+	uint8_t A_nibble = A & LO_NIBBLE_MASK;
+	uint8_t n_nibble = n & LO_NIBBLE_MASK;
+	uint8_t c_flag = get_flag(C_FLAG);
+	uint_fast16_t result = A + n + c_flag;
+
+	clear_flag_register();
+	set_flag(result > BYTE_MASK, C_FLAG);
+	set_flag(A_nibble + n_nibble + c_flag > LO_NIBBLE_MASK, H_FLAG);
+	set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
+
+	cpu.AF.bytes.high = (uint8_t) result;
+}
+#pragma GCC diagnostic pop
+
+void OPC_ADC_A_A(void) {
+	ADC_A_n(cpu.AF.bytes.high);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_B(void) {
+	ADC_A_n(cpu.BC.bytes.high);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_C(void) {
+	ADC_A_n(cpu.BC.bytes.low);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_D(void) {
+	ADC_A_n(cpu.DE.bytes.high);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_E(void) {
+	ADC_A_n(cpu.DE.bytes.low);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_H(void) {
+	ADC_A_n(cpu.HL.bytes.high);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_L(void) {
+	ADC_A_n(cpu.HL.bytes.low);
+
+	cpu.cycle_count += 4;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_HL(void) {
+	ADC_A_n(mmu_get_byte(cpu.HL.word));
+
+	cpu.cycle_count += 8;
+	cpu.PC += 1;
+}
+
+void OPC_ADC_A_d8(void) {
+	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+	ADC_A_n(immediate);
+
+	cpu.cycle_count += 8;
+	cpu.PC += 2;
 }
 
 static void SUB_A_n(uint8_t n) {
