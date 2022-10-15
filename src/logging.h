@@ -1,5 +1,5 @@
-#ifndef _CH8_SRC_DEBUG_H_
-#define _CH8_SRC_DEBUG_H_
+#ifndef YOBEMAG_LOGGING_H
+#define YOBEMAG_LOGGING_H
 
 #include <stdio.h>
 
