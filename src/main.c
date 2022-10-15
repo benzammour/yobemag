@@ -34,20 +34,18 @@ int main(void) {
     cpu_init();
     printf("Successfully initialized CPU\n");
 
-    uint8_t x = 0;
-    while(1) {
-        if (cpu_step()) {
+    uint8_t iterations = 0;
+    while (1) {
+        if (cpu_step())
             break;
-        }
 
-        if (lcd_step()) {
+        if (lcd_step())
             break;
-        }
 
-        x++;
+        iterations++;
     }
 
-    printf("%d\n", x);
+    printf("%d\n", iterations);
     SDL_Quit();
 
     return 0;
