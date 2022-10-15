@@ -1,5 +1,7 @@
 #include <stdio.h>
+
 #include "lcd.h"
+#include "logging.h"
 
 
 static SDL_Window *window;

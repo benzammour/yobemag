@@ -1,9 +1,11 @@
 #include <stdio.h>
-#include "rom.h"
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <string.h>
+
+#include "rom.h"
+#include "logging.h"
 
 static const char *cartridge_types[0xFF+1] = {
     [0x00] = "ROM ONLY",
