@@ -66,6 +66,10 @@ cmake-build-release/
 # IntelliJ
 .idea/
 
+
+# Sphinx docs
+docs/_build
+
 # NeoVIM
 compile_commands.json
 .cache/
