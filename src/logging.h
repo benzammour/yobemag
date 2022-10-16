@@ -29,6 +29,11 @@ void log_str(const LoggingLevel log_lvl, const char* const log_lvl_str, FILE *co
  */
 void log_set_lvl(LoggingLevel log_lvl);
 
+/*
+ * This is necessary, since __VA_ARGS__ is a C GNU extension.
+ * clang will not compile with -Werror, if this warning is not ignored here.
+ * Ignoring is fine, since clang can handle this GNU extension.
+ */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
 
