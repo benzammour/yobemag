@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include "lcd.h"
 
+#include "lcd.h"
 
 static SDL_Window *window;
 static SDL_Surface *surface;
 
-
-uint8_t lcd_load(void) {
+ErrorCode lcd_load(void) {
     SDL_Init(SDL_INIT_EVERYTHING);
 
     window = SDL_CreateWindow(
@@ -19,10 +18,10 @@ uint8_t lcd_load(void) {
 
     surface = SDL_GetWindowSurface(window);
 
-    return 0;
+    return ERR_SUCCESS;
 }
 
-uint8_t lcd_step(void) {
+ErrorCode lcd_step(void) {
     SDL_Event e;
     const uint8_t *key_states;
 
@@ -30,12 +29,12 @@ uint8_t lcd_step(void) {
 
     while(SDL_PollEvent(&e)) {
         if(e.type == SDL_QUIT) {
-            return 0;
+            return ERR_SUCCESS;
         }
     }
 
     if(key_states[SDL_SCANCODE_Q]) {
-        return 1;
+        return ERR_FAILURE;
     }
 
 
@@ -43,5 +42,5 @@ uint8_t lcd_step(void) {
         printf("a");
     }
 
-    return 0;
+    return ERR_SUCCESS;
 }
