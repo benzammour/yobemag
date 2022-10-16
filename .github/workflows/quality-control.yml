@@ -1,4 +1,4 @@
-name: build # should probably be renamed
+name: Quality Control # should probably be renamed
 on:
   push:
     branches:
