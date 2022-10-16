@@ -14,27 +14,27 @@ int main(const int argc, char **const argv) {
     
     if (cli_config_handle(args, argc, argv)) {
         cli_config_destroy(args);
-        exit((int)ERR_FAILURE);
+        exit(ERR_FAILURE);
     }
 
     ErrorCode ret = rom_load("./roms/hello-world.gb");
     if (ret) {
         LOG_FATAL("Failed to load ROM");
-        exit((int)ret);
+        exit(ret);
     }
     printf("Successfully initialized ROM\n");
 
     ret = mem_init();
     if (ret) {
         fprintf(stderr, "Failed to initialize MMU\n");
-        exit((int)ret);
+        exit(ret);
     }
     LOG_INFO("Successfully initialized MMU");
 
     ret = lcd_load();
     if (ret) {
         LOG_FATAL("Failed to initialize LCD");
-        exit((int)ret);
+        exit(ret);
     }
     LOG_INFO("Successfully initialized LCD");
 
