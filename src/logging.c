@@ -5,8 +5,8 @@
 
 static LoggingLevel min_log_lvl = FATAL;
 
-void log_set_lvl(CLIArguments *const conf) {
-    min_log_lvl = (LoggingLevel) conf->logging_level;
+void log_set_lvl(LoggingLevel log_lvl) {
+    min_log_lvl = log_lvl;
 
     // minimum debug level cannot be higher than fatal
     if (min_log_lvl > FATAL)

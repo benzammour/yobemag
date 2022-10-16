@@ -3,8 +3,10 @@
 
 #include <stdint.h>
 
+#include "logging.h"
+
 typedef struct CLIArguments {
-    int logging_level;
+    LoggingLevel logging_level;
     int us_delay;
     const char* rom_path;
 } CLIArguments;

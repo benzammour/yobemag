@@ -66,8 +66,8 @@ int cli_config_handle(CLIArguments* const conf, int const argc, char **const arg
                 if (safe_strtol(optarg, &strtol_in))
                     return EXIT_FAILURE;
 
-                conf->logging_level = strtol_in;
-                log_set_lvl(conf);
+                conf->logging_level = (LoggingLevel) strtol_in;
+                log_set_lvl(conf->logging_level);
                 break;
             default:
                 fprintf(stderr, "%s\n", usage_str);

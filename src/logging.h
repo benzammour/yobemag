@@ -3,8 +3,6 @@
 
 #include <stdio.h>
 
-#include "cli.h"
-
 typedef enum LoggingLevel {
     DEBUG,
     INFO,
@@ -15,7 +13,7 @@ typedef enum LoggingLevel {
 
 void log_str(const LoggingLevel dbg_lvl, const char* const dbg_lvl_str, FILE *const stream, const char* const msg, ...);
 
-void log_set_lvl(CLIArguments *const conf);
+void log_set_lvl(LoggingLevel log_lvl);
 
 #define LOG_DEBUG(msg, ...)     log_str(DEBUG, "DEBUG", stdout, msg, ##__VA_ARGS__)
 #define LOG_INFO(msg, ...)      log_str(INFO, "INFO", stdout, msg, ##__VA_ARGS__)
