@@ -3,7 +3,15 @@
 
 #include "logging.h"
 
+/******************************************************
+ *** LOCAL VARIABLES                                ***
+ ******************************************************/
+
 static LoggingLevel min_log_lvl = FATAL;
+
+/******************************************************
+ *** EXPOSED METHODS                                ***
+ ******************************************************/
 
 void log_set_lvl(LoggingLevel log_lvl) {
     min_log_lvl = log_lvl;
