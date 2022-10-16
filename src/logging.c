@@ -28,20 +28,22 @@ void log_set_lvl(LoggingLevel log_lvl) {
 }
 
 __attribute__((format(printf, 4, 5)))
-void log_str(LoggingLevel const dbg_lvl, const char *const dbg_lvl_str, FILE *const stream, const char *const msg, ...) {
-    if (dbg_lvl < min_log_lvl) return;
+void log_str(LoggingLevel const log_lvl, const char *const log_lvl_str, FILE *const stream, const char *const msg, ...) {
+    if (log_lvl < min_log_lvl) return;
 
     va_list args;
-    time_t rawtime;
-    struct tm * timeinfo;
+    time_t current_time;
+    struct tm local_time;
+    char time_str[20];
 
     va_start(args, msg);
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    char* time_str = asctime(timeinfo);
-    time_str[24] = '\0'; // terminate str early to eliminate newline (i hate this)
 
-    fprintf(stream, "%10s – %s – ", dbg_lvl_str, time_str);
+    time(&current_time);
+    localtime_r(&current_time, &local_time);
+    strftime(time_str, 20, "%F %T", &local_time);
+
+    fprintf(stream, "%10s – %s – ", log_lvl_str, time_str);
     vfprintf(stream, msg, args);
     fprintf(stream, "\n");
 }
+
