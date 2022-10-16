@@ -15,6 +15,6 @@ CLIArguments* cli_config_default(void);
 
 void cli_config_destroy(CLIArguments *const conf);
 
-int cli_config_handle(CLIArguments *const conf, int const argc, char **const argv);
+int cli_config_handle(CLIArguments *const conf, const int argc, char **const argv);
 
 #endif //YOBEMAG_CLI_H
