@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "mmu.h"
 #include "rom.h"
 #include "cpu.h"
@@ -224,7 +225,7 @@ uint16_t cpu_get_two_bytes(uint16_t addr) {
     return value;
 }
 
-uint8_t cpu_step(void) {
+ErrorCode cpu_step(void) {
 	cpu.opcode = mmu_get_byte(cpu.PC);
 
 
@@ -237,7 +238,7 @@ uint8_t cpu_step(void) {
 
 	cpu.PC++;
 
-    return 0;
+    return ERR_SUCCESS;
 }
 
 // OP-Codes
@@ -292,10 +293,10 @@ void OPC_DEC_D(void) {
     REG_DEC(&cpu.DE.bytes.high);
 }
 
-void OPC_DEC_E(void) { 
+void OPC_DEC_E(void) {
     REG_DEC(&cpu.DE.bytes.low);
 }
-    
+
 void OPC_LD_HL_PLUS_A(void) {
     uint16_t i = cpu.HL.word;
     mmu_write_byte(i, cpu.AF.bytes.high);
@@ -317,7 +318,7 @@ void OPC_LD_SP(void) {
 	cpu.cycle_count += 3;
 }
 
-void OPC_LD_HL_MINUS_A(void) { 
+void OPC_LD_HL_MINUS_A(void) {
     cpu.cycle_count++;
     uint16_t i = cpu.HL.word;
     mmu_write_byte(i, cpu.AF.bytes.high);
@@ -329,11 +330,11 @@ void OPC_LD_B_B(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.BC.bytes.high);
 }
 
-void OPC_LD_B_C(void) { 
+void OPC_LD_B_C(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.BC.bytes.low);
 }
 
-void OPC_LD_B_D(void) { 
+void OPC_LD_B_D(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.DE.bytes.high);
 }
 
@@ -345,7 +346,7 @@ void OPC_LD_B_H(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.HL.bytes.high);
 }
 
-void OPC_LD_B_L(void) { 
+void OPC_LD_B_L(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.HL.bytes.low);
 }
 
@@ -358,7 +359,7 @@ void OPC_LD_B_A(void) {
     LD_REG_REG(&cpu.BC.bytes.high, cpu.AF.bytes.high);
 }
 
-void OPC_LD_C_B(void) { 
+void OPC_LD_C_B(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.BC.bytes.high);
 }
 
@@ -366,7 +367,7 @@ void OPC_LD_C_C(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.BC.bytes.low);
 }
 
-void OPC_LD_C_D(void) { 
+void OPC_LD_C_D(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.DE.bytes.high);
 }
 
@@ -374,186 +375,186 @@ void OPC_LD_C_E(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.DE.bytes.low);
 }
 
-void OPC_LD_C_H(void) { 
+void OPC_LD_C_H(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.HL.bytes.high);
 }
 
-void OPC_LD_C_L(void) { 
+void OPC_LD_C_L(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.HL.bytes.low);
 }
 
-void OPC_LD_C_HL(void) { 
+void OPC_LD_C_HL(void) {
     LD_REG_REG(&cpu.BC.bytes.low, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_C_A(void) { 
+void OPC_LD_C_A(void) {
     LD_REG_REG(&cpu.BC.bytes.low, cpu.AF.bytes.high);
 }
 
-void OPC_LD_D_B(void) { 
+void OPC_LD_D_B(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.BC.bytes.high);
 }
 
-void OPC_LD_D_C(void) { 
+void OPC_LD_D_C(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.BC.bytes.low);
 }
 
-void OPC_LD_D_D(void) { 
+void OPC_LD_D_D(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.DE.bytes.high);
 }
 
-void OPC_LD_D_E(void) { 
+void OPC_LD_D_E(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.DE.bytes.low);
 }
 
-void OPC_LD_D_H(void) { 
+void OPC_LD_D_H(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.HL.bytes.high);
 }
 
-void OPC_LD_D_L(void) { 
+void OPC_LD_D_L(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.HL.bytes.low);
 }
 
-void OPC_LD_D_HL(void) { 
+void OPC_LD_D_HL(void) {
     LD_REG_REG(&cpu.DE.bytes.high, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_D_A(void) { 
+void OPC_LD_D_A(void) {
     LD_REG_REG(&cpu.DE.bytes.high, cpu.AF.bytes.high);
 }
 
-void OPC_LD_E_B(void) { 
+void OPC_LD_E_B(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.BC.bytes.high);
 }
 
-void OPC_LD_E_C(void) { 
+void OPC_LD_E_C(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.BC.bytes.low);
 }
 
-void OPC_LD_E_D(void) { 
+void OPC_LD_E_D(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.DE.bytes.high);
 }
 
-void OPC_LD_E_E(void) { 
+void OPC_LD_E_E(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.DE.bytes.low);
 }
 
-void OPC_LD_E_H(void) { 
+void OPC_LD_E_H(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.HL.bytes.high);
 }
 
-void OPC_LD_E_L(void) { 
+void OPC_LD_E_L(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.HL.bytes.low);
 }
 
-void OPC_LD_E_HL(void) { 
+void OPC_LD_E_HL(void) {
     LD_REG_REG(&cpu.DE.bytes.low, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_E_A(void) { 
+void OPC_LD_E_A(void) {
     LD_REG_REG(&cpu.DE.bytes.low, cpu.AF.bytes.high);
     cpu.cycle_count++;
 }
 
-void OPC_LD_H_B(void) { 
+void OPC_LD_H_B(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.BC.bytes.high);
 }
 
-void OPC_LD_H_C(void) { 
+void OPC_LD_H_C(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.BC.bytes.low);
 }
 
-void OPC_LD_H_D(void) { 
+void OPC_LD_H_D(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.DE.bytes.high);
 }
 
-void OPC_LD_H_E(void) { 
+void OPC_LD_H_E(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.DE.bytes.low);
 }
 
-void OPC_LD_H_H(void) { 
+void OPC_LD_H_H(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.HL.bytes.high);
 }
 
-void OPC_LD_H_L(void) { 
+void OPC_LD_H_L(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.HL.bytes.low);
 }
 
-void OPC_LD_H_HL(void) { 
+void OPC_LD_H_HL(void) {
     LD_REG_REG(&cpu.HL.bytes.high, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_H_A(void) { 
+void OPC_LD_H_A(void) {
     LD_REG_REG(&cpu.HL.bytes.high, cpu.AF.bytes.high);
 }
 
-void OPC_LD_L_B(void) { 
+void OPC_LD_L_B(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.BC.bytes.high);
 }
 
-void OPC_LD_L_C(void) { 
+void OPC_LD_L_C(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.BC.bytes.low);
 }
 
-void OPC_LD_L_D(void) { 
+void OPC_LD_L_D(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.DE.bytes.high);
 }
 
-void OPC_LD_L_E(void) { 
+void OPC_LD_L_E(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.DE.bytes.low);
 }
 
-void OPC_LD_L_H(void) { 
+void OPC_LD_L_H(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.HL.bytes.high);
 }
 
-void OPC_LD_L_L(void) { 
+void OPC_LD_L_L(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.HL.bytes.low);
 }
 
-void OPC_LD_L_HL(void) { 
+void OPC_LD_L_HL(void) {
     LD_REG_REG(&cpu.HL.bytes.low, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_L_A(void) { 
+void OPC_LD_L_A(void) {
     LD_REG_REG(&cpu.HL.bytes.low, cpu.AF.bytes.high);
 }
 
-void OPC_LD_A_B(void) { 
+void OPC_LD_A_B(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.BC.bytes.high);
 }
 
-void OPC_LD_A_C(void) { 
+void OPC_LD_A_C(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.BC.bytes.low);
 }
 
-void OPC_LD_A_D(void) { 
+void OPC_LD_A_D(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.DE.bytes.high);
 }
 
-void OPC_LD_A_E(void) { 
+void OPC_LD_A_E(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.DE.bytes.low);
 }
 
-void OPC_LD_A_H(void) { 
+void OPC_LD_A_H(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.HL.bytes.high);
 }
 
-void OPC_LD_A_L(void) { 
+void OPC_LD_A_L(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.HL.bytes.low);
 }
 
-void OPC_LD_A_HL(void) { 
+void OPC_LD_A_HL(void) {
     LD_REG_REG(&cpu.AF.bytes.high, mmu_get_byte(cpu.HL.word));
     cpu.cycle_count++;
 }
 
-void OPC_LD_A_A(void) { 
+void OPC_LD_A_A(void) {
     LD_REG_REG(&cpu.AF.bytes.high, cpu.AF.bytes.high);
     cpu.cycle_count++;
 }
