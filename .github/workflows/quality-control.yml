@@ -1,8 +1,5 @@
 name: Quality Control # should probably be renamed
 on:
-  push:
-    branches:
-      - main
   pull_request:
     types: [ opened, synchronize, reopened ]
 jobs:
