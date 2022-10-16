@@ -60,13 +60,13 @@ void cli_config_destroy(CLIArguments *const conf) {
     free(conf);
 }
 
-int cli_config_handle(CLIArguments* const conf, const int argc, char **const argv) {
+ErrorCode cli_config_handle(CLIArguments* const conf, const int argc, char **const argv) {
     int c;
 
     if (argc < 2) {
         LOG_FATAL("No ROM path specified!");
         fprintf(stderr, "%s\n", usage_str);
-        return EXIT_FAILURE;
+        return ERR_FAILURE;
     }
 
     // parse all options first
@@ -75,14 +75,14 @@ int cli_config_handle(CLIArguments* const conf, const int argc, char **const arg
         switch (c) {
             case 'l':
                 if (safe_strtol(optarg, &strtol_in))
-                    return EXIT_FAILURE;
+                    return ERR_FAILURE;
 
                 conf->logging_level = (LoggingLevel) strtol_in;
                 log_set_lvl(conf->logging_level);
                 break;
             default:
                 fprintf(stderr, "%s\n", usage_str);
-                return EXIT_FAILURE;
+                return ERR_FAILURE;
         }
     }
 
@@ -91,19 +91,19 @@ int cli_config_handle(CLIArguments* const conf, const int argc, char **const arg
     if (argc - optind > 1) {
         LOG_FATAL("You provided too many arguments!");
         fprintf(stderr, "%s\n", usage_str);
-        return EXIT_FAILURE;
+        return ERR_FAILURE;
     }
 
     if (optind >= argc) {
         LOG_FATAL("No ROM path specified!");
         fprintf(stderr, "%s\n", usage_str);
-        return EXIT_FAILURE;
+        return ERR_FAILURE;
     }
 
     // path to rom is the only remaining argument
     conf->rom_path = argv[optind++];
     LOG_DEBUG("Path to ROM: %s", conf->rom_path);
 
-    return EXIT_SUCCESS;
+    return ERR_SUCCESS;
 }
 
