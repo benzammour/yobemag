@@ -50,8 +50,7 @@ static int safe_strtol(const char* const str_to_conv, int* const store_into) {
 CLIArguments* cli_config_default(void) {
     CLIArguments* conf = malloc(sizeof(CLIArguments));
 
-    conf->logging_level = (int) FATAL;
-    conf->us_delay = 0;
+    conf->logging_level = FATAL;
     conf->rom_path = "";
 
     return conf;

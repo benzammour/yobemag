@@ -7,7 +7,6 @@
 
 typedef struct CLIArguments {
     LoggingLevel logging_level;
-    int us_delay;
     const char* rom_path;
 } CLIArguments;
 
