@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "rom.h"
 #include "cpu.h"
+#include "logging.h"
 
 #define LO_NIBBLE_MASK (0x0F)
 //#define HI_NIBBLE_MASK (0xF0)
@@ -14,7 +15,7 @@ typedef void (*op_function)(void);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 static void UNKNOWN_OPCODE(void) {
-    fprintf(stderr, "Unallowed/Unimplemented OP Code: 0x%x\n", cpu.opcode);
+    LOG_ERROR("Unallowed/Unimplemented OP Code: 0x%x", cpu.opcode);
 }
 #pragma GCC diagnostic pop
 
@@ -212,7 +213,7 @@ uint16_t cpu_get_PC(void) {
 }
 
 void cpu_print_registers(void) {
-    printf("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d\n",
+    LOG_DEBUG("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d",
 		   cpu.PC, cpu.AF.bytes.high, cpu.AF.bytes.low, cpu.BC.bytes.high, cpu.BC.bytes.low, cpu.DE.bytes.high, cpu.DE.bytes.low, cpu.HL.bytes.high, cpu.HL.bytes.low, cpu.SP, cpu.cycle_count);
 }
 
@@ -229,7 +230,7 @@ ErrorCode cpu_step(void) {
 	cpu.opcode = mmu_get_byte(cpu.PC);
 
 
-     printf("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X\n",
+     LOG_DEBUG("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X",
 			cpu.PC, cpu.opcode,
 			mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), cpu.AF.bytes.high, cpu.BC.bytes.high, cpu.BC.bytes.low, cpu.DE.bytes.high, cpu.DE.bytes.low);
 

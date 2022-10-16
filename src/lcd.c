@@ -1,6 +1,8 @@
 #include <stdio.h>
 
 #include "lcd.h"
+#include "logging.h"
+
 
 static SDL_Window *window;
 static SDL_Surface *surface;
@@ -39,7 +41,7 @@ ErrorCode lcd_step(void) {
 
 
     if(key_states[SDL_SCANCODE_A]) {
-        printf("a");
+        LOG_DEBUG("a");
     }
 
     return ERR_SUCCESS;
