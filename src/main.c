@@ -1,39 +1,40 @@
 #include <stdio.h>
 #include <stdint.h>
+
 #include "lcd.h"
 #include "cpu.h"
 #include "rom.h"
 #include "mmu.h"
 #include "cli.h"
 #include "logging.h"
+#include "errcodes.h"
 
 int main(const int argc, char **const argv) {
     CLIArguments* args = cli_config_default();
     
     if (cli_config_handle(args, argc, argv)) {
         cli_config_destroy(args);
-        return -4;
+        exit((int)ERR_FAILURE);
     }
 
-    uint8_t ret = rom_load("./roms/hello-world.gb");
+    ErrorCode ret = rom_load("./roms/hello-world.gb");
     if (ret) {
         LOG_FATAL("Failed to load ROM");
-        exit(-1);
+        exit((int)ret);
     }
-    LOG_INFO("Successfully initialized ROM");
+    printf("Successfully initialized ROM\n");
 
     ret = mem_init();
     if (ret) {
-        LOG_FATAL("Failed to initialize MMU");
-        exit(-2);
+        fprintf(stderr, "Failed to initialize MMU\n");
+        exit((int)ret);
     }
     LOG_INFO("Successfully initialized MMU");
-    
 
     ret = lcd_load();
     if (ret) {
         LOG_FATAL("Failed to initialize LCD");
-        exit(-3);
+        exit((int)ret);
     }
     LOG_INFO("Successfully initialized LCD");
 
@@ -41,19 +42,18 @@ int main(const int argc, char **const argv) {
     cpu_init();
     LOG_INFO("Successfully initialized CPU");
 
-    uint8_t x = 0;
-    while(1) {
-        if (cpu_step()) {
+    uint8_t iterations = 0;
+    while (1) {
+        if (cpu_step())
             break;
-        }
 
-        if (lcd_step()) {
+        if (lcd_step())
             break;
-        }
 
-        x++;
+        ++iterations;
     }
-    LOG_INFO("Total number of interations: %d", x);
+    LOG_INFO("Total number of interations: %d", iterations);
+
 
     SDL_Quit();
     cli_config_destroy(args);

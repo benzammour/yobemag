@@ -3,28 +3,30 @@
 
 #include <stdint.h>
 
+#include "errcodes.h"
+
 typedef enum flag {
-	/*
-	 * Carry flag
+	/**
+	 * @brief Carry flag
 	 */
 	C_FLAG = 4,
-	/*
-	 * Half carry flag
+	/**
+	 * @brief Half carry flag
 	 */
 	H_FLAG = 5,
-	/*
-	 * Subtract flag
+	/**
+	 * @brief Subtract flag
 	 */
 	N_FLAG = 6,
-	/*
-	 * Zero flag
+	/**
+	 * @brief Zero flag
 	 */
 	Z_FLAG = 7,
 } Flag;
 
 typedef union Register {
 	struct {
-		uint8_t high; // A, D, D, H
+		uint8_t high; // A, B, D, H
 		uint8_t low; // F, C, E, L
 	} bytes;
 	uint16_t word;
@@ -48,7 +50,7 @@ extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
-uint8_t cpu_step(void);
+ErrorCode cpu_step(void);
 
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);

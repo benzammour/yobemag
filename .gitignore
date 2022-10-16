@@ -65,3 +65,7 @@ cmake-build-release/
 
 # IntelliJ
 .idea/
+
+# NeoVIM
+compile_commands.json
+.cache/

@@ -56,10 +56,9 @@ static const char *rom_sizes[] = {
     [0x54] = "1.5MByte (96 banks)",
 };
 
-
 static uint8_t *rom_bytes;
 
-uint8_t rom_setup(uint8_t *rom_data) {
+void rom_setup(uint8_t *rom_data) {
     char title[17];
 
     memcpy(title, &rom_data[0x134], 16);
@@ -74,31 +73,30 @@ uint8_t rom_setup(uint8_t *rom_data) {
     LOG_INFO("Cartridge rom size: %s (%02x)", rom_sizes[romsize_index], romsize_index);
 
     rom_bytes = rom_data;
-
-    return 0;
 }
 
-uint8_t rom_load(const char *filename) {
+ErrorCode rom_load(const char *filename) {
     int f;
     struct stat st;
-    
+
     uint8_t *bytes;
     size_t rom_size;
 
     f = open(filename, O_RDONLY);
     if(f == -1)
-        return 1;
+        return ERR_FILE_IO;
 
     if(fstat(f, &st) == -1)
-        return 1;
+        return ERR_FILE_IO;
 
     rom_size = (size_t) st.st_size;
 
     bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
     if(!bytes)
-        return 0;
+        return ERR_FAILURE;
 
-    return rom_setup(bytes);
+    rom_setup(bytes);
+    return ERR_SUCCESS;
 }
 
 uint8_t *get_rom_bytes(void) {
