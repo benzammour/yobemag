@@ -7,4 +7,4 @@ add_executable(${TEST_NAME} ${TEST_FILES})
 
 target_link_libraries(${TEST_NAME} PRIVATE -lm -lcriterion)
 
-add_custom_target(test COMMAND ./${TEST_NAME})
+add_custom_target(test COMMAND ./${TEST_NAME} DEPENDS ${TEST_NAME})
