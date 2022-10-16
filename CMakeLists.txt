@@ -67,6 +67,7 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GN
     target_compile_options(${PRODUCT_NAME} PUBLIC
         # Standard GCC warnings: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
         -Wlogical-op
+        -Wno-unknown-pragmas
         -Warray-bounds=2
         -Wjump-misses-init
         -Wunsafe-loop-optimizations
