@@ -1,13 +1,78 @@
-name: Build
+name: Quality Control # should probably be renamed
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [ opened, synchronize, reopened ]
 jobs:
   build:
-    name: Build
+    name: CMake Build
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        compiler: [ clang-12, clang-13, clang-14, gcc-11 ]
+        build-type: [ Debug, Release ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install ninja-build libsdl2-dev libcriterion-dev -y
+
+      - name: Build
+        run: |
+          cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPTIMIZE=3 .
+          ninja -j 0
+
+  static-analysis:
+    name: Static Analysis
+    needs: [ build ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install libsdl2-dev gcc-12 -y
+
+      - name: Run GCC Static Analyzer
+        run: |
+          gcc-12 -v
+          out=$(gcc-12 -fanalyzer -c src/*.c -Isrc); echo -e $out; if [[ $(echo $out | head -c1 | wc -c) > 1 ]]; then exit 1; fi
+
+  unit-tests:
+    name: Criterion Unit Tests
+    needs: [ static-analysis ]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install ninja-build libsdl2-dev libcriterion-dev -y
+
+      - name: Run Criterion test suite
+        run: |
+          mkdir build && cd build
+          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug ..
+          ninja test
+
+  sonarcloud:
+    name: SonarCloud Analysis
+    needs: [ unit-tests ]
     runs-on: ubuntu-22.04
     env:
       SONAR_SCANNER_VERSION: 4.7.0.2747
@@ -43,11 +108,10 @@ jobs:
         run: |
           mkdir build
           cmake -G Ninja . -B build
-          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ninja -C build
+          build-wrapper-linux-x86-64 --out-dir ${{ env.BUILD_WRAPPER_OUT_DIR }} ninja -C build -j 0
       - name: Run sonar-scanner
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner --define sonar.host.url="${{ env.SONAR_SERVER_URL }}" --define sonar.cfamily.build-wrapper-output="${{ env.BUILD_WRAPPER_OUT_DIR }}"
-
