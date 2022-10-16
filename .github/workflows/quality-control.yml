@@ -25,7 +25,7 @@ jobs:
       - name: Build
         run: |
           cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} -DOPTIMIZE=3 .
-          ninja -j 2
+          ninja -j 0
 
   static-analysis:
     name: Static Analysis
