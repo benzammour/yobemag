@@ -42,7 +42,7 @@ int main(void) {
         if (lcd_step())
             break;
 
-        iterations++;
+        ++iterations;
     }
 
     printf("%d\n", iterations);
