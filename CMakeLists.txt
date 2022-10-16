@@ -17,7 +17,7 @@ add_executable(${PRODUCT_NAME} ${SRC_FILES})
 add_subdirectory(test)
 
 message("[${MSG_PREFIX}] Using ${CMAKE_GENERATOR}")
-message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER} version ${CMAKE_C_COMPILER_VERSION}")
+message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VERSION}")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
     message("[${MSG_PREFIX}] Using -g")
@@ -50,9 +50,11 @@ target_compile_options(${PRODUCT_NAME} PUBLIC
     -Wmissing-include-dirs
     -Wformat=2)
 
-message("[${MSG_PREFIX}] Using -O${OPTIMIZE}")
-# Use the same optimization level for build and test
-add_compile_options(-O${OPTIMIZE})
+if (DEFINED OPTIMIZE)
+    message("[${MSG_PREFIX}] Using -O${OPTIMIZE}")
+    # Use the same optimization level for build and test
+    add_compile_options(-O${OPTIMIZE})
+endif ()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_compile_options(${PRODUCT_NAME} PUBLIC
