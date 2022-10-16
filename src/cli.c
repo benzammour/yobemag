@@ -9,20 +9,7 @@
 #include "cli.h"
 #include "logging.h"
 
-/******************************************************
- *** LOCAL DEFINES                                  ***
- ******************************************************/
-
-
-/******************************************************
- *** LOCAL VARIABLES                                ***
- ******************************************************/
-
 static const char* usage_str = "yobemag [-l <0..4>] <ROM>";
-
-/******************************************************
- *** LOCAL METHODS                                  ***
- ******************************************************/
 
 static int safe_strtol(const char* const str_to_conv, int* const store_into) {
     char* end;
@@ -47,10 +34,6 @@ static int safe_strtol(const char* const str_to_conv, int* const store_into) {
 
     return EXIT_FAILURE;
 }
-
-/******************************************************
- *** EXPOSED METHODS                                ***
- ******************************************************/
 
 CLIArguments* cli_config_default(void) {
     CLIArguments* conf = malloc(sizeof(CLIArguments));
@@ -112,3 +95,4 @@ int cli_config_handle(CLIArguments* const conf, int const argc, char **const arg
 
     return EXIT_SUCCESS;
 }
+
