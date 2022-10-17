@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 #include "mmu.h"
-#include "rom.h"
 #include "cpu.h"
 #include "logging.h"
 

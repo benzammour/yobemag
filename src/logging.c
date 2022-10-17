@@ -2,8 +2,11 @@
 #include <time.h>
 #include <string.h>
 #include <libgen.h>
+#include <stdlib.h>
+#include <SDL2/SDL.h>
 
 #include "logging.h"
+#include "rom.h"
 
 /******************************************************
  *** LOCAL VARIABLES                                ***
@@ -41,14 +44,27 @@ void log_set_lvl(LoggingLevel log_lvl) {
     LOG_INFO("Log level initialized to %d.", min_log_lvl);
 }
 
-void log_exit_msg(const char *const file_path, const int line_number, const char *const msg) {
+void log_exit(const char *const file_path, const int line_number, const char *const msg, ...) {
+	va_list args;
+	va_start(args, msg);
+
 	char time_str[20];
 	get_time(time_str);
 
 	char *file_path_copy = strdup(file_path);
 	const char *file_name = basename(file_path_copy);
 
-	fprintf(stderr, "%10s – %s – %s:%d - %s\n", "FATAL", time_str, file_name, line_number, msg);
+	fprintf(stderr, "%10s – %s – %s:%d - ", "FATAL", time_str, file_name, line_number);
+	vfprintf(stderr, msg, args);
+	fprintf(stderr, "\n");
+
+	va_end(args);
+
+	fflush(stdout);
+    fflush(stderr);
+    SDL_Quit();
+    rom_destroy();
+    exit(EXIT_FAILURE);
 }
 
 void log_str(const LoggingLevel log_lvl, const char *const log_lvl_str, FILE *const stream, const char *const msg, ...) {

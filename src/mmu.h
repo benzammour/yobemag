@@ -6,8 +6,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "err_codes.h"
-
 void mmu_init(void);
 __attribute__((pure)) uint8_t mmu_get_byte(uint16_t addr);
 void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr);

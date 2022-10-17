@@ -5,8 +5,6 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-#include "err_codes.h"
-
 void lcd_init(void);
 bool lcd_step(void);
 

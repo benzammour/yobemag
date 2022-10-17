@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 #include "logging.h"
-#include "err_codes.h"
 
 typedef struct CLIArguments {
     LoggingLevel logging_level;

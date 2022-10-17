@@ -11,7 +11,14 @@ typedef enum LoggingLevel {
     FATAL
 } LoggingLevel;
 
-void log_exit_msg(const char *file_path, int line_number, const char* msg);
+/**
+ * @brief   Set the minimum required of a log message to be printed to the console
+ *
+ * @param   log_lvl The desired minimal logging level
+ */
+void log_set_lvl(LoggingLevel log_lvl);
+
+_Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_path, int line_number, const char* msg, ...);
 
 /**
  * @brief   Log a string to @p stream with logging level @p dbg_lvl, (printed as @p log_lvl_str),
@@ -26,13 +33,6 @@ void log_exit_msg(const char *file_path, int line_number, const char* msg);
 __attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const char* log_lvl_str, FILE *stream,
 												   const char* msg, ...);
 
-/**
- * @brief   Set the minimum required of a log message to be printed to the console
- *
- * @param   log_lvl The desired minimal logging level
- */
-void log_set_lvl(LoggingLevel log_lvl);
-
 /*
  * This is necessary, since __VA_ARGS__ is a C GNU extension.
  * clang will not compile with -Werror, if this warning is not ignored here.
@@ -46,6 +46,7 @@ void log_set_lvl(LoggingLevel log_lvl);
 #define LOG_WARNING(msg, ...)   log_str(WARNING, "WARNING", stdout, msg, ##__VA_ARGS__)
 #define LOG_ERROR(msg, ...)     log_str(ERROR, "ERROR", stderr, msg, ##__VA_ARGS__)
 #define LOG_FATAL(msg, ...)     log_str(FATAL, "FATAL", stderr, msg, ##__VA_ARGS__)
+#define LOG_EXIT(msg, ...)     log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
 
 #pragma clang diagnostic pop 
 

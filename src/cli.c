@@ -3,7 +3,6 @@
 #include <getopt.h>
 #include <stdio.h>
 #include <errno.h>
-#include <stdbool.h>
 
 #include "cli.h"
 #include "logging.h"
@@ -11,6 +10,8 @@
 /******************************************************
  *** LOCAL VARIABLES                                ***
  ******************************************************/
+
+static const char* usage_str = "Usage: yobemag [-l <0..4>] <ROM>";
 
 static CLIArguments cli_args = {
 		.logging_level = FATAL,
@@ -25,27 +26,21 @@ static void safe_strtol(const char* const str_to_conv, int* const store_into) {
 	errno = 0;
 
 	char* end;
-	bool failed = true;
 	const long strtol_in = strtol(str_to_conv, &end, 10);
 
     if (end == str_to_conv) {
-        LOG_FATAL("%s: not a decimal number", str_to_conv);
+        LOG_EXIT("strtol failed: %s not a decimal number", str_to_conv);
     } else if ('\0' != *end) {
-        LOG_FATAL("%s: extra characters at end of input: %s", str_to_conv, end);
+        LOG_EXIT("strtol failed: %s has extra characters at end of input: %s", str_to_conv, end);
     } else if ((LONG_MIN == strtol_in || LONG_MAX == strtol_in) && ERANGE == errno) {
-        LOG_FATAL("%s out of range of type long", str_to_conv);
+		LOG_EXIT("strtol failed: %s out of range of type long", str_to_conv);
     } else if (strtol_in > INT_MAX) {
-        LOG_FATAL("%ld greater than INT_MAX", strtol_in);
+		LOG_EXIT("strtol failed: %ld greater than INT_MAX", strtol_in);
     } else if (strtol_in < INT_MIN) {
-        LOG_FATAL("%ld less than INT_MIN", strtol_in);
+		LOG_EXIT("strtol failed: %ld less than INT_MIN", strtol_in);
     } else {
         *store_into = (int) strtol_in;
-		failed = false;
     }
-
-	if (failed) {
-		YOBEMAG_EXIT(ERR_STRTOL_FAILED);
-	}
 }
 
 /******************************************************
@@ -54,7 +49,7 @@ static void safe_strtol(const char* const str_to_conv, int* const store_into) {
 
 CLIArguments* cli_config_handle(const int argc, char **const argv) {
 	if (argc < 2) {
-		YOBEMAG_EXIT(ERR_NO_ROM_PATH);
+		LOG_EXIT("No ROM path specified! %s", usage_str);
 	}
 
 	// parse all options first
@@ -68,16 +63,16 @@ CLIArguments* cli_config_handle(const int argc, char **const argv) {
                 log_set_lvl(cli_args.logging_level);
                 break;
             default:
-				YOBEMAG_EXIT(ERR_WRONG_USAGE);
+				LOG_EXIT("%s", usage_str);
         }
     }
 
     // parse the remaining options
 
 	if (argc - optind > 1) {
-		YOBEMAG_EXIT(ERR_TOO_MANY_ARGS);
+		LOG_EXIT("You provided too many arguments! %s", usage_str);
 	} else if (optind >= argc) {
-		YOBEMAG_EXIT(ERR_NO_ROM_PATH);
+		LOG_EXIT("No ROM path specified! %s", usage_str);
 	}
 
     // path to rom is the only remaining argument

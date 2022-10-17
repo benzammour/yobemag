@@ -7,7 +7,6 @@
 #include "mmu.h"
 #include "cli.h"
 #include "logging.h"
-#include "err_codes.h"
 
 int main(const int argc, char **const argv) {
     CLIArguments* cli_args = cli_config_handle(argc, argv);

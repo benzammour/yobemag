@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-#include "err_codes.h"
-
 typedef enum flag {
 	/**
 	 * @brief Carry flag

@@ -4,9 +4,16 @@
 #include "lcd.h"
 #include "logging.h"
 
+/******************************************************
+ *** LOCAL VARIABLES                                ***
+ ******************************************************/
 
 static SDL_Window *window;
 static SDL_Surface *surface;
+
+/******************************************************
+ *** EXPOSED METHODS                                ***
+ ******************************************************/
 
 void lcd_init(void) {
     SDL_Init(SDL_INIT_EVERYTHING);

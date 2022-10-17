@@ -4,6 +4,8 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <SDL2/SDL.h>
 
 #include "rom.h"
 #include "logging.h"
@@ -89,16 +91,16 @@ static void rom_setup(void) {
 void rom_init(const char *file_name) {
     int f = open(file_name, O_RDONLY);
     if (f == -1)
-		YOBEMAG_EXIT(ERR_FILE_IO);
+		LOG_EXIT("Opening file %s failed: %s", file_name, strerror(errno));
 
 	struct stat st;
     if (fstat(f, &st) == -1)
-		YOBEMAG_EXIT(ERR_FILE_IO);
+		LOG_EXIT("Retrieving information about file %s failed: %s", file_name, strerror(errno));
 
 	rom_size = (size_t) st.st_size;
 	rom_bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
     if (rom_bytes == MAP_FAILED)
-		YOBEMAG_EXIT(ERR_MMAP_FAILED);
+		LOG_EXIT("mmap for file %s failed: %s", file_name, strerror(errno));
 
     rom_setup();
 }
