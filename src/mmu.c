@@ -1,5 +1,8 @@
 #include "mmu.h"
+#include "logging.h"
 #include "rom.h"
+
+#define ROM_LIMIT (0x8000)
 
 static uint8_t *mem;
 
@@ -44,13 +47,12 @@ uint8_t mmu_get_byte(uint16_t addr) {
     return mem[addr];
 }
 
-void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr) {
-    if (dest_addr < 0x8000) {
-        return;
+void mmu_write_byte(uint16_t dest_addr, uint8_t value) {
+    if (dest_addr < ROM_LIMIT) {
+        LOG_ERROR("Cannot write into %x as it is reserved for ROM space", dest_addr);
     }
 
-    // TODO: implement further writing
-	(void) source_addr;
+    mem[dest_addr] = value;
 }
 
 uint16_t mmu_get_two_bytes(uint16_t addr) {
