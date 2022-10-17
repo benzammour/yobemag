@@ -73,7 +73,7 @@ jobs:
 
       - name: Run gcov
         run: |
-          gcovr -r .. --exclude=../test --sonarqube > coverage.xml
+          gcovr --sonarqube > coverage.xml
 
       - name: Upload artifact (gcov report)
         uses: actions/upload-artifact@v3
