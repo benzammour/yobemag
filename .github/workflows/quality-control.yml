@@ -46,7 +46,7 @@ jobs:
       - name: Run GCC Static Analyzer
         run: |
           gcc-12 -v
-          out=$(gcc-12 -fanalyzer -c src/*.c -Isrc); echo -e $out; if [[ $(echo $out | head -c1 | wc -c) > 1 ]]; then exit 1; fi # TODO: Use @Benzammour's fix
+          out=$(gcc-12 -fanalyzer -c src/*.c -Isrc 2>&1 >/dev/null); echo "$out"; if [[ $(echo $out | wc -c) > 1 ]]; then exit 1; fi
 
   unit-tests:
     name: Criterion Unit Tests
