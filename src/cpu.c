@@ -206,6 +206,8 @@ void optable_init(void) {
 
 /* ------------------ CPU Funcs */
 void cpu_init(void) {
+    optable_init();
+
 	cpu.AF.word = 0x01B0;
     cpu.BC.word = 0x0013;
 	cpu.DE.word = 0x00D8;
@@ -642,6 +644,7 @@ static void SUB_A_n(uint8_t n) {
 
 	clear_flag_register();
 	set_flag(!result, Z_FLAG);
+	set_flag(1, N_FLAG);
 	set_flag((n & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
 	set_flag(result > 0, C_FLAG);
 

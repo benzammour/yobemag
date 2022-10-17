@@ -25,18 +25,26 @@ static const uint8_t bootrom[256] = {
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
 };
 
-ErrorCode mem_init(void) {
-    uint8_t *rom_bytes = get_rom_bytes();
-
+ErrorCode mmu_init(void) {
     mem = calloc(1, 0x10000);
+    uint8_t *rom_bytes = get_rom_bytes();
+    if (rom_bytes == NULL) {
+        LOG_ERROR("ROM-bytes buffer is NULL!\n");
+    } else {
+        memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
+        memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
+    }
 
     if (mem == NULL)
         return ERR_MEMORY;
-
-    memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
-    memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
+    
+    memcpy(mem, bootrom, 0x100);
 
     return ERR_SUCCESS;
+}
+
+void mmu_destroy(void) {
+    free(mem);
 }
 
 uint8_t mmu_get_byte(uint16_t addr) {

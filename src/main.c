@@ -24,7 +24,7 @@ int main(const int argc, char **const argv) {
     }
     printf("Successfully initialized ROM\n");
 
-    ret = mem_init();
+    ret = mmu_init();
     if (ret) {
         fprintf(stderr, "Failed to initialize MMU\n");
         exit(ret);
