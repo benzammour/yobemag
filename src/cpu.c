@@ -92,8 +92,8 @@ void REG_INC(uint8_t *reg) {
 
 void optable_init(void) {
     // Set up lookup table
-    instr_lookup[0x0] = OPC_NOP;
-    instr_lookup[0x1] = OPC_LD_BC;
+    instr_lookup[0x00] = OPC_NOP;
+    instr_lookup[0x01] = OPC_LD_BC;
     instr_lookup[0x02] = OPC_LD_BC_A;
     instr_lookup[0x03] = OPC_INC_BC;
     instr_lookup[0x04] = OPC_INC_B;
@@ -178,6 +178,17 @@ void optable_init(void) {
 	instr_lookup[0x86] = OPC_ADD_A_HL;
 	instr_lookup[0x87] = OPC_ADD_A_A;
 	instr_lookup[0xC6] = OPC_ADD_A_d8;
+    
+	// 8-bit ALU: SUB A,n
+	instr_lookup[0x90] = OPC_SUB_A_B;
+	instr_lookup[0x91] = OPC_SUB_A_C;
+	instr_lookup[0x92] = OPC_SUB_A_D;
+	instr_lookup[0x93] = OPC_SUB_A_E;
+	instr_lookup[0x94] = OPC_SUB_A_H;
+	instr_lookup[0x95] = OPC_SUB_A_L;
+	instr_lookup[0x96] = OPC_SUB_A_HL;
+	instr_lookup[0x97] = OPC_SUB_A_A;
+	instr_lookup[0xD6] = OPC_SUB_A_d8;
 
     // TODO: 0xA8
     // TODO: 0xA9
@@ -621,5 +632,64 @@ void OPC_ADD_A_HL(void) {
 void OPC_ADD_A_d8(void) {
 	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
 	ADD_A_n(immediate);
+	cpu.cycle_count += 8;
+}
+
+
+static void SUB_A_n(uint8_t n) {
+	uint8_t A = cpu.AF.bytes.high;
+	uint_fast16_t result = A - n;
+
+	clear_flag_register();
+	set_flag(!result, Z_FLAG);
+	set_flag((n & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
+	set_flag(result > 0, C_FLAG);
+
+	cpu.AF.bytes.high = (uint8_t) result;
+}
+
+void OPC_SUB_A_A(void) {
+	SUB_A_n(cpu.AF.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_B(void) {
+	SUB_A_n(cpu.BC.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_C(void) {
+	SUB_A_n(cpu.BC.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_D(void) {
+	SUB_A_n(cpu.DE.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_E(void) {
+	SUB_A_n(cpu.DE.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_H(void) {
+	SUB_A_n(cpu.HL.bytes.high);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_L(void) {
+	SUB_A_n(cpu.HL.bytes.low);
+	cpu.cycle_count += 4;
+}
+
+void OPC_SUB_A_HL(void) {
+	SUB_A_n(mmu_get_byte(cpu.HL.word));
+	cpu.cycle_count += 8;
+}
+
+void OPC_SUB_A_d8(void) {
+	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+	SUB_A_n(immediate);
 	cpu.cycle_count += 8;
 }

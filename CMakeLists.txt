@@ -96,7 +96,8 @@ if (${TEST})
     set(TEST_NAME ${PRODUCT_NAME}_test)
 
     set(TEST_FILES
-        test/sample_unit_test.c)
+        test/sample_unit_test.c
+        test/8bit_sub_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")
