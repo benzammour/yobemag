@@ -88,9 +88,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 target_link_libraries(${PRODUCT_NAME} PUBLIC -lm -lSDL2 -pthread)
 
+install(TARGETS ${PRODUCT_NAME} DESTINATION ~/.local/bin/ PERMISSIONS OWNER_EXECUTE)
+
 ################################################################################
 ###                                Unit Tests                                ###
 ################################################################################
+
 
 if (${TEST})
     set(TEST_NAME ${PRODUCT_NAME}_test)
