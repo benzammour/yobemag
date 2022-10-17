@@ -2,27 +2,29 @@ cmake_minimum_required(VERSION 3.0)
 project(YOBEMAG C)
 
 set(PRODUCT_NAME yobemag)
-string(TOUPPER ${PRODUCT_NAME} MSG_PREFIX)
+string(TOUPPER ${PRODUCT_NAME} UPPER_PRODUCT_NAME)
 
 include_directories(src)
 set(SRC_FILES
-    src/cpu.c
-    src/main.c
-    src/mmu.c
-    src/lcd.c
-    src/rom.c
-    src/logging.c
-    src/cli.c)
+    ${PROJECT_SOURCE_DIR}/src/cpu.c
+    ${PROJECT_SOURCE_DIR}/src/main.c
+    ${PROJECT_SOURCE_DIR}/src/mmu.c
+    ${PROJECT_SOURCE_DIR}/src/lcd.c
+    ${PROJECT_SOURCE_DIR}/src/rom.c
+    ${PROJECT_SOURCE_DIR}/src/logging.c
+    ${PROJECT_SOURCE_DIR}/src/cli.c)
 
 add_executable(${PRODUCT_NAME} ${SRC_FILES})
 
 add_subdirectory(test)
+# CMake complains about not being used, however, it is by the test subdirectory
+set(ignoreMe "${COVERAGE}")
 
-message("[${MSG_PREFIX}] Using ${CMAKE_GENERATOR}")
-message("[${MSG_PREFIX}] Using ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VERSION}")
+message("[${UPPER_PRODUCT_NAME}] Using ${CMAKE_GENERATOR}")
+message("[${UPPER_PRODUCT_NAME}] Using ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VERSION}")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
-    message("[${MSG_PREFIX}] Using -g")
+    message("[${UPPER_PRODUCT_NAME}] Using -g")
     target_compile_options(${PRODUCT_NAME} PUBLIC -g)
 endif ()
 
@@ -53,7 +55,7 @@ target_compile_options(${PRODUCT_NAME} PUBLIC
     -Wformat=2)
 
 if (DEFINED OPTIMIZE)
-    message("[${MSG_PREFIX}] Using -O${OPTIMIZE}")
+    message("[${UPPER_PRODUCT_NAME}] Using -O${OPTIMIZE}")
     # Use the same optimization level for build and test
     add_compile_options(-O${OPTIMIZE})
 endif ()
