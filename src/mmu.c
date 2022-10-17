@@ -2,11 +2,14 @@
 #include "logging.h"
 #include "rom.h"
 
+/******************************************************
+ *** LOCAL VARIABLES                                ***
+ ******************************************************/
 #define ROM_LIMIT (0x8000)
 
-static uint8_t *mem;
+static uint8_t mem[0x10000];
 
-static const uint8_t bootrom[256] = {
+static const uint8_t boot_rom[256] = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
     0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
     0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
@@ -25,23 +28,19 @@ static const uint8_t bootrom[256] = {
     0xF5, 0x06, 0x19, 0x78, 0x86, 0x23, 0x05, 0x20, 0xFB, 0x86, 0x20, 0xFE, 0x3E, 0x01, 0xE0, 0x50
 };
 
-ErrorCode mem_init(void) {
-    uint8_t *rom_bytes = get_rom_bytes();
+/******************************************************
+ *** EXPOSED METHODS                                ***
+ ******************************************************/
 
-    mem = calloc(1, 0x10000);
-
-    if (mem == NULL)
-        return ERR_MEMORY;
-
+void mmu_init(void) {
+    const uint8_t *rom_bytes = get_rom_bytes();
     memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
     memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
-
-    return ERR_SUCCESS;
 }
 
 uint8_t mmu_get_byte(uint16_t addr) {
     if (addr < 0x100) {
-        return bootrom[addr];
+        return boot_rom[addr];
     }
 
     return mem[addr];

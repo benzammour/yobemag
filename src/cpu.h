@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "errcodes.h"
+#include "err_codes.h"
 
 typedef enum flag {
 	/**
@@ -50,7 +50,7 @@ extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
-ErrorCode cpu_step(void);
+void cpu_step(void);
 
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);

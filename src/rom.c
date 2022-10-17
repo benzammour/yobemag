@@ -3,9 +3,14 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <string.h>
+#include <errno.h>
 
 #include "rom.h"
 #include "logging.h"
+
+/******************************************************
+ *** LOCAL VARIABLES                                ***
+ ******************************************************/
 
 static const char *cartridge_types[0xFF+1] = {
     [0x00] = "ROM ONLY",
@@ -56,49 +61,59 @@ static const char *rom_sizes[] = {
     [0x54] = "1.5MByte (96 banks)",
 };
 
-static uint8_t *rom_bytes;
+static uint8_t* rom_bytes = NULL;
+static size_t rom_size;
 
-void rom_setup(uint8_t *rom_data) {
+/******************************************************
+ *** LOCAL METHODS                                  ***
+ ******************************************************/
+
+static void rom_setup(void) {
     char title[17];
-
-    memcpy(title, &rom_data[0x134], 16);
+    memcpy(title, &rom_bytes[0x134], 16);
     title[16] = '\0';
     
     LOG_INFO("Rom title: %s", title);
 
-    uint8_t type = rom_data[0x147];
+    uint8_t type = rom_bytes[0x147];
     LOG_INFO("Cartridge type: %s (%02x)", cartridge_types[type], type);
 
-    uint8_t romsize_index = rom_data[0x148];
-    LOG_INFO("Cartridge rom size: %s (%02x)", rom_sizes[romsize_index], romsize_index);
-
-    rom_bytes = rom_data;
+    uint8_t rom_size_index = rom_bytes[0x148];
+    LOG_INFO("Cartridge rom size: %s (%02x)", rom_sizes[rom_size_index], rom_size_index);
 }
 
-ErrorCode rom_load(const char *filename) {
-    int f;
-    struct stat st;
+/******************************************************
+ *** EXPOSED METHODS                                ***
+ ******************************************************/
 
-    uint8_t *bytes;
-    size_t rom_size;
+void rom_init(const char *file_name) {
+    int f = open(file_name, O_RDONLY);
+    if (f == -1)
+		YOBEMAG_EXIT(ERR_FILE_IO);
 
-    f = open(filename, O_RDONLY);
-    if(f == -1)
-        return ERR_FILE_IO;
+	struct stat st;
+    if (fstat(f, &st) == -1)
+		YOBEMAG_EXIT(ERR_FILE_IO);
 
-    if(fstat(f, &st) == -1)
-        return ERR_FILE_IO;
+	rom_size = (size_t) st.st_size;
+	rom_bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
+    if (rom_bytes == MAP_FAILED)
+		YOBEMAG_EXIT(ERR_MMAP_FAILED);
 
-    rom_size = (size_t) st.st_size;
-
-    bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
-    if(!bytes)
-        return ERR_FAILURE;
-
-    rom_setup(bytes);
-    return ERR_SUCCESS;
+    rom_setup();
 }
 
-uint8_t *get_rom_bytes(void) {
+void rom_destroy(void) {
+	if (rom_bytes != NULL && munmap(rom_bytes, rom_size) == -1) {
+		// We cannot use YOBEMAG_EXIT here since it calls rom_destroy
+		LOG_FATAL("munmap failed: %s", strerror(errno));
+		fflush(stdout);
+		fflush(stderr);
+		SDL_Quit();
+		exit(EXIT_FAILURE);
+	}
+}
+
+uint8_t* get_rom_bytes(void) {
     return rom_bytes;
 }

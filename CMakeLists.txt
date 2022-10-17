@@ -12,7 +12,8 @@ set(SRC_FILES
     src/lcd.c
     src/rom.c
     src/logging.c
-    src/cli.c)
+    src/cli.c
+    src/err_codes.c)
 
 add_executable(${PRODUCT_NAME} ${SRC_FILES})
 

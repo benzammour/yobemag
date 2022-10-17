@@ -7,56 +7,38 @@
 #include "mmu.h"
 #include "cli.h"
 #include "logging.h"
-#include "errcodes.h"
+#include "err_codes.h"
 
 int main(const int argc, char **const argv) {
-    CLIArguments* args = cli_config_default();
-    
-    if (cli_config_handle(args, argc, argv)) {
-        cli_config_destroy(args);
-        exit(ERR_FAILURE);
-    }
+    CLIArguments* cli_args = cli_config_handle(argc, argv);
 
-    ErrorCode ret = rom_load("./roms/hello-world.gb");
-    if (ret) {
-        LOG_FATAL("Failed to load ROM");
-        exit(ret);
-    }
-    printf("Successfully initialized ROM\n");
+	rom_init(cli_args->rom_path);
+    LOG_INFO("Successfully initialized ROM");
 
-    ret = mem_init();
-    if (ret) {
-        fprintf(stderr, "Failed to initialize MMU\n");
-        exit(ret);
-    }
+	mmu_init();
     LOG_INFO("Successfully initialized MMU");
 
-    ret = lcd_load();
-    if (ret) {
-        LOG_FATAL("Failed to initialize LCD");
-        exit(ret);
-    }
+	lcd_init();
     LOG_INFO("Successfully initialized LCD");
-
 
     cpu_init();
     LOG_INFO("Successfully initialized CPU");
 
     uint8_t iterations = 0;
     while (1) {
-        if (cpu_step())
-            break;
+        cpu_step();
 
         if (lcd_step())
             break;
 
         ++iterations;
     }
-    LOG_INFO("Total number of interations: %d", iterations);
+    LOG_INFO("Total number of iterations: %d", iterations);
 
+	fflush(stdout);
+	fflush(stderr);
+	SDL_Quit();
+	rom_destroy();
 
-    SDL_Quit();
-    cli_config_destroy(args);
-
-    return 0;
+    return EXIT_SUCCESS;
 }

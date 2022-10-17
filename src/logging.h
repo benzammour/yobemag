@@ -11,8 +11,11 @@ typedef enum LoggingLevel {
     FATAL
 } LoggingLevel;
 
+void log_exit_msg(const char *file_path, int line_number, const char* msg);
+
 /**
- * @brief   Log a string to @p stream with logging level @p dbg_lvl, (printed as @p log_lvl_str), formatted as @p msg with parameters @p ...
+ * @brief   Log a string to @p stream with logging level @p dbg_lvl, (printed as @p log_lvl_str),
+ * 			formatted as @p msg with parameters @p ...
  *
  * @param   log_lvl     Logging level, represented as enum
  * @param   log_lvl_str Logging level string representation
@@ -20,7 +23,8 @@ typedef enum LoggingLevel {
  * @param   msg         Format string for the log message
  * @param   ...         Parameters for format string
  */
-void log_str(const LoggingLevel log_lvl, const char* const log_lvl_str, FILE *const stream, const char* const msg, ...);
+__attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const char* log_lvl_str, FILE *stream,
+												   const char* msg, ...);
 
 /**
  * @brief   Set the minimum required of a log message to be printed to the console
