@@ -15,5 +15,5 @@ Test(simple, fixtures, .init = setup, .fini = teardown) {
 	cr_assert(c != NULL);
 	cli_config_destroy(c);
 	c = NULL;
-	cr_assert(c != NULL);
+	cr_assert(c == NULL);
 }
