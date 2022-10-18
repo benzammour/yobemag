@@ -9,9 +9,12 @@
 #include "logging.h"
 
 int main(const int argc, char **const argv) {
-    CLIArguments* cli_args = cli_config_handle(argc, argv);
+	CLIArguments cli_args;
+	cli_parse(&cli_args, argc, argv);
 
-	rom_init(cli_args->rom_path);
+	log_set_lvl(cli_args.logging_level);
+
+	rom_init(cli_args.rom_path);
     LOG_INFO("Successfully initialized ROM");
 
 	mmu_init();

@@ -13,11 +13,6 @@
 
 static const char* usage_str = "Usage: yobemag [-l <0..4>] <ROM>";
 
-static CLIArguments cli_args = {
-		.logging_level = FATAL,
-		.rom_path = "",
-};
-
 /******************************************************
  *** LOCAL METHODS                                  ***
  ******************************************************/
@@ -47,10 +42,13 @@ static void safe_strtol(const char* const str_to_conv, int* const store_into) {
  *** EXPOSED METHODS                                ***
  ******************************************************/
 
-CLIArguments* cli_config_handle(const int argc, char **const argv) {
+void cli_parse(CLIArguments* const cli_args, const int argc, char **const argv) {
 	if (argc < 2) {
 		LOG_EXIT("No ROM path specified! %s", usage_str);
 	}
+
+	// set default values
+	cli_args->logging_level = FATAL;
 
 	// parse all options first
 	int strtol_in;
@@ -59,8 +57,7 @@ CLIArguments* cli_config_handle(const int argc, char **const argv) {
         switch (c) {
             case 'l':
 				safe_strtol(optarg, &strtol_in);
-                cli_args.logging_level = (LoggingLevel) strtol_in;
-                log_set_lvl(cli_args.logging_level);
+                cli_args->logging_level = (LoggingLevel) strtol_in;
                 break;
             default:
 				LOG_EXIT("%s", usage_str);
@@ -75,8 +72,6 @@ CLIArguments* cli_config_handle(const int argc, char **const argv) {
 	}
 
     // path to rom is the only remaining argument
-    cli_args.rom_path = argv[optind++];
-    LOG_DEBUG("Path to ROM: %s", cli_args.rom_path);
-
-	return &cli_args;
+    cli_args->rom_path = argv[optind++];
+    LOG_DEBUG("Path to ROM: %s", cli_args->rom_path);
 }

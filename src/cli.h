@@ -22,9 +22,10 @@ typedef struct CLIArguments {
 /**
  * @brief   Extract CLI flags with (optional) arguments from @p argv
  *
- * @param   argc    Number of arguments passed to the program
- * @param   argv    The passed arguments
+ * @param   cli_args	Will be filled with parsed values from CLI
+ * @param   argc    	Number of arguments passed to the program
+ * @param   argv    	The passed arguments
  */
-CLIArguments* cli_config_handle(int argc, char **argv);
+void cli_parse(CLIArguments *cli_args, int argc, char **argv);
 
 #endif //YOBEMAG_CLI_H

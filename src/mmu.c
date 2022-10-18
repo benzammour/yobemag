@@ -7,10 +7,12 @@
  ******************************************************/
 
 #define ROM_LIMIT (0x8000)
+#define BOOT_ROM_SIZE (256)
+#define MEM_SIZE (65536)
 
-static uint8_t mem[0x10000];
+static uint8_t mem[MEM_SIZE];
 
-static const uint8_t boot_rom[256] = {
+static const uint8_t boot_rom[BOOT_ROM_SIZE] = {
     0x31, 0xFE, 0xFF, 0xAF, 0x21, 0xFF, 0x9F, 0x32, 0xCB, 0x7C, 0x20, 0xFB, 0x21, 0x26, 0xFF, 0x0E,
     0x11, 0x3E, 0x80, 0x32, 0xE2, 0x0C, 0x3E, 0xF3, 0xE2, 0x32, 0x3E, 0x77, 0x77, 0x3E, 0xFC, 0xE0,
     0x47, 0x11, 0x04, 0x01, 0x21, 0x10, 0x80, 0x1A, 0xCD, 0x95, 0x00, 0xCD, 0x96, 0x00, 0x13, 0x7B,
@@ -41,8 +43,7 @@ void mmu_init(void) {
 }
 
 uint8_t mmu_get_byte(uint16_t addr) {
-	// TODO: Use define instead of magic number
-    if (addr < 0x100) {
+    if (addr < BOOT_ROM_SIZE) {
         return boot_rom[addr];
     }
 
@@ -62,6 +63,6 @@ uint16_t mmu_get_two_bytes(uint16_t addr) {
 }
 
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {
-    mmu_write_byte(dest_addr, ((uint8_t) value));
+    mmu_write_byte(dest_addr, (uint8_t) value);
     mmu_write_byte(dest_addr + 1, (uint8_t) (value >> 8));
 }
