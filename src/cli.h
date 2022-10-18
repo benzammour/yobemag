@@ -25,6 +25,8 @@ typedef struct CLIArguments {
  * @param   cli_args	Will be filled with parsed values from CLI
  * @param   argc    	Number of arguments passed to the program
  * @param   argv    	The passed arguments
+ *
+ * @note This function can exit upon failure to parse arguments
  */
 void cli_parse(CLIArguments *cli_args, int argc, char **argv);
 

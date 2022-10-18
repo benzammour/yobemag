@@ -21,11 +21,11 @@ void log_set_lvl(LoggingLevel log_lvl);
 /**
  * @brief 	Log a string to stderr with logging level ::FATAL formatted as
  * 			@p msg with parameters @p ...
- * 			This function is invoked by `#LOG_EXIT(msg, ...)`.
+ * 			This function is invoked by `#YOBEMAG_EXIT(msg, ...)`.
  *
  *
- * @param 	file_path 	Passed by `#LOG_EXIT(msg, ...)`. Indicates invocation site
- * @param 	line_number Passed by `#LOG_EXIT(msg, ...)`. Indicates specific invocation line
+ * @param 	file_path 	Passed by `#YOBEMAG_EXIT(msg, ...)`. Indicates invocation site
+ * @param 	line_number Passed by `#YOBEMAG_EXIT(msg, ...)`. Indicates specific invocation line
  * @param 	msg 		Format string for the log message
  * @param 	...			Parameters for format string
  */
@@ -57,7 +57,7 @@ __attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const c
 #define LOG_WARNING(msg, ...)   log_str(WARNING, "WARNING", stdout, msg, ##__VA_ARGS__)
 #define LOG_ERROR(msg, ...)     log_str(ERROR, "ERROR", stderr, msg, ##__VA_ARGS__)
 #define LOG_FATAL(msg, ...)     log_str(FATAL, "FATAL", stderr, msg, ##__VA_ARGS__)
-#define LOG_EXIT(msg, ...)     log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
+#define YOBEMAG_EXIT(msg, ...)     log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
 
 #pragma clang diagnostic pop 
 

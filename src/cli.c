@@ -24,15 +24,15 @@ static void safe_strtol(const char* const str_to_conv, int* const store_into) {
 	const long strtol_in = strtol(str_to_conv, &end, 10);
 
     if (end == str_to_conv) {
-        LOG_EXIT("strtol failed: %s not a decimal number", str_to_conv);
+        YOBEMAG_EXIT("strtol failed: %s not a decimal number", str_to_conv);
     } else if ('\0' != *end) {
-        LOG_EXIT("strtol failed: %s has extra characters at end of input: %s", str_to_conv, end);
+        YOBEMAG_EXIT("strtol failed: %s has extra characters at end of input: %s", str_to_conv, end);
     } else if ((LONG_MIN == strtol_in || LONG_MAX == strtol_in) && ERANGE == errno) {
-		LOG_EXIT("strtol failed: %s out of range of type long", str_to_conv);
+		YOBEMAG_EXIT("strtol failed: %s out of range of type long", str_to_conv);
     } else if (strtol_in > INT_MAX) {
-		LOG_EXIT("strtol failed: %ld greater than INT_MAX", strtol_in);
+		YOBEMAG_EXIT("strtol failed: %ld greater than INT_MAX", strtol_in);
     } else if (strtol_in < INT_MIN) {
-		LOG_EXIT("strtol failed: %ld less than INT_MIN", strtol_in);
+		YOBEMAG_EXIT("strtol failed: %ld less than INT_MIN", strtol_in);
     } else {
         *store_into = (int) strtol_in;
     }
@@ -44,7 +44,7 @@ static void safe_strtol(const char* const str_to_conv, int* const store_into) {
 
 void cli_parse(CLIArguments* const cli_args, const int argc, char **const argv) {
 	if (argc < 2) {
-		LOG_EXIT("No ROM path specified! %s", usage_str);
+		YOBEMAG_EXIT("No ROM path specified! %s", usage_str);
 	}
 
 	// set default values
@@ -60,15 +60,15 @@ void cli_parse(CLIArguments* const cli_args, const int argc, char **const argv) 
                 cli_args->logging_level = (LoggingLevel) strtol_in;
                 break;
             default:
-				LOG_EXIT("%s", usage_str);
+				YOBEMAG_EXIT("%s", usage_str);
         }
     }
 
     // parse the remaining options
 	if (argc - optind > 1) {
-		LOG_EXIT("You provided too many arguments! %s", usage_str);
+		YOBEMAG_EXIT("You provided too many arguments! %s", usage_str);
 	} else if (optind >= argc) {
-		LOG_EXIT("No ROM path specified! %s", usage_str);
+		YOBEMAG_EXIT("No ROM path specified! %s", usage_str);
 	}
 
     // path to rom is the only remaining argument

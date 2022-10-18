@@ -95,23 +95,23 @@ static void rom_setup(void) {
 void rom_init(const char *file_name) {
     int f = open(file_name, O_RDONLY);
     if (f == -1)
-		LOG_EXIT("Opening file %s failed: %s", file_name, strerror(errno));
+		YOBEMAG_EXIT("Opening file %s failed: %s", file_name, strerror(errno));
 
 	struct stat st;
     if (fstat(f, &st) == -1)
-		LOG_EXIT("Retrieving information about file %s failed: %s", file_name, strerror(errno));
+		YOBEMAG_EXIT("Retrieving information about file %s failed: %s", file_name, strerror(errno));
 
 	rom_size = (size_t) st.st_size;
 	rom_bytes = mmap(NULL, rom_size, PROT_READ, MAP_PRIVATE, f, 0);
     if (rom_bytes == MAP_FAILED)
-		LOG_EXIT("mmap for file %s failed: %s", file_name, strerror(errno));
+		YOBEMAG_EXIT("mmap for file %s failed: %s", file_name, strerror(errno));
 
     rom_setup();
 }
 
 void rom_destroy(void) {
 	if (rom_bytes != NULL && munmap(rom_bytes, rom_size) == -1) {
-		// We cannot use LOG_EXIT here since it calls rom_destroy
+		// We cannot use YOBEMAG_EXIT here since it calls rom_destroy
 		LOG_FATAL("munmap failed: %s", strerror(errno));
 		fflush(stdout);
 		fflush(stderr);
