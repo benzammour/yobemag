@@ -35,13 +35,17 @@ static void get_time(char* const time_str) {
 void log_set_lvl(LoggingLevel log_lvl) {
     min_log_lvl = log_lvl;
 
-    // minimum debug level cannot be higher than fatal
-    if (min_log_lvl > FATAL)
-        min_log_lvl = FATAL;
+    // minimum logging level cannot be higher than fatal
+	if (min_log_lvl > FATAL) {
+		LOG_WARNING("Provided logging level %d is higher than FATAL (%d).", min_log_lvl, FATAL);
+		min_log_lvl = FATAL;
+	}
 
-    // minimum debug level cannot be lower than debug
-    if (min_log_lvl < DEBUG)
-        min_log_lvl = DEBUG;
+    // minimum logging level cannot be lower than debug
+	if (min_log_lvl < DEBUG) {
+		LOG_WARNING("Provided logging level %d is lower than DEBUG (%d).", min_log_lvl, DEBUG);
+		min_log_lvl = DEBUG;
+	}
 
     LOG_INFO("Log level initialized to %d.", min_log_lvl);
 }
@@ -76,7 +80,7 @@ void log_str(const LoggingLevel log_lvl, const char *const log_lvl_str, FILE *co
     va_list args;
 	va_start(args, msg);
 
-	char time_str[20];
+	char time_str[MAX_TIME_STR_LEN];
 	get_time(time_str);
 
 	fprintf(stream, "%10s – %s – ", log_lvl_str, time_str);

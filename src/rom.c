@@ -14,6 +14,11 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
+#define ROM_TITLE_LEN (17)
+#define ROM_TITLE_START_ADDR (0x134)
+#define CARTRIDGE_TYPE_ADDR (0x147)
+#define CARTRIDGE_SIZE_ADDR (0x148)
+
 static const char *cartridge_types[0xFF+1] = {
     [0x00] = "ROM ONLY",
     [0x01] = "MBC1",
@@ -71,16 +76,15 @@ static size_t rom_size;
  ******************************************************/
 
 static void rom_setup(void) {
-    char title[17];
-    memcpy(title, &rom_bytes[0x134], 16);
-    title[16] = '\0';
-    
+    char title[ROM_TITLE_LEN];
+    memcpy(title, &rom_bytes[ROM_TITLE_START_ADDR], ROM_TITLE_LEN - 1);
+    title[ROM_TITLE_LEN - 1] = '\0';
     LOG_INFO("Rom title: %s", title);
 
-    uint8_t type = rom_bytes[0x147];
+    uint8_t type = rom_bytes[CARTRIDGE_TYPE_ADDR];
     LOG_INFO("Cartridge type: %s (%02x)", cartridge_types[type], type);
 
-    uint8_t rom_size_index = rom_bytes[0x148];
+    uint8_t rom_size_index = rom_bytes[CARTRIDGE_SIZE_ADDR];
     LOG_INFO("Cartridge rom size: %s (%02x)", rom_sizes[rom_size_index], rom_size_index);
 }
 
@@ -107,7 +111,7 @@ void rom_init(const char *file_name) {
 
 void rom_destroy(void) {
 	if (rom_bytes != NULL && munmap(rom_bytes, rom_size) == -1) {
-		// We cannot use YOBEMAG_EXIT here since it calls rom_destroy
+		// We cannot use LOG_EXIT here since it calls rom_destroy
 		LOG_FATAL("munmap failed: %s", strerror(errno));
 		fflush(stdout);
 		fflush(stderr);

@@ -8,6 +8,9 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
+#define WINDOW_WIDTH (640)
+#define WINDOW_HEIGHT (576)
+
 static SDL_Window *window;
 static SDL_Surface *surface;
 
@@ -22,7 +25,7 @@ void lcd_init(void) {
         "yobemag GB Emulator",
         SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED,
-        640, 576,
+		WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_INPUT_FOCUS
     );
 
