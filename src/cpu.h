@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+/**
+ * Encodes bit positions for flag register A.
+ */
 typedef enum flag {
 	/**
 	 * @brief Carry flag

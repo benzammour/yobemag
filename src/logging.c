@@ -12,6 +12,8 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
+#define MAX_TIME_STR_LEN (20)
+
 static LoggingLevel min_log_lvl = FATAL;
 
 /******************************************************
@@ -23,7 +25,7 @@ static void get_time(char* const time_str) {
 	struct tm local_time;
 	time(&current_time);
 	localtime_r(&current_time, &local_time);
-	strftime(time_str, 20, "%F %T", &local_time);
+	strftime(time_str, MAX_TIME_STR_LEN, "%F %T", &local_time);
 }
 
 /******************************************************
@@ -48,7 +50,7 @@ void log_exit(const char *const file_path, const int line_number, const char *co
 	va_list args;
 	va_start(args, msg);
 
-	char time_str[20];
+	char time_str[MAX_TIME_STR_LEN];
 	get_time(time_str);
 
 	char *file_path_copy = strdup(file_path);

@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 typedef enum LoggingLevel {
-    DEBUG,
+    DEBUG = -1,
     INFO,
     WARNING,
     ERROR,
@@ -18,6 +18,17 @@ typedef enum LoggingLevel {
  */
 void log_set_lvl(LoggingLevel log_lvl);
 
+/**
+ * @brief 	Log a string to stderr with logging level ::FATAL formatted as
+ * 			@p msg with parameters @p ...
+ * 			This function is invoked by `#LOG_EXIT`.
+ *
+ *
+ * @param 	file_path 	Passed by `#LOG_EXIT`. Indicates invocation site.
+ * @param 	line_number Passed by `#LOG_EXIT`. Indicates specific invocation line.
+ * @param 	msg 		Format string for the log message
+ * @param 	...			Parameters for format string
+ */
 _Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_path, int line_number, const char* msg, ...);
 
 /**
