@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 /**
- * Encodes bit positions for flag register A.
+ * Encodes bit positions for flag register A
  */
 typedef enum flag {
 	/**

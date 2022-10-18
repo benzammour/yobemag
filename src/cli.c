@@ -68,7 +68,6 @@ CLIArguments* cli_config_handle(const int argc, char **const argv) {
     }
 
     // parse the remaining options
-
 	if (argc - optind > 1) {
 		LOG_EXIT("You provided too many arguments! %s", usage_str);
 	} else if (optind >= argc) {

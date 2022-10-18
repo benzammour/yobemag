@@ -21,11 +21,11 @@ void log_set_lvl(LoggingLevel log_lvl);
 /**
  * @brief 	Log a string to stderr with logging level ::FATAL formatted as
  * 			@p msg with parameters @p ...
- * 			This function is invoked by `#LOG_EXIT`.
+ * 			This function is invoked by `#LOG_EXIT(msg, ...)`.
  *
  *
- * @param 	file_path 	Passed by `#LOG_EXIT`. Indicates invocation site.
- * @param 	line_number Passed by `#LOG_EXIT`. Indicates specific invocation line.
+ * @param 	file_path 	Passed by `#LOG_EXIT(msg, ...)`. Indicates invocation site
+ * @param 	line_number Passed by `#LOG_EXIT(msg, ...)`. Indicates specific invocation line
  * @param 	msg 		Format string for the log message
  * @param 	...			Parameters for format string
  */
@@ -35,7 +35,7 @@ _Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_p
  * @brief   Log a string to @p stream with logging level @p dbg_lvl, (printed as @p log_lvl_str),
  * 			formatted as @p msg with parameters @p ...
  *
- * @param   log_lvl     Logging level, represented as enum
+ * @param   log_lvl     Logging level, represented as ::LoggingLevel
  * @param   log_lvl_str Logging level string representation
  * @param   stream      Stream to print to (commonly stderr/stdout)
  * @param   msg         Format string for the log message

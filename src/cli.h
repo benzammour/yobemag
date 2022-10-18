@@ -6,15 +6,15 @@
 #include "logging.h"
 
 /**
- * @brief Stores passed cli arguments for later use.
+ * @brief Stores passed cli arguments for later use
  */
 typedef struct CLIArguments {
 	/**
-	 * @brief Indicates the minimum logging level (checked by ::log_str()).
+	 * @brief Indicates the minimum logging level (checked by ::log_str())
 	 */
     LoggingLevel logging_level;
 	/**
-	 * @brief Propagated to ::rom_load() to create a memory map to rom file.
+	 * @brief Propagated to ::rom_load() to create a memory map to rom file
 	 */
     const char* rom_path;
 } CLIArguments;
