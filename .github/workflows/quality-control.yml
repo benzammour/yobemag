@@ -48,9 +48,36 @@ jobs:
           gcc-12 -v
           out=$(gcc-12 -fanalyzer -c src/*.c -Isrc); echo -e $out; if [[ $(echo $out | head -c1 | wc -c) > 1 ]]; then exit 1; fi # TODO: Use @Benzammour's fix
 
+  unit-tests-with-sanitizers:
+    name: Criterion Unit Tests with Sanitizers
+    needs: [ static-analysis ]
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        config: [ { compiler: gcc, sanitizer: valgrind },
+                  { compiler: clang-14, sanitizer: address },
+                  { compiler: clang-14, sanitizer: undefined } ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install ninja-build libsdl2-dev libcriterion-dev valgrind -y
+
+      - name: Run Criterion test suite with sanitizer
+        run: |
+          mkdir build
+          cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=${{ matrix.config.sanitizer }} -DTEST=1 . -B build
+          ninja -j 0 -C build sanitize-test
+
   unit-tests:
     name: Criterion Unit Tests
-    needs: [ static-analysis ]
+    needs: [ unit-tests-with-sanitizers ]
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
@@ -68,7 +95,7 @@ jobs:
       - name: Run Criterion test suite
         run: |
           mkdir build
-          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 -DOPTIMIZE=0 . -B build
+          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 . -B build
           ninja -j 0 -C build test
 
       - name: Run gcov
