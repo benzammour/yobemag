@@ -52,18 +52,17 @@ target_compile_options(${PRODUCT_NAME} PUBLIC
 
 if (DEFINED OPTIMIZE)
     message("[${UPPER_PRODUCT_NAME}] Using -O${OPTIMIZE}")
-    # Use the same optimization level for build and test
-    add_compile_options(-O${OPTIMIZE})
+    target_compile_options(${PRODUCT_NAME} PUBLIC -O${OPTIMIZE})
 endif ()
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_compile_options(${PRODUCT_NAME} PUBLIC
                            -Weverything
                            -Wno-declaration-after-statement
                            -Wno-padded
                            -Wno-gnu-designator
                            -ferror-limit=0)
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
+elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_compile_options(${PRODUCT_NAME} PUBLIC
                            # Standard GCC warnings: https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
                            -Wlogical-op
@@ -110,9 +109,34 @@ if (${TEST})
             message("[${UPPER_PRODUCT_NAME}] Adding coverage flags")
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 --coverage")
         else ()
-            message("[${MSG_PREFIX}] GCC is required to output coverage reports")
+            message(FATAL_ERROR "[${MSG_PREFIX}] GCC is required to output coverage reports")
         endif ()
     endif ()
+
+    if (DEFINED SANITIZE)
+        if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
+            if (NOT ${SANITIZE} STREQUAL "valgrind")
+                message("[${UPPER_PRODUCT_NAME}] Adding -fsanitize=${SANITIZE} and necessary compiler flags")
+                set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=${SANITIZE}")
+                if (${SANITIZE} STREQUAL "memory")
+                    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize-memory-track-origins -fno-omit-frame-pointer -g -O2")
+                else ()
+                    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O1 -fno-omit-frame-pointer -g")
+                endif ()
+                message("${CMAKE_C_FLAGS}")
+                add_custom_target(sanitize-test COMMAND ./${TEST_NAME} DEPENDS ${TEST_NAME})
+            else()
+                message(FATAL_ERROR "[${UPPER_PRODUCT_NAME}] GCC is required to run ${SANITIZE}")
+            endif()
+        else (CMAKE_C_COMPILER_ID STREQUAL "GNU")
+            if (${SANITIZE} STREQUAL "valgrind")
+                message("[${UPPER_PRODUCT_NAME}] Adding no compile flags for ${SANITIZE}")
+                add_custom_target(sanitize-test COMMAND valgrind --leak-check=yes ./${TEST_NAME} DEPENDS ${TEST_NAME})
+            else()
+                message(FATAL_ERROR "[${UPPER_PRODUCT_NAME}] clang is required to run address, memory, or undefined sanitizers")
+            endif()
+        endif ()
+    endif()
 
     target_link_libraries(${TEST_NAME} PUBLIC -lm -lSDL2 -pthread -lcriterion)
 
