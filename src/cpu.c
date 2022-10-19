@@ -635,7 +635,7 @@ void OPC_ADD_A_d8(void) {
 
 static void SUB_A_n(uint8_t n) {
 	uint8_t A = cpu.AF.bytes.high;
-	uint_fast16_t result = A - n;
+	uint8_t result = A - n;
 
 	clear_flag_register();
 	set_flag(!result, Z_FLAG);
@@ -643,7 +643,7 @@ static void SUB_A_n(uint8_t n) {
 	set_flag((n & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
 	set_flag(n > A, C_FLAG);
 
-	cpu.AF.bytes.high = (uint8_t) result;
+	cpu.AF.bytes.high = result;
 }
 
 void OPC_SUB_A_A(void) {
