@@ -1,7 +1,7 @@
 #include "cpu_mmu.h"
 
 void cpu_mmu_setup(void) {
-    srand(time(NULL));
+    srand(0xcafebeef);
     cpu_init();
 }
 
