@@ -646,7 +646,7 @@ static void SUB_A_n(uint8_t n) {
 	set_flag(!result, Z_FLAG);
 	set_flag(1, N_FLAG);
 	set_flag((n & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
-	set_flag(result > 0, C_FLAG);
+	set_flag(n > A, C_FLAG);
 
 	cpu.AF.bytes.high = (uint8_t) result;
 }
