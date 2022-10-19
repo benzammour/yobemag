@@ -1,5 +1,5 @@
-#ifndef YOBEMAG_LOGGING_H
-#define YOBEMAG_LOGGING_H
+#ifndef YOBEMAG_LOG_H
+#define YOBEMAG_LOG_H
 
 #include <stdio.h>
 
@@ -61,4 +61,4 @@ __attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const c
 
 #pragma clang diagnostic pop 
 
-#endif //YOBEMAG_LOGGING_H
+#endif //YOBEMAG_LOG_H

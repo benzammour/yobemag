@@ -4,11 +4,9 @@
 #include <sys/mman.h>
 #include <string.h>
 #include <errno.h>
-#include <stdlib.h>
-#include <SDL2/SDL.h>
 
 #include "rom.h"
-#include "logging.h"
+#include "log.h"
 
 /******************************************************
  *** LOCAL VARIABLES                                ***
@@ -111,12 +109,7 @@ void rom_init(const char *file_name) {
 
 void rom_destroy(void) {
 	if (rom_bytes != NULL && munmap(rom_bytes, rom_size) == -1) {
-		// We cannot use YOBEMAG_EXIT here since it calls rom_destroy
-		LOG_FATAL("munmap failed: %s", strerror(errno));
-		fflush(stdout);
-		fflush(stderr);
-		SDL_Quit();
-		exit(EXIT_FAILURE);
+		YOBEMAG_EXIT("munmap failed: %s", strerror(errno));
 	}
 }
 

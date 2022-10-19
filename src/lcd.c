@@ -2,7 +2,7 @@
 #include <stdbool.h>
 
 #include "lcd.h"
-#include "logging.h"
+#include "log.h"
 
 /******************************************************
  *** LOCAL VARIABLES                                ***

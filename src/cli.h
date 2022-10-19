@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "logging.h"
+#include "log.h"
 
 /**
  * @brief Stores passed cli arguments for later use

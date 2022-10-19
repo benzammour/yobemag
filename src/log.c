@@ -3,10 +3,8 @@
 #include <string.h>
 #include <libgen.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
 
-#include "logging.h"
-#include "rom.h"
+#include "log.h"
 
 /******************************************************
  *** LOCAL VARIABLES                                ***
@@ -66,10 +64,6 @@ void log_exit(const char *const file_path, const int line_number, const char *co
 
 	va_end(args);
 
-	fflush(stdout);
-    fflush(stderr);
-    SDL_Quit();
-    rom_destroy();
     exit(EXIT_FAILURE);
 }
 

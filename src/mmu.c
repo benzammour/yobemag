@@ -1,5 +1,5 @@
 #include "mmu.h"
-#include "logging.h"
+#include "log.h"
 #include "rom.h"
 
 /******************************************************

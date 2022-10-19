@@ -2,7 +2,7 @@
 
 #include "mmu.h"
 #include "cpu.h"
-#include "logging.h"
+#include "log.h"
 
 #define LO_NIBBLE_MASK (0x0F)
 //#define HI_NIBBLE_MASK (0xF0)

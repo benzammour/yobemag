@@ -5,7 +5,7 @@
 #include <errno.h>
 
 #include "cli.h"
-#include "logging.h"
+#include "log.h"
 
 /******************************************************
  *** LOCAL VARIABLES                                ***

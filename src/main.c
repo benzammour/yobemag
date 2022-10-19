@@ -6,9 +6,20 @@
 #include "rom.h"
 #include "mmu.h"
 #include "cli.h"
-#include "logging.h"
+#include "log.h"
+
+static void teardown(void) {
+	fflush(stderr);
+	fflush(stdout);
+	// Both of these functions are "secured" against calling before initialization
+	SDL_Quit();
+	rom_destroy();
+}
 
 int main(const int argc, char **const argv) {
+	// First thing we do is register exit hook
+	atexit(&teardown);
+
 	CLIArguments cli_args;
 	cli_parse(&cli_args, argc, argv);
 
@@ -36,11 +47,6 @@ int main(const int argc, char **const argv) {
         ++iterations;
     }
     LOG_INFO("Total number of iterations: %d", iterations);
-
-	fflush(stdout);
-	fflush(stderr);
-	SDL_Quit();
-	rom_destroy();
 
     return EXIT_SUCCESS;
 }
