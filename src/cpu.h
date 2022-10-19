@@ -62,8 +62,6 @@ void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);
 void REG_INC(uint8_t *reg);
 
-void optable_init(void);
-
 void OPC_NOP(void);
 void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);

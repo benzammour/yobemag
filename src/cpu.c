@@ -90,7 +90,7 @@ void REG_INC(uint8_t *reg) {
 	cpu.cycle_count += 1;
 }
 
-void optable_init(void) {
+static void optable_init(void) {
     // Set up lookup table
     instr_lookup[0x00] = OPC_NOP;
     instr_lookup[0x01] = OPC_LD_BC;
@@ -249,8 +249,6 @@ ErrorCode cpu_step(void) {
 
     // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
-
-	cpu.PC++;
 
     return ERR_SUCCESS;
 }
@@ -654,45 +652,54 @@ static void SUB_A_n(uint8_t n) {
 void OPC_SUB_A_A(void) {
 	SUB_A_n(cpu.AF.bytes.high);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_B(void) {
 	SUB_A_n(cpu.BC.bytes.high);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_C(void) {
 	SUB_A_n(cpu.BC.bytes.low);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_D(void) {
 	SUB_A_n(cpu.DE.bytes.high);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_E(void) {
 	SUB_A_n(cpu.DE.bytes.low);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_H(void) {
 	SUB_A_n(cpu.HL.bytes.high);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_L(void) {
 	SUB_A_n(cpu.HL.bytes.low);
 	cpu.cycle_count += 4;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_HL(void) {
 	SUB_A_n(mmu_get_byte(cpu.HL.word));
 	cpu.cycle_count += 8;
+    cpu.PC += 1;
 }
 
 void OPC_SUB_A_d8(void) {
 	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
 	SUB_A_n(immediate);
 	cpu.cycle_count += 8;
+    cpu.PC += 2;
 }

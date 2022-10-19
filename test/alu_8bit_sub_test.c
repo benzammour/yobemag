@@ -1,7 +1,8 @@
 #include <criterion/criterion.h>
+#include <criterion/new/assert.h>
 
 #include "fixtures/cpu_mmu.h"
-#include "logging.h"
+#include "common/util.h"
 
 Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode = 0x97;
@@ -19,22 +20,22 @@ Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // Z should be set, as our result is 0
-    cr_assert(cpu.AF.bytes.low & (1 << Z_FLAG));
+    cr_expect(eq(u8, get_flag_bit(Z_FLAG), 1));
 
     // N should be set
-    cr_assert(cpu.AF.bytes.low & (1 << N_FLAG));
+    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
 
     // H should NOT be set because of no half-borrow
-    cr_assert(!(cpu.AF.bytes.low & (1 << H_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(H_FLAG)));
 
     // C should NOT be set because of no borrow
-    cr_assert(!(cpu.AF.bytes.low & (1 << C_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(C_FLAG)));
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, (address + 1)));
 }
 
 Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -55,22 +56,22 @@ Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     const uint8_t actual = cpu.AF.bytes.high;
 
     // Z should not be set, as our result is not 0
-    cr_assert(!(cpu.AF.bytes.low & (1 << Z_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
 
     // N should always be set
-    cr_assert(cpu.AF.bytes.low & (1 << N_FLAG));
+    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
 
     // H should be set because borrow occured
-    cr_assert(cpu.AF.bytes.low & (1 << H_FLAG));
+    cr_expect(eq(u8, get_flag_bit(H_FLAG), 1));
 
     // C should not be set because of no borrow
-    cr_assert(!(cpu.AF.bytes.low & (1 << C_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(C_FLAG)));
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -91,22 +92,22 @@ Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // Z should not be set, as our result is not 0
-    cr_assert(!(cpu.AF.bytes.low & (1 << Z_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
 
     // N should always be set
-    cr_assert(cpu.AF.bytes.low & (1 << N_FLAG));
+    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
 
     // H should not be set because no HB occured
-    cr_assert(!(cpu.AF.bytes.low & (1 << H_FLAG)));
+    cr_expect(zero(u8, get_flag_bit(H_FLAG)));
 
     // C should be set because of borrow
-    cr_assert(cpu.AF.bytes.low & (1 << C_FLAG));
+    cr_expect(eq(u8, get_flag_bit(C_FLAG), 1));
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -127,10 +128,10 @@ Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -151,10 +152,10 @@ Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -175,10 +176,10 @@ Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -199,10 +200,10 @@ Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -226,10 +227,10 @@ Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
 Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -251,8 +252,8 @@ Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t actual = cpu.AF.bytes.high;
 
     // check if value is correct
-    cr_assert(actual == expected);
+    cr_expect(eq(u8, actual, expected));
 
-    // check if pc is Pc is updated correctly
-    cr_assert(cpu.PC == (address + 1));
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 2));
 }
