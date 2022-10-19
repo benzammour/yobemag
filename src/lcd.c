@@ -45,13 +45,13 @@ bool lcd_step(void) {
     }
 
     if(key_states[SDL_SCANCODE_Q]) {
-        return false;
+        return true;
     }
 
 
     if(key_states[SDL_SCANCODE_A]) {
-        LOG_DEBUG("a");
+        LOG_INFO("a");
     }
 
-    return true;
+    return false;
 }
