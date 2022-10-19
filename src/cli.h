@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef YOBEMAG_CLI_H
 #define YOBEMAG_CLI_H
 

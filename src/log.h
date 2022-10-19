@@ -1,7 +1,10 @@
+/** @file */
+
 #ifndef YOBEMAG_LOG_H
 #define YOBEMAG_LOG_H
 
 #include <stdio.h>
+#include "attributes.h"
 
 typedef enum LoggingLevel {
     DEBUG = -1,
@@ -21,15 +24,16 @@ void log_set_lvl(LoggingLevel log_lvl);
 /**
  * @brief 	Log a string to stderr with logging level ::FATAL formatted as
  * 			@p msg with parameters @p ...
- * 			This function is invoked by `#YOBEMAG_EXIT(msg, ...)`.
+ * 			This function is invoked by `#YOBEMAG_EXIT(msg, ...)`
  *
+ * @note This function does not return
  *
  * @param 	file_path 	Passed by `#YOBEMAG_EXIT(msg, ...)`. Indicates invocation site
  * @param 	line_number Passed by `#YOBEMAG_EXIT(msg, ...)`. Indicates specific invocation line
  * @param 	msg 		Format string for the log message
  * @param 	...			Parameters for format string
  */
-_Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_path, int line_number, const char* msg, ...);
+ATTR_NORETURN ATTR_FORMAT3 void log_exit(const char *file_path, int line_number, const char* msg, ...);
 
 /**
  * @brief   Log a string to @p stream with logging level @p dbg_lvl, (printed as @p log_lvl_str),
@@ -41,7 +45,7 @@ _Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_p
  * @param   msg         Format string for the log message
  * @param   ...         Parameters for format string
  */
-__attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const char* log_lvl_str, FILE *stream,
+ATTR_FORMAT4 void log_str(LoggingLevel log_lvl, const char* log_lvl_str, FILE *stream,
 												   const char* msg, ...);
 
 /*
@@ -56,8 +60,7 @@ __attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const c
 #define LOG_INFO(msg, ...)      log_str(INFO, "INFO", stdout, msg, ##__VA_ARGS__)
 #define LOG_WARNING(msg, ...)   log_str(WARNING, "WARNING", stdout, msg, ##__VA_ARGS__)
 #define LOG_ERROR(msg, ...)     log_str(ERROR, "ERROR", stderr, msg, ##__VA_ARGS__)
-#define LOG_FATAL(msg, ...)     log_str(FATAL, "FATAL", stderr, msg, ##__VA_ARGS__)
-#define YOBEMAG_EXIT(msg, ...)     log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
+#define YOBEMAG_EXIT(msg, ...)	log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
 
 #pragma clang diagnostic pop 
 

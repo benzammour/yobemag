@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef YOBEMAG_LCD_H
 #define YOBEMAG_LCD_H
 

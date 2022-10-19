@@ -3,6 +3,7 @@
 #include "mmu.h"
 #include "cpu.h"
 #include "log.h"
+#include "attributes.h"
 
 #define LO_NIBBLE_MASK (0x0F)
 //#define HI_NIBBLE_MASK (0xF0)
@@ -32,15 +33,15 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void set_flag(uint8_t bit, Flag f) {
+ATTR_ALWAYS_INLINE inline static void set_flag(uint8_t bit, Flag f) {
 	cpu.AF.bytes.low |= bit << f;
 }
 
-__attribute((always_inline)) inline static void clear_flag(uint8_t bit, Flag f) {
+ATTR_ALWAYS_INLINE inline static void clear_flag(uint8_t bit, Flag f) {
 	cpu.AF.bytes.low &= (uint8_t) ~(bit << f);
 }
 
-__attribute((always_inline)) inline static void clear_flag_register(void) {
+ATTR_ALWAYS_INLINE inline static void clear_flag_register(void) {
 	cpu.AF.bytes.low = 0;
 }
 

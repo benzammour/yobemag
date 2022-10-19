@@ -1,7 +1,11 @@
+/** @file */
+
 #ifndef YOBEMAG_CPU_H
 #define YOBEMAG_CPU_H
 
 #include <stdint.h>
+
+#include "attributes.h"
 
 /**
  * Encodes bit positions for flag register A
@@ -50,11 +54,11 @@ typedef struct CPU {
 extern CPU cpu;
 
 void cpu_init(void);
-__attribute__((pure)) uint16_t cpu_get_cycle_count(void);
+ATTR_PURE uint16_t cpu_get_cycle_count(void);
 void cpu_step(void);
 
 
-__attribute__((pure)) uint16_t cpu_get_PC(void);
+ATTR_PURE uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
 
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
