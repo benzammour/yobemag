@@ -4,6 +4,11 @@
 
 #define ROM_LIMIT (0x8000)
 
+#define MB0 (0x0000)
+#define MB0_LENGTH (0x4000)
+#define MB1 (0x4000)
+#define MB1_LENGTH (0x4000)
+
 static uint8_t *mem;
 
 static const uint8_t bootrom[256] = {
@@ -31,8 +36,8 @@ ErrorCode mmu_init(void) {
     if (rom_bytes == NULL) {
         LOG_ERROR("ROM-bytes buffer is NULL!\n");
     } else {
-        memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
-        memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
+        memcpy(&mem[MB0], &rom_bytes[MB0], MB0_LENGTH);
+        memcpy(&mem[MB1], &rom_bytes[MB1], MB1_LENGTH);
     }
 
     if (mem == NULL)
