@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-#include "errcodes.h"
-
+/**
+ * Encodes bit positions for flag register A
+ */
 typedef enum flag {
 	/**
 	 * @brief Carry flag
@@ -50,7 +51,7 @@ extern CPU cpu;
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
-ErrorCode cpu_step(void);
+void cpu_step(void);
 
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);

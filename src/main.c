@@ -6,57 +6,47 @@
 #include "rom.h"
 #include "mmu.h"
 #include "cli.h"
-#include "logging.h"
-#include "errcodes.h"
+#include "log.h"
+
+static void teardown(void) {
+	fflush(stderr);
+	fflush(stdout);
+	// Both of these functions are "secured" against calling before initialization
+	SDL_Quit();
+	rom_destroy();
+}
 
 int main(const int argc, char **const argv) {
-    CLIArguments* args = cli_config_default();
-    
-    if (cli_config_handle(args, argc, argv)) {
-        cli_config_destroy(args);
-        exit(ERR_FAILURE);
-    }
+	// First thing we do is register exit hook
+	atexit(&teardown);
 
-    ErrorCode ret = rom_load("./roms/hello-world.gb");
-    if (ret) {
-        LOG_FATAL("Failed to load ROM");
-        exit(ret);
-    }
-    printf("Successfully initialized ROM\n");
+	CLIArguments cli_args;
+	cli_parse(&cli_args, argc, argv);
 
-    ret = mmu_init();
-    if (ret) {
-        fprintf(stderr, "Failed to initialize MMU\n");
-        exit(ret);
-    }
+	log_set_lvl(cli_args.logging_level);
+
+	rom_init(cli_args.rom_path);
+    LOG_INFO("Successfully initialized ROM");
+
+	mmu_init();
     LOG_INFO("Successfully initialized MMU");
 
-    ret = lcd_load();
-    if (ret) {
-        LOG_FATAL("Failed to initialize LCD");
-        exit(ret);
-    }
+	lcd_init();
     LOG_INFO("Successfully initialized LCD");
-
 
     cpu_init();
     LOG_INFO("Successfully initialized CPU");
 
     uint8_t iterations = 0;
     while (1) {
-        if (cpu_step())
-            break;
+        cpu_step();
 
         if (lcd_step())
             break;
 
         ++iterations;
     }
-    LOG_INFO("Total number of interations: %d", iterations);
+    LOG_INFO("Total number of iterations: %d", iterations);
 
-
-    SDL_Quit();
-    cli_config_destroy(args);
-
-    return 0;
+    return EXIT_SUCCESS;
 }

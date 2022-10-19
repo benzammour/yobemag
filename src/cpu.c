@@ -1,9 +1,8 @@
 #include <stdio.h>
 
 #include "mmu.h"
-#include "rom.h"
 #include "cpu.h"
-#include "logging.h"
+#include "log.h"
 
 #define LO_NIBBLE_MASK (0x0F)
 //#define HI_NIBBLE_MASK (0xF0)
@@ -239,18 +238,16 @@ uint16_t cpu_get_two_bytes(uint16_t addr) {
     return value;
 }
 
-ErrorCode cpu_step(void) {
+void cpu_step(void) {
 	cpu.opcode = mmu_get_byte(cpu.PC);
 
-
-     LOG_DEBUG("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X",
+	LOG_DEBUG("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X",
 			cpu.PC, cpu.opcode,
 			mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), cpu.AF.bytes.high, cpu.BC.bytes.high, cpu.BC.bytes.low, cpu.DE.bytes.high, cpu.DE.bytes.low);
 
     // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
 
-    return ERR_SUCCESS;
 }
 
 // OP-Codes
