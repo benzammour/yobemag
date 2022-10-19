@@ -10,6 +10,11 @@
 #define BOOT_ROM_SIZE (256)
 #define MEM_SIZE (65536)
 
+#define MB0 (0x0000)
+#define MB0_LENGTH (0x4000)
+#define MB1 (0x4000)
+#define MB1_LENGTH (0x4000)
+
 static uint8_t mem[MEM_SIZE];
 
 static const uint8_t boot_rom[BOOT_ROM_SIZE] = {
@@ -37,9 +42,9 @@ static const uint8_t boot_rom[BOOT_ROM_SIZE] = {
 
 void mmu_init(void) {
     const uint8_t *rom_bytes = get_rom_bytes();
-	// TODO: Use defines instead of magic numbers
-    memcpy(&mem[0x0000], &rom_bytes[0x0000], 0x4000);
-    memcpy(&mem[0x4000], &rom_bytes[0x4000], 0x4000);
+
+    memcpy(&mem[MB0], &rom_bytes[MB0], MB0_LENGTH);
+    memcpy(&mem[MB1], &rom_bytes[MB1], MB1_LENGTH);
 }
 
 uint8_t mmu_get_byte(uint16_t addr) {

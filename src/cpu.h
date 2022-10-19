@@ -63,8 +63,6 @@ void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);
 void REG_INC(uint8_t *reg);
 
-void optable_init(void);
-
 void OPC_NOP(void);
 void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);
@@ -173,5 +171,37 @@ void OPC_ADD_A_HL(void);
  * 			since it reads the data from the opcode itself.
  */
 void OPC_ADD_A_d8(void);
+
+
+
+
+void OPC_SUB_A_A(void);
+
+void OPC_SUB_A_B(void);
+
+void OPC_SUB_A_C(void);
+
+void OPC_SUB_A_D(void);
+
+void OPC_SUB_A_E(void);
+
+void OPC_SUB_A_H(void);
+
+void OPC_SUB_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 		  then subtracts the fetched byte from A.
+ */
+void OPC_SUB_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 		  then subtracts the fetched byte from A.
+ *
+ * @warning PC cannot be incremented before this operation is completed
+ * 			since it reads the data from the opcode itself.
+ */
+void OPC_SUB_A_d8(void);
 
 #endif //YOBEMAG_CPU_H
