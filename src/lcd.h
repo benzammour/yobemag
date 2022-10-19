@@ -2,11 +2,10 @@
 #define YOBEMAG_LCD_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <SDL2/SDL.h>
 
-#include "errcodes.h"
-
-ErrorCode lcd_load(void);
-ErrorCode lcd_step(void);
+void lcd_init(void);
+bool lcd_step(void);
 
 #endif //YOBEMAG_LCD_H
