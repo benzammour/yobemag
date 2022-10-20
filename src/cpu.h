@@ -27,8 +27,8 @@ typedef enum flag {
 
 typedef union DoubleWordReg {
 	struct {
-		uint8_t high; // A, B, D, H
-		uint8_t low; // F, C, E, L
+		uint8_t hi; // A, B, D, H
+		uint8_t lo; // F, C, E, L
 	} words;
 	uint16_t dword;
 } DoubleWordReg;
@@ -51,20 +51,20 @@ typedef struct CPU {
 extern CPU cpu;
 
 #define CPU_DREG_HL cpu.HL.dword
-#define CPU_REG_H cpu.HL.words.high
-#define CPU_REG_L cpu.HL.words.low
+#define CPU_REG_H cpu.HL.words.hi
+#define CPU_REG_L cpu.HL.words.lo
 
 #define CPU_DREG_DE cpu.DE.dword
-#define CPU_REG_D cpu.DE.words.high
-#define CPU_REG_E cpu.DE.words.low
+#define CPU_REG_D cpu.DE.words.hi
+#define CPU_REG_E cpu.DE.words.lo
 
 #define CPU_DREG_BC cpu.BC.dword
-#define CPU_REG_B cpu.BC.words.high
-#define CPU_REG_C cpu.BC.words.low
+#define CPU_REG_B cpu.BC.words.hi
+#define CPU_REG_C cpu.BC.words.lo
 
 #define CPU_DREG_AF cpu.AF.dword
-#define CPU_REG_A cpu.AF.words.high
-#define CPU_REG_F cpu.AF.words.low
+#define CPU_REG_A cpu.AF.words.hi
+#define CPU_REG_F cpu.AF.words.lo
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
