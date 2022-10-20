@@ -224,3 +224,25 @@ Test(sbc_a_n, sbc_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + 2));
 }
+
+Test(sbc_a_n, sbc_check_integer_promotion, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode = 0x9D; // not important that it's exactly this one
+    const uint8_t a = 123;
+    const uint8_t l = 255;
+    const uint8_t expected = (uint8_t) (a - l - 1);
+    const uint16_t address = rand() % (0xFFFF);
+    set_flag(1, C_FLAG);
+
+    uint8_t actual = cpu_setup(opcode, address, a, l, &cpu.HL.bytes.low);
+
+    // C should be set because of borrow
+    // checks if integer promotion was successful
+    cr_expect(eq(u8, get_flag_bit(C_FLAG), 1));
+
+    // check if value is correct
+    cr_expect(eq(u8, actual, expected));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
+}
+
