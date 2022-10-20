@@ -32,7 +32,11 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void set_flag(uint8_t bit, Flag f) {
+uint8_t get_flag_bit(Flag f) {
+    return (cpu.AF.bytes.low >> f) & 1;
+}
+
+void set_flag(uint8_t bit, Flag f) {
 	cpu.AF.bytes.low |= bit << f;
 }
 
@@ -188,6 +192,17 @@ static void optable_init(void) {
 	instr_lookup[0x96] = OPC_SUB_A_HL;
 	instr_lookup[0x97] = OPC_SUB_A_A;
 	instr_lookup[0xD6] = OPC_SUB_A_d8;
+
+	// 8-bit ALU: SUB A,n
+	instr_lookup[0x98] = OPC_SBC_A_B;
+	instr_lookup[0x99] = OPC_SBC_A_C;
+	instr_lookup[0x9A] = OPC_SBC_A_D;
+	instr_lookup[0x9B] = OPC_SBC_A_E;
+	instr_lookup[0x9C] = OPC_SBC_A_H;
+	instr_lookup[0x9D] = OPC_SBC_A_L;
+	instr_lookup[0x9E] = OPC_SBC_A_HL;
+	instr_lookup[0x9F] = OPC_SBC_A_A;
+	instr_lookup[0xDE] = OPC_SBC_A_d8;
 
     // TODO: 0xA8
     // TODO: 0xA9
@@ -697,6 +712,76 @@ void OPC_SUB_A_HL(void) {
 void OPC_SUB_A_d8(void) {
 	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
 	SUB_A_n(immediate);
+	cpu.cycle_count += 8;
+    cpu.PC += 2;
+}
+
+
+static void SBC_A_n(uint8_t n) {
+	uint8_t A = cpu.AF.bytes.high;
+    uint8_t carry = get_flag_bit(C_FLAG);
+	uint8_t result = (uint8_t) (A - carry - n);
+
+	clear_flag_register();
+	set_flag(!result, Z_FLAG);
+	set_flag(1, N_FLAG);
+	set_flag(((n + carry) & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
+	set_flag((n + carry) > A, C_FLAG);
+
+	cpu.AF.bytes.high = result;
+}
+
+void OPC_SBC_A_A(void) {
+	SBC_A_n(cpu.AF.bytes.high);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_B(void) {
+	SBC_A_n(cpu.BC.bytes.high);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_C(void) {
+	SBC_A_n(cpu.BC.bytes.low);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_D(void) {
+	SBC_A_n(cpu.DE.bytes.high);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_E(void) {
+	SBC_A_n(cpu.DE.bytes.low);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_H(void) {
+	SBC_A_n(cpu.HL.bytes.high);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_L(void) {
+	SBC_A_n(cpu.HL.bytes.low);
+	cpu.cycle_count += 4;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_HL(void) {
+	SBC_A_n(mmu_get_byte(cpu.HL.word));
+	cpu.cycle_count += 8;
+    cpu.PC += 1;
+}
+
+void OPC_SBC_A_d8(void) {
+	uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+	SBC_A_n(immediate);
 	cpu.cycle_count += 8;
     cpu.PC += 2;
 }

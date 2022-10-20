@@ -7,37 +7,37 @@
  * Encodes bit positions for flag register A
  */
 typedef enum flag {
-	/**
-	 * @brief Carry flag
-	 */
-	C_FLAG = 4,
-	/**
-	 * @brief Half carry flag
-	 */
-	H_FLAG = 5,
-	/**
-	 * @brief Subtract flag
-	 */
-	N_FLAG = 6,
-	/**
-	 * @brief Zero flag
-	 */
-	Z_FLAG = 7,
+    /**
+     * @brief Carry flag
+     */
+    C_FLAG = 4,
+    /**
+     * @brief Half carry flag
+     */
+    H_FLAG = 5,
+    /**
+     * @brief Subtract flag
+     */
+    N_FLAG = 6,
+    /**
+     * @brief Zero flag
+     */
+    Z_FLAG = 7,
 } Flag;
 
 typedef union Register {
-	struct {
-		uint8_t high; // A, B, D, H
-		uint8_t low; // F, C, E, L
-	} bytes;
-	uint16_t word;
+    struct {
+        uint8_t high; // A, B, D, H
+        uint8_t low; // F, C, E, L
+    } bytes;
+    uint16_t word;
 } Register;
 
 typedef struct CPU {
-	Register HL;
-	Register DE;
-	Register BC;
-	Register AF;
+    Register HL;
+    Register DE;
+    Register BC;
+    Register AF;
 
     uint16_t SP;
     uint16_t PC;
@@ -56,6 +56,9 @@ void cpu_step(void);
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
+
+__attribute__((pure)) uint8_t get_flag_bit(Flag f);
+void set_flag(uint8_t bit, Flag f);
 
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
 void LD_8(uint8_t *addr);
@@ -159,13 +162,13 @@ void OPC_ADD_A_L(void);
 
 /**
  * @brief First fetches a byte from the address `HL`,
- * 		  then adds the fetched byte to A.
+ * 	      then adds the fetched byte to A.
  */
 void OPC_ADD_A_HL(void);
 
 /**
  * @brief First fetches an immediate byte from PC + 1,
- * 		  then adds the fetched byte to A.
+ * 	      then adds the fetched byte to A.
  *
  * @warning PC cannot be incremented before this operation is completed
  * 			since it reads the data from the opcode itself.
@@ -174,34 +177,121 @@ void OPC_ADD_A_d8(void);
 
 
 
-
+/**
+ * @brief Subtract the value stored in Register A from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_A(void);
 
+/**
+ * @brief Subtract the value stored in Register B from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_B(void);
 
+/**
+ * @brief Subtract the value stored in Register C from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_C(void);
 
+/**
+ * @brief Subtract the value stored in Register D from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_D(void);
 
+/**
+ * @brief Subtract the value stored in Register E from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_E(void);
 
+/**
+ * @brief Subtract the value stored in Register H from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_H(void);
 
+/**
+ * @brief Subtract the value stored in Register L from
+ * 	      the value stored in A and store it back into A.
+ */
 void OPC_SUB_A_L(void);
 
 /**
  * @brief First fetches a byte from the address `HL`,
- * 		  then subtracts the fetched byte from A.
+ * 	      then subtracts the fetched byte from A.
  */
 void OPC_SUB_A_HL(void);
 
 /**
  * @brief First fetches an immediate byte from PC + 1,
- * 		  then subtracts the fetched byte from A.
+ * 	      then subtracts the fetched byte from A.
  *
  * @warning PC cannot be incremented before this operation is completed
  * 			since it reads the data from the opcode itself.
  */
 void OPC_SUB_A_d8(void);
+
+
+
+/**
+ * @brief Subtract the value stored in Register A from the value stored in A, 
+ * 	      additionally subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_A(void);
+
+/**
+ * @brief Subtract the value stored in Register B from the value stored in A,
+ *        additionally subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_B(void);
+
+/**
+ * @brief Subtract the value stored in Register C from the value stored in A,
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_C(void);
+
+/**
+ * @brief Subtract the value stored in Register D from the value stored in A,
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_D(void);
+
+/**
+ * @brief Subtract the value stored in Register E from the value stored in A,
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_E(void);
+
+/**
+ * @brief Subtract the value stored in Register H from the value stored in A,
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_H(void);
+
+/**
+ * @brief Subtract the value stored in Register L from the value stored in A,
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`, subtracts the fetched byte from A
+ *        addtionally, subtract the carry flag, then store it in A.
+ */
+void OPC_SBC_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1, subtracts the fetched byte from A
+ *        addtionally, subtract the carry flag, then store it in A.
+ *
+ * @warning PC cannot be incremented before this operation is completed
+ * 			since it reads the data from the opcode itself.
+ */
+void OPC_SBC_A_d8(void);
+
 
 #endif //YOBEMAG_CPU_H
