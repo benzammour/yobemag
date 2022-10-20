@@ -25,19 +25,20 @@ typedef enum flag {
 	Z_FLAG = 7,
 } Flag;
 
-typedef union Register {
+typedef union DoubleWordReg {
 	struct {
 		uint8_t high; // A, B, D, H
 		uint8_t low; // F, C, E, L
 	} bytes;
 	uint16_t word;
-} Register;
+} DoubleWordReg;
+
 
 typedef struct CPU {
-	Register HL;
-	Register DE;
-	Register BC;
-	Register AF;
+	DoubleWordReg HL;
+	DoubleWordReg DE;
+	DoubleWordReg BC;
+	DoubleWordReg AF;
 
     uint16_t SP;
     uint16_t PC;
