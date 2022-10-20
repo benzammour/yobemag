@@ -22,10 +22,10 @@ static op_function instr_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
 static op_function cb_prefixed_lookup[0xFF + 1] = { [0 ... 0xFF] = UNKNOWN_OPCODE };
 
 CPU cpu = {
-    .HL.word = 0,
-    .DE.word = 0,
-    .BC.word = 0,
-    .AF.word = 0,
+    .HL.dword = 0,
+    .DE.dword = 0,
+    .BC.dword = 0,
+    .AF.dword = 0,
 	0,
 	0,
     0,
