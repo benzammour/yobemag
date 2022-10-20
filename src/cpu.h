@@ -185,7 +185,8 @@ void OPC_ADD_A_L(void);
  * @brief First fetches a byte from the address `HL`,
  * 	      then adds the fetched byte to A.
  *
- * @note This instruction requires the PC to be incremented by 1.
+ * @note This instruction requires the PC to be incremented by 1,
+ *       but takes 8 CPU cycles because of fetching a byte from memory
  */
 void OPC_ADD_A_HL(void);
 
@@ -279,7 +280,8 @@ void OPC_ADC_A_L(void);
  * 		  then adds the fetched byte to A together with
  * 		  the carry flag.
  *
- * @note This instruction requires the PC to be incremented by 2.
+ * @note This instruction requires the PC to be incremented by 1,
+ *       but takes 8 CPU cycles because of fetching a byte from memory.
  */
 void OPC_ADC_A_HL(void);
 
@@ -296,7 +298,6 @@ void OPC_ADC_A_HL(void);
  */
 void OPC_ADC_A_d8(void);
 
-#endif //YOBEMAG_CPU_H
 /**
  * @brief Subtract the value stored in Register A from the value stored in A,
  * 	      additionally subtract the carry flag, then store it in A.
