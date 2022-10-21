@@ -8,4 +8,4 @@
 void lcd_init(void);
 bool lcd_step(void);
 
-#endif //YOBEMAG_LCD_H
+#endif // YOBEMAG_LCD_H

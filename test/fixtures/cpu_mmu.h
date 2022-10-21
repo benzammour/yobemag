@@ -11,4 +11,4 @@
 void cpu_mmu_setup(void);
 void cpu_teardown(void);
 
-#endif //YOBEMAG_TEST_CPU_MMU_H
+#endif // YOBEMAG_TEST_CPU_MMU_H
