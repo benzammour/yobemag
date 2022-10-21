@@ -263,6 +263,7 @@ void cpu_step(void) {
 // OP-Codes
 void OPC_NOP(void) {
     ++cpu.cycle_count;
+    ++cpu.PC;
 }
 
 void OPC_LD_BC(void) {
