@@ -100,9 +100,10 @@ if (${TEST})
     set(TEST_FILES
         test/fixtures/cpu_mmu.c
         test/common/util.c
+        test/alu_8bit_add_test.c
         test/alu_8bit_adc_test.c
-        test/alu_8bit_sub_test.c
         test/alu_8bit_lds_test.c
+        test/alu_8bit_sub_test.c
         test/alu_8bit_sbc_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
