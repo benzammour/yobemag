@@ -80,7 +80,6 @@ __attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
     CPU_REG_F |= bit << f;
 }
 
-void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
 void LD_8(uint8_t *addr);
 void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);

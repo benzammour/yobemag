@@ -88,3 +88,29 @@ Test(ld_b_n, ld_b_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
+
+Test(sbc_a_n, ld_b_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0xDE;
+    const uint8_t a        = 70;
+    const uint8_t num      = 1;
+    const uint8_t expected = a - num - 1;
+    set_flag(1, C_FLAG);
+
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+
+    // setup cpu
+    cpu.PC    = address;
+    CPU_REG_A = a;
+    mmu_write_byte(address, opcode);
+    mmu_write_byte(address + 1, num);
+
+    // do the actual emulation
+    cpu_step();
+    const uint8_t actual = CPU_REG_A;
+
+    // check if value is correct
+    cr_expect(eq(u8, actual, expected));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 2));
+}
