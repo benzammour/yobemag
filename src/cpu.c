@@ -117,7 +117,7 @@ static void optable_init(void) {
     instr_lookup[0x43] = OPC_LD_B_E;
     instr_lookup[0x44] = OPC_LD_B_H;
     instr_lookup[0x45] = OPC_LD_B_L;
-    instr_lookup[0x46] = OPC_LD_D_HL;
+    instr_lookup[0x46] = OPC_LD_B_HL;
     instr_lookup[0x47] = OPC_LD_B_A;
     instr_lookup[0x48] = OPC_LD_C_B;
     instr_lookup[0x49] = OPC_LD_C_C;
