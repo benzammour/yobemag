@@ -6,6 +6,10 @@
 #include <string.h>
 #include <stdio.h>
 
+#define ROM_LIMIT (0x8000)
+#define BOOT_ROM_SIZE (256)
+#define MEM_SIZE (65536)
+
 void mmu_init(void);
 __attribute__((pure)) uint8_t mmu_get_byte(uint16_t addr);
 void mmu_write_byte(uint16_t dest_addr, uint8_t source_addr);

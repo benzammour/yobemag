@@ -18,11 +18,12 @@ static uint8_t cpu_setup(const uint8_t opcode, const uint16_t address, const uin
     return actual;
 }
 
-Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x97;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9F;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     const uint8_t a        = 128;
     const uint8_t expected = 0;
+    set_flag(0, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, a, &CPU_REG_A);
 
@@ -45,12 +46,13 @@ Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, (address + 1)));
 }
 
-Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x90;
-    const uint8_t a        = 0b0100101;
-    const uint8_t b        = 0b0001101;
-    const uint8_t expected = a - b;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x98;
+    const uint8_t a        = 0b0100111;
+    const uint8_t b        = 0b0000111;
+    const uint8_t expected = a - b - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, b, &CPU_REG_B);
 
@@ -73,12 +75,13 @@ Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x91;
-    const uint8_t a        = 0b0000101;
+Test(sbc_a_n, sbc_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x99;
+    const uint8_t a        = 0b0000111;
     const uint8_t c        = 0b0010101;
-    const uint8_t expected = a - c;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint8_t expected = a - c - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, c, &CPU_REG_C);
 
@@ -101,12 +104,13 @@ Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x92;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t d        = rand() % (0xFF);
-    const uint8_t expected = a - d;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9A;
+    const uint8_t a        = 200;
+    const uint8_t d        = 101;
+    const uint8_t expected = a - d - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, d, &CPU_REG_D);
 
@@ -117,12 +121,13 @@ Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x93;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t e        = rand() % (0xFF);
-    const uint8_t expected = a - e;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9B;
+    const uint8_t a        = 200;
+    const uint8_t e        = 101;
+    const uint8_t expected = a - e - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, e, &CPU_REG_E);
 
@@ -133,12 +138,13 @@ Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x94;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t h        = rand() % (0xFF);
-    const uint8_t expected = a - h;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9C;
+    const uint8_t a        = 200;
+    const uint8_t h        = 101;
+    const uint8_t expected = a - h - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, h, &CPU_REG_H);
 
@@ -149,12 +155,13 @@ Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x95;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t l        = rand() % (0xFF);
-    const uint8_t expected = a - l;
-    const uint16_t address = rand() % (0xFFFF);
+Test(sbc_a_n, sbc_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9D;
+    const uint8_t a        = 200;
+    const uint8_t l        = 101;
+    const uint8_t expected = a - l - 1;
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, l, &CPU_REG_L);
 
@@ -165,14 +172,15 @@ Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0x96;
+Test(sbc_a_n, sbc_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9E;
     const uint8_t a        = 70;
     const uint8_t num      = 1;
-    const uint8_t expected = a - num;
+    const uint8_t expected = a - num - 1;
+    set_flag(1, C_FLAG);
 
-    const uint16_t address      = rand() % (0xFFFF);
-    const uint16_t word_address = (rand() + 0x8000) % (0x10000);
+    const uint16_t address      = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    const uint16_t word_address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     // setup cpu
     cpu.PC      = address;
@@ -192,13 +200,14 @@ Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0xD6;
+Test(sbc_a_n, sbc_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0xDE;
     const uint8_t a        = 70;
     const uint8_t num      = 1;
-    const uint8_t expected = a - num;
+    const uint8_t expected = a - num - 1;
+    set_flag(1, C_FLAG);
 
-    const uint16_t address = rand() % (0xFFFF - 1);
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     // setup cpu
     cpu.PC    = address;
@@ -215,4 +224,25 @@ Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + 2));
+}
+
+Test(sbc_a_n, sbc_check_integer_promotion, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    const uint8_t opcode   = 0x9D; // not important that it's exactly this one
+    const uint8_t a        = 123;
+    const uint8_t l        = 255;
+    const uint8_t expected = (uint8_t) (a - l - 1);
+    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    set_flag(1, C_FLAG);
+
+    uint8_t actual = cpu_setup(opcode, address, a, l, &CPU_REG_L);
+
+    // C should be set because of borrow
+    // checks if integer promotion was successful
+    cr_expect(eq(u8, get_flag_bit(C_FLAG), 1));
+
+    // check if value is correct
+    cr_expect(eq(u8, actual, expected));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
