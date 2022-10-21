@@ -25,19 +25,19 @@ typedef enum flag {
     Z_FLAG = 7,
 } Flag;
 
-typedef union Register {
+typedef union DoubleWordReg {
     struct {
-        uint8_t high; // A, B, D, H
-        uint8_t low; // F, C, E, L
-    } bytes;
-    uint16_t word;
-} Register;
+        uint8_t hi; // A, B, D, H
+        uint8_t lo; // F, C, E, L
+    } words;
+    uint16_t dword;
+} DoubleWordReg;
 
 typedef struct CPU {
-    Register HL;
-    Register DE;
-    Register BC;
-    Register AF;
+    DoubleWordReg HL;
+    DoubleWordReg DE;
+    DoubleWordReg BC;
+    DoubleWordReg AF;
 
     uint16_t SP;
     uint16_t PC;
@@ -49,20 +49,35 @@ typedef struct CPU {
 
 extern CPU cpu;
 
+#define CPU_DREG_HL cpu.HL.dword
+#define CPU_REG_H   cpu.HL.words.hi
+#define CPU_REG_L   cpu.HL.words.lo
+
+#define CPU_DREG_DE cpu.DE.dword
+#define CPU_REG_D   cpu.DE.words.hi
+#define CPU_REG_E   cpu.DE.words.lo
+
+#define CPU_DREG_BC cpu.BC.dword
+#define CPU_REG_B   cpu.BC.words.hi
+#define CPU_REG_C   cpu.BC.words.lo
+
+#define CPU_DREG_AF cpu.AF.dword
+#define CPU_REG_A   cpu.AF.words.hi
+#define CPU_REG_F   cpu.AF.words.lo
+
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
 void cpu_step(void);
-
 
 __attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
 
 __attribute((always_inline)) inline uint8_t get_flag_bit(Flag f) {
-    return (cpu.AF.bytes.low >> f) & 1;
+    return (CPU_REG_F >> f) & 1;
 }
 
 __attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
-	cpu.AF.bytes.low |= bit << f;
+    CPU_REG_F |= bit << f;
 }
 
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
@@ -180,8 +195,6 @@ void OPC_ADD_A_HL(void);
  */
 void OPC_ADD_A_d8(void);
 
-
-
 /**
  * @brief Subtract the value stored in Register A from
  * 	      the value stored in A and store it back into A.
@@ -241,10 +254,8 @@ void OPC_SUB_A_HL(void);
  */
 void OPC_SUB_A_d8(void);
 
-
-
 /**
- * @brief Subtract the value stored in Register A from the value stored in A, 
+ * @brief Subtract the value stored in Register A from the value stored in A,
  * 	      additionally subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_A(void);
@@ -302,5 +313,4 @@ void OPC_SBC_A_HL(void);
  */
 void OPC_SBC_A_d8(void);
 
-
-#endif //YOBEMAG_CPU_H
+#endif // YOBEMAG_CPU_H
