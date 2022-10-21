@@ -72,7 +72,7 @@ void cpu_step(void);
 __attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
 
-__attribute((always_inline)) inline uint8_t get_flag_bit(Flag f) {
+__attribute((always_inline)) inline uint8_t get_flag(Flag f) {
     return (CPU_REG_F >> f) & 1;
 }
 

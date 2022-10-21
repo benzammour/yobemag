@@ -23,21 +23,21 @@ Test(sbc_a_n, sbc_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     const uint8_t a        = 128;
     const uint8_t expected = 0;
-    set_flag(0, C_FLAG);
+    clear_flag(C_FLAG);
 
     uint8_t actual = cpu_setup(opcode, address, a, a, &CPU_REG_A);
 
     // Z should be set, as our result is 0
-    cr_expect(eq(u8, get_flag_bit(Z_FLAG), 1));
+    cr_expect(eq(u8, get_flag(Z_FLAG), 1));
 
     // N should be set
-    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
+    cr_expect(eq(u8, get_flag(N_FLAG), 1));
 
     // H should NOT be set because of no half-borrow
-    cr_expect(zero(u8, get_flag_bit(H_FLAG)));
+    cr_expect(zero(u8, get_flag(H_FLAG)));
 
     // C should NOT be set because of no borrow
-    cr_expect(zero(u8, get_flag_bit(C_FLAG)));
+    cr_expect(zero(u8, get_flag(C_FLAG)));
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -57,16 +57,16 @@ Test(sbc_a_n, sbc_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     uint8_t actual = cpu_setup(opcode, address, a, b, &CPU_REG_B);
 
     // Z should not be set, as our result is not 0
-    cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
+    cr_expect(zero(u8, get_flag(Z_FLAG)));
 
     // N should always be set
-    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
+    cr_expect(eq(u8, get_flag(N_FLAG), 1));
 
-    // H should be set because borrow occured
-    cr_expect(eq(u8, get_flag_bit(H_FLAG), 1));
+    // H should be set because borrow occurred
+    cr_expect(eq(u8, get_flag(H_FLAG), 1));
 
     // C should not be set because of no borrow
-    cr_expect(zero(u8, get_flag_bit(C_FLAG)));
+    cr_expect(zero(u8, get_flag(C_FLAG)));
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -86,16 +86,16 @@ Test(sbc_a_n, sbc_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     uint8_t actual = cpu_setup(opcode, address, a, c, &CPU_REG_C);
 
     // Z should not be set, as our result is not 0
-    cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
+    cr_expect(zero(u8, get_flag(Z_FLAG)));
 
     // N should always be set
-    cr_expect(eq(u8, get_flag_bit(N_FLAG), 1));
+    cr_expect(eq(u8, get_flag(N_FLAG), 1));
 
-    // H should not be set because no HB occured
-    cr_expect(zero(u8, get_flag_bit(H_FLAG)));
+    // H should not be set because no HB occurred
+    cr_expect(zero(u8, get_flag(H_FLAG)));
 
     // C should be set because of borrow
-    cr_expect(eq(u8, get_flag_bit(C_FLAG), 1));
+    cr_expect(eq(u8, get_flag(C_FLAG), 1));
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -238,7 +238,7 @@ Test(sbc_a_n, sbc_check_integer_promotion, .init = cpu_mmu_setup, .fini = cpu_te
 
     // C should be set because of borrow
     // checks if integer promotion was successful
-    cr_expect(eq(u8, get_flag_bit(C_FLAG), 1));
+    cr_expect(eq(u8, get_flag(C_FLAG), 1));
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));

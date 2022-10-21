@@ -36,13 +36,9 @@ __attribute((always_inline)) inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
 
-__attribute((always_inline)) inline static uint8_t get_flag(Flag f) {
-    return (CPU_REG_F >> f) & 1;
-}
-
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
     *register_one = register_two;
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void LD_8(uint8_t *addr) {
@@ -249,9 +245,9 @@ void cpu_print_registers(void) {
 
 uint16_t cpu_get_two_bytes(uint16_t addr) {
     uint16_t value = mmu_get_byte(addr);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
     value |= (mmu_get_byte(addr + 1) << 8);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 
     return value;
 }
@@ -272,7 +268,7 @@ void cpu_step(void) {
 
 // OP-Codes
 void OPC_NOP(void) {
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_BC(void) {
@@ -285,7 +281,7 @@ void OPC_LD_BC(void) {
 
 void OPC_LD_BC_A(void) {
     mmu_write_byte(CPU_DREG_BC, CPU_REG_A);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_INC_BC(void) {
@@ -315,7 +311,7 @@ void OPC_LD_C(void) {
 
 void OPC_LD_DE_A(void) {
     mmu_write_byte(CPU_DREG_DE, CPU_REG_A);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_DEC_D(void) {
@@ -330,7 +326,7 @@ void OPC_LD_HL_PLUS_A(void) {
     uint16_t i = CPU_DREG_HL;
     mmu_write_byte(i, CPU_REG_A);
     CPU_DREG_HL = i + 1;
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_DEC_H(void) {
@@ -348,11 +344,11 @@ void OPC_LD_SP(void) {
 }
 
 void OPC_LD_HL_MINUS_A(void) {
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
     uint16_t i = CPU_DREG_HL;
     mmu_write_byte(i, CPU_REG_A);
     CPU_DREG_HL = i - 1;
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_B_B(void) {
@@ -381,7 +377,7 @@ void OPC_LD_B_L(void) {
 
 void OPC_LD_B_HL(void) {
     LD_REG_REG(&CPU_REG_B, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_B_A(void) {
@@ -414,7 +410,7 @@ void OPC_LD_C_L(void) {
 
 void OPC_LD_C_HL(void) {
     LD_REG_REG(&CPU_REG_C, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_C_A(void) {
@@ -447,7 +443,7 @@ void OPC_LD_D_L(void) {
 
 void OPC_LD_D_HL(void) {
     LD_REG_REG(&CPU_REG_D, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_D_A(void) {
@@ -480,12 +476,12 @@ void OPC_LD_E_L(void) {
 
 void OPC_LD_E_HL(void) {
     LD_REG_REG(&CPU_REG_E, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_E_A(void) {
     LD_REG_REG(&CPU_REG_E, CPU_REG_A);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_H_B(void) {
@@ -514,7 +510,7 @@ void OPC_LD_H_L(void) {
 
 void OPC_LD_H_HL(void) {
     LD_REG_REG(&CPU_REG_H, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_H_A(void) {
@@ -547,7 +543,7 @@ void OPC_LD_L_L(void) {
 
 void OPC_LD_L_HL(void) {
     LD_REG_REG(&CPU_REG_L, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_L_A(void) {
@@ -580,12 +576,12 @@ void OPC_LD_A_L(void) {
 
 void OPC_LD_A_HL(void) {
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 void OPC_LD_A_A(void) {
     LD_REG_REG(&CPU_REG_A, CPU_REG_A);
-    cpu.cycle_count++;
+    ++cpu.cycle_count;
 }
 
 /******************************************************
@@ -815,7 +811,7 @@ void OPC_SUB_A_d8(void) {
 
 static void SBC_A_n(uint8_t n) {
     uint8_t A      = CPU_REG_A;
-    uint8_t carry  = get_flag_bit(C_FLAG);
+    uint8_t carry  = get_flag(C_FLAG);
     uint8_t result = (uint8_t) (A - carry - n);
 
     clear_flag_register();
