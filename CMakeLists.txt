@@ -98,7 +98,6 @@ if (${TEST})
     set(TEST_NAME ${PRODUCT_NAME}_test)
 
     set(TEST_FILES
-        src/cpu.c
         test/fixtures/cpu_mmu.c
         test/alu_8bit_sub_test.c
         test/alu_8bit_sbc_test.c)

@@ -57,8 +57,13 @@ void cpu_step(void);
 __attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
 
-__attribute__((pure)) uint8_t get_flag_bit(Flag f);
-void set_flag(uint8_t bit, Flag f);
+__attribute((always_inline)) inline uint8_t get_flag_bit(Flag f) {
+    return (cpu.AF.bytes.low >> f) & 1;
+}
+
+__attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
+	cpu.AF.bytes.low |= bit << f;
+}
 
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
 void LD_8(uint8_t *addr);
@@ -222,6 +227,7 @@ void OPC_SUB_A_L(void);
 /**
  * @brief First fetches a byte from the address `HL`,
  * 	      then subtracts the fetched byte from A.
+ *        As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SUB_A_HL(void);
 
@@ -231,6 +237,7 @@ void OPC_SUB_A_HL(void);
  *
  * @warning PC cannot be incremented before this operation is completed
  * 			since it reads the data from the opcode itself.
+ *          As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SUB_A_d8(void);
 
@@ -281,6 +288,7 @@ void OPC_SBC_A_L(void);
 /**
  * @brief First fetches a byte from the address `HL`, subtracts the fetched byte from A
  *        addtionally, subtract the carry flag, then store it in A.
+ *        As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SBC_A_HL(void);
 
@@ -290,6 +298,7 @@ void OPC_SBC_A_HL(void);
  *
  * @warning PC cannot be incremented before this operation is completed
  * 			since it reads the data from the opcode itself.
+ *          As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SBC_A_d8(void);
 
