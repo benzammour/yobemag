@@ -32,10 +32,6 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void clear_flag(uint8_t bit, Flag f) {
-    CPU_REG_F &= (uint8_t) ~(bit << f);
-}
-
 __attribute((always_inline)) inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
@@ -81,7 +77,7 @@ void REG_INC(uint8_t *reg) {
     (*reg)++;
 
     set_flag((*reg & 0xF) == 0, H_FLAG);
-    clear_flag(1, N_FLAG);
+    set_flag(1, N_FLAG);
     set_flag(!(*reg), Z_FLAG);
 
     // TODO: This is 4 in most and 12 in one case,
@@ -200,7 +196,7 @@ static void optable_init(void) {
     instr_lookup[0x9F] = OPC_SBC_A_A;
     instr_lookup[0xDE] = OPC_SBC_A_d8;
 
-	// 8-bit ALU: ADC A,n
+    // 8-bit ALU: ADC A,n
     instr_lookup[0x88] = OPC_ADC_A_B;
     instr_lookup[0x89] = OPC_ADC_A_C;
     instr_lookup[0x8A] = OPC_ADC_A_D;
@@ -834,49 +830,49 @@ static void SBC_A_n(uint8_t n) {
 void OPC_SBC_A_A(void) {
     SBC_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_B(void) {
     SBC_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_C(void) {
     SBC_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_D(void) {
     SBC_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_E(void) {
     SBC_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_H(void) {
     SBC_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_L(void) {
     SBC_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_HL(void) {
     SBC_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
-    cpu.PC += 1;
+    ++cpu.PC;
 }
 
 void OPC_SBC_A_d8(void) {

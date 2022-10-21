@@ -3,7 +3,6 @@
 #include <criterion/parameterized.h>
 
 #include "fixtures/cpu_mmu.h"
-#include "common/util.h"
 
 typedef struct TestParams {
     uint8_t opcode;
@@ -70,7 +69,8 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_no_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag OFF
-    CPU_REG_F &= ~(0 << C_FLAG);
+    clear_flag(C_FLAG);
+    clear_flag(C_FLAG);
     run_test(params);
 }
 
@@ -91,7 +91,7 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag ON
-    CPU_REG_F |= 1 << C_FLAG;
+    set_flag(1, C_FLAG);
     run_test(params);
 }
 
@@ -112,7 +112,7 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_no_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag OFF
-    CPU_REG_F &= ~(0 << C_FLAG);
+    clear_flag(C_FLAG);
     run_test(params);
 }
 
@@ -133,7 +133,8 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag ON
-    CPU_REG_F |= 1 << C_FLAG;
+    set_flag(1, C_FLAG);
+    set_flag(1, C_FLAG);
     run_test(params);
 }
 
@@ -154,7 +155,7 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag ON
-    CPU_REG_F |= 1 << C_FLAG;
+    set_flag(1, C_FLAG);
     run_test(params);
 }
 
@@ -215,19 +216,14 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
 
 ParameterizedTest(SpecialTestParams *params, ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow,
                   .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    uint8_t opcode = params->opcode;
-    uint8_t A      = params->lhs;
-    uint8_t value  = params->rhs;
-    if (params->uses_borrow) {
-        CPU_REG_F |= 1 << C_FLAG;
-    } else {
-        CPU_REG_F &= ~(0 << C_FLAG);
-    }
-
+    uint8_t opcode             = params->opcode;
+    uint8_t A                  = params->lhs;
+    uint8_t value              = params->rhs;
     uint16_t address           = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     uint16_t address_increment = 1;
 
     // setup cpu
+    set_flag(params->uses_borrow, C_FLAG);
     cpu.PC    = address;
     CPU_REG_A = A;
     mmu_write_byte(address, opcode);

@@ -80,6 +80,10 @@ __attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
     CPU_REG_F |= bit << f;
 }
 
+__attribute((always_inline)) inline void clear_flag(Flag f) {
+    CPU_REG_F &= ~(0 << f);
+}
+
 void LD_REG_REG(uint8_t *register_one, uint8_t register_two);
 void LD_8(uint8_t *addr);
 void REG_XOR(uint8_t *register_x, uint8_t register_y);
@@ -357,4 +361,4 @@ void OPC_SBC_A_HL(void);
  */
 void OPC_SBC_A_d8(void);
 
-#endif //YOBEMAG_CPU_H
+#endif // YOBEMAG_CPU_H
