@@ -6,10 +6,6 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
-#define ROM_LIMIT (0x8000)
-#define BOOT_ROM_SIZE (256)
-#define MEM_SIZE (65536)
-
 #define MB0 (0x0000)
 #define MB0_LENGTH (0x4000)
 #define MB1 (0x4000)
