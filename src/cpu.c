@@ -231,14 +231,6 @@ void cpu_init(void) {
     cpu.cycle_count = 0;
 }
 
-uint16_t cpu_get_cycle_count(void) {
-    return cpu.cycle_count;
-}
-
-uint16_t cpu_get_PC(void) {
-    return cpu.PC;
-}
-
 void cpu_print_registers(void) {
     LOG_DEBUG("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d", cpu.PC,
               CPU_REG_A, CPU_REG_F, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E, CPU_REG_H, CPU_REG_L, cpu.SP,

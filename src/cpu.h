@@ -66,10 +66,8 @@ extern CPU cpu;
 #define CPU_REG_F   cpu.AF.words.lo
 
 void cpu_init(void);
-__attribute__((pure)) uint16_t cpu_get_cycle_count(void);
 void cpu_step(void);
 
-__attribute__((pure)) uint16_t cpu_get_PC(void);
 void cpu_print_registers(void);
 
 __attribute((always_inline)) inline uint8_t get_flag(Flag f) {
@@ -81,7 +79,7 @@ __attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
 }
 
 __attribute((always_inline)) inline void clear_flag(Flag f) {
-    CPU_REG_F &= ~(0 << f);
+    CPU_REG_F &= ~(1 << f);
 }
 
 void LD_8(uint8_t *addr);
