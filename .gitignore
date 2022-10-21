@@ -57,6 +57,7 @@ yobemag
 *.rom
 *.gb
 *.code-workspace
+!roms/yobemag.gb
 
 # Build
 build/
