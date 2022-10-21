@@ -70,7 +70,6 @@ ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = 
                   .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    clear_flag(C_FLAG);
     run_test(params);
 }
 
@@ -134,7 +133,6 @@ ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init 
                   .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    set_flag(1, C_FLAG);
     run_test(params);
 }
 
@@ -176,7 +174,7 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow) {
 ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag OFF
-    CPU_REG_F &= (1 << C_FLAG);
+    clear_flag(C_FLAG);
     run_test(params);
 }
 
