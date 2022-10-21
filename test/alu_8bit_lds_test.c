@@ -45,8 +45,8 @@ ParameterizedTest(LD_8bit_TestParams *params, ld_b_n, ld_b_n, .init = cpu_mmu_se
     cpu.PC           = address;
 
     // setup cpu
-    uint8_t *goal_reg   = get_cpu_regs(params->l_dword_reg, params->l_word_offset);
-    uint8_t *source_reg = get_cpu_regs(params->r_dword_reg, params->r_word_offset);
+    uint8_t *goal_reg   = get_cpu_reg(params->l_dword_reg, params->l_word_offset);
+    uint8_t *source_reg = get_cpu_reg(params->r_dword_reg, params->r_word_offset);
     *goal_reg           = params->lhs;
     *source_reg         = params->rhs;
 

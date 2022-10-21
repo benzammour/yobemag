@@ -60,8 +60,8 @@ yobemag
 
 # Build
 build/
-cmake-build-debug/
-cmake-build-release/
+cmake-build-*/
+**/_build/
 
 # IntelliJ
 .idea/
