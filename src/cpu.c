@@ -40,9 +40,8 @@ __attribute((always_inline)) inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
 
-void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
+__attribute__((always_inline)) inline static void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
     *register_one = register_two;
-    cpu.cycle_count++;
 }
 
 void LD_8(uint8_t *addr) {
@@ -106,13 +105,15 @@ static void optable_init(void) {
     instr_lookup[0x2D] = OPC_DEC_L;
     instr_lookup[0x31] = OPC_LD_SP;
     instr_lookup[0x32] = OPC_LD_HL_MINUS_A;
+
+    // 8-bit loads
     instr_lookup[0x40] = OPC_LD_B_B;
     instr_lookup[0x41] = OPC_LD_B_C;
     instr_lookup[0x42] = OPC_LD_B_D;
     instr_lookup[0x43] = OPC_LD_B_E;
     instr_lookup[0x44] = OPC_LD_B_H;
     instr_lookup[0x45] = OPC_LD_B_L;
-    instr_lookup[0x46] = OPC_LD_D_HL;
+    instr_lookup[0x46] = OPC_LD_B_HL;
     instr_lookup[0x47] = OPC_LD_B_A;
     instr_lookup[0x48] = OPC_LD_C_B;
     instr_lookup[0x49] = OPC_LD_C_C;
@@ -343,35 +344,58 @@ void OPC_LD_HL_MINUS_A(void) {
 
 void OPC_LD_B_B(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_B);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_C(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_C);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_D(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_D);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_E(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_E);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_H(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_H);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_L(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_L);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_HL(void) {
     LD_REG_REG(&CPU_REG_B, mmu_get_byte(CPU_DREG_HL));
-    cpu.cycle_count++;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
 }
 
 void OPC_LD_B_A(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_A);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_B(void) {
