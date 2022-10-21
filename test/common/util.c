@@ -1,8 +1,8 @@
 #include "util.h"
 
-uint8_t *get_cpu_regs(uint8_t reg_offset, uint8_t word_offset) {
-    char *target_dword_reg = ((char *) &cpu) + reg_offset;
-    uint8_t *target        = (uint8_t *) (target_dword_reg + word_offset);
+uint8_t *get_cpu_reg(size_t dreg_offset, size_t reg_offset) {
+    char *target_dword_reg = ((char *) &cpu) + dreg_offset;
+    uint8_t *target_reg    = (uint8_t *) (target_dword_reg + reg_offset);
 
-    return target;
+    return target_reg;
 }

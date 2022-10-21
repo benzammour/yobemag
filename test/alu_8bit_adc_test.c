@@ -3,6 +3,7 @@
 #include <criterion/parameterized.h>
 
 #include "fixtures/cpu_mmu.h"
+#include "common/util.h"
 
 typedef struct TestParams {
     uint8_t opcode;
@@ -32,9 +33,8 @@ static void run_test(TestParams const *const params) {
     CPU_REG_A        = params->lhs;
 
     // write rhs to desired register
-    char *target_reg       = ((char *) &cpu) + params->rhs_dreg_offset;
-    uint8_t *target_nibble = (uint8_t *) (target_reg + params->rhs_reg_offset);
-    *(target_nibble)       = params->rhs;
+    uint8_t *target_reg = get_cpu_reg(params->rhs_dreg_offset, params->rhs_reg_offset);
+    *target_reg         = params->rhs;
 
     mmu_write_byte(address, params->opcode);
 
