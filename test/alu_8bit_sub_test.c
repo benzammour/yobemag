@@ -7,13 +7,13 @@
 static uint8_t cpu_setup(const uint8_t opcode, const uint16_t address, const uint8_t lhs, const uint8_t rhs, uint8_t* reg) {
     // setup cpu
     cpu.PC = address;
-    cpu.AF.bytes.high = lhs;
+    CPU_REG_A = lhs;
     *reg = rhs;
     mmu_write_byte(address, opcode);
 
     // do the actual emulation
     cpu_step();
-    const uint8_t actual = cpu.AF.bytes.high;
+    const uint8_t actual = CPU_REG_A;
     
     return actual;
 }
@@ -24,7 +24,7 @@ Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t a = 128;
     const uint8_t expected = 0;
 
-    uint8_t actual = cpu_setup(opcode, address, a, a, &cpu.AF.bytes.high);
+    uint8_t actual = cpu_setup(opcode, address, a, a, &CPU_REG_A);
 
     // Z should be set, as our result is 0
     cr_expect(eq(u8, get_flag_bit(Z_FLAG), 1));
@@ -52,7 +52,7 @@ Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     const uint8_t expected = a - b;
     const uint16_t address = rand() % (0xFFFF);
 
-    uint8_t actual = cpu_setup(opcode, address, a, b, &cpu.BC.bytes.high);
+    uint8_t actual = cpu_setup(opcode, address, a, b, &CPU_REG_B);
 
     // Z should not be set, as our result is not 0
     cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
@@ -80,7 +80,7 @@ Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t expected = a - c;
     const uint16_t address = rand() % (0xFFFF);
     
-    uint8_t actual = cpu_setup(opcode, address, a, c, &cpu.BC.bytes.low);
+    uint8_t actual = cpu_setup(opcode, address, a, c, &CPU_REG_C);
 
     // Z should not be set, as our result is not 0
     cr_expect(zero(u8, get_flag_bit(Z_FLAG)));
@@ -108,7 +108,7 @@ Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t expected = a - d;
     const uint16_t address = rand() % (0xFFFF);
 
-    uint8_t actual = cpu_setup(opcode, address, a, d, &cpu.DE.bytes.high);
+    uint8_t actual = cpu_setup(opcode, address, a, d, &CPU_REG_D);
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -124,7 +124,7 @@ Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t expected = a - e;
     const uint16_t address = rand() % (0xFFFF);
 
-    uint8_t actual = cpu_setup(opcode, address, a, e, &cpu.DE.bytes.low);
+    uint8_t actual = cpu_setup(opcode, address, a, e, &CPU_REG_E);
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -140,7 +140,7 @@ Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t expected = a - h;
     const uint16_t address = rand() % (0xFFFF);
 
-    uint8_t actual = cpu_setup(opcode, address, a, h, &cpu.HL.bytes.high);
+    uint8_t actual = cpu_setup(opcode, address, a, h, &CPU_REG_H);
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -156,7 +156,7 @@ Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t expected = a - l;
     const uint16_t address = rand() % (0xFFFF);
 
-    uint8_t actual = cpu_setup(opcode, address, a, l, &cpu.HL.bytes.low);
+    uint8_t actual = cpu_setup(opcode, address, a, l, &CPU_REG_L);
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -176,14 +176,14 @@ Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
     // setup cpu
     cpu.PC = address;
-    cpu.AF.bytes.high = a;
-    cpu.HL.word = word_address;
+    CPU_REG_A = a;
+    CPU_DREG_HL = word_address;
     mmu_write_byte(address, opcode);
     mmu_write_byte(word_address, num);
 
     // do the actual emulation
     cpu_step();
-    const uint8_t actual = cpu.AF.bytes.high;
+    const uint8_t actual = CPU_REG_A;
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
@@ -202,13 +202,13 @@ Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
     // setup cpu
     cpu.PC = address;
-    cpu.AF.bytes.high = a;
+    CPU_REG_A = a;
     mmu_write_byte(address, opcode);
     mmu_write_byte(address+1, num);
 
     // do the actual emulation
     cpu_step();
-    const uint8_t actual = cpu.AF.bytes.high;
+    const uint8_t actual = CPU_REG_A;
 
     // check if value is correct
     cr_expect(eq(u8, actual, expected));
