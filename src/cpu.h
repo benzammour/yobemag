@@ -79,7 +79,7 @@ __attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
 }
 
 __attribute((always_inline)) inline void clear_flag(Flag f) {
-    CPU_REG_F &= ~(1 << f);
+    CPU_REG_F &= (uint8_t) ~(1 << f);
 }
 
 void LD_8(uint8_t *addr);
@@ -313,44 +313,44 @@ void OPC_SBC_A_B(void);
 
 /**
  * @brief Subtract the value stored in Register C from the value stored in A,
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_C(void);
 
 /**
  * @brief Subtract the value stored in Register D from the value stored in A,
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_D(void);
 
 /**
  * @brief Subtract the value stored in Register E from the value stored in A,
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_E(void);
 
 /**
  * @brief Subtract the value stored in Register H from the value stored in A,
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_H(void);
 
 /**
  * @brief Subtract the value stored in Register L from the value stored in A,
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  */
 void OPC_SBC_A_L(void);
 
 /**
  * @brief First fetches a byte from the address `HL`, subtracts the fetched byte from A
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  *        As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SBC_A_HL(void);
 
 /**
  * @brief First fetches an immediate byte from PC + 1, subtracts the fetched byte from A
- *        addtionally, subtract the carry flag, then store it in A.
+ *        additionally, subtract the carry flag, then store it in A.
  *
  * @warning PC cannot be incremented before this operation is completed
  * 			since it reads the data from the opcode itself.
