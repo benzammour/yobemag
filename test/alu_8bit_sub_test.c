@@ -20,7 +20,7 @@ static uint8_t cpu_setup(const uint8_t opcode, const uint16_t address, const uin
 
 Test(sub_a_n, sub_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode   = 0x97;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     const uint8_t a        = 128;
     const uint8_t expected = 0;
 
@@ -50,7 +50,7 @@ Test(sub_a_n, sub_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     const uint8_t a        = 0b0100101;
     const uint8_t b        = 0b0001101;
     const uint8_t expected = a - b;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, b, &CPU_REG_B);
 
@@ -78,7 +78,7 @@ Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t a        = 0b0000101;
     const uint8_t c        = 0b0010101;
     const uint8_t expected = a - c;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, c, &CPU_REG_C);
 
@@ -103,10 +103,10 @@ Test(sub_a_n, sub_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
 Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode   = 0x92;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t d        = rand() % (0xFF);
+    const uint8_t a        = random();
+    const uint8_t d        = random();
     const uint8_t expected = a - d;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, d, &CPU_REG_D);
 
@@ -119,10 +119,10 @@ Test(sub_a_n, sub_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
 Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode   = 0x93;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t e        = rand() % (0xFF);
+    const uint8_t a        = random();
+    const uint8_t e        = random();
     const uint8_t expected = a - e;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, e, &CPU_REG_E);
 
@@ -135,10 +135,10 @@ Test(sub_a_n, sub_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
 Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode   = 0x94;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t h        = rand() % (0xFF);
+    const uint8_t a        = random();
+    const uint8_t h        = random();
     const uint8_t expected = a - h;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, h, &CPU_REG_H);
 
@@ -151,10 +151,10 @@ Test(sub_a_n, sub_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
 
 Test(sub_a_n, sub_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t opcode   = 0x95;
-    const uint8_t a        = rand() % (0xFF);
-    const uint8_t l        = rand() % (0xFF);
+    const uint8_t a        = random();
+    const uint8_t l        = random();
     const uint8_t expected = a - l;
-    const uint16_t address = rand() % (0xFFFF);
+    const uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
     uint8_t actual = cpu_setup(opcode, address, a, l, &CPU_REG_L);
 
@@ -171,8 +171,8 @@ Test(sub_a_n, sub_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t num      = 1;
     const uint8_t expected = a - num;
 
-    const uint16_t address      = rand() % (0xFFFF);
-    const uint16_t word_address = (rand() + 0x8000) % (0x10000);
+    const uint16_t address      = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    const uint16_t word_address = (random() + 0x8000) % (0x10000);
 
     // setup cpu
     cpu.PC      = address;
@@ -198,7 +198,7 @@ Test(sub_a_n, sub_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t num      = 1;
     const uint8_t expected = a - num;
 
-    const uint16_t address = rand() % (0xFFFF - 1);
+    const uint16_t address = random() % (0xFFFF - 1);
 
     // setup cpu
     cpu.PC    = address;
