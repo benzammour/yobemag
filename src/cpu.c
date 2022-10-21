@@ -237,15 +237,6 @@ void cpu_print_registers(void) {
               cpu.cycle_count);
 }
 
-uint16_t cpu_get_two_bytes(uint16_t addr) {
-    uint16_t value = mmu_get_byte(addr);
-    ++cpu.cycle_count;
-    value |= (mmu_get_byte(addr + 1) << 8);
-    ++cpu.cycle_count;
-
-    return value;
-}
-
 void cpu_step(void) {
     cpu.opcode = mmu_get_byte(cpu.PC);
 
@@ -675,16 +666,12 @@ void OPC_ADD_A_d8(void) {
     cpu.PC += 2;
 }
 
-// GCC complains about the rhs of "uint_fast16_t result = A + n + c_flag" being a _signed_ int
-// Likely a false positive of the warning
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
 static void ADC_A_n(uint8_t n) {
     uint8_t A            = CPU_REG_A;
     uint8_t A_nibble     = A & LO_NIBBLE_MASK;
     uint8_t n_nibble     = n & LO_NIBBLE_MASK;
     uint8_t c_flag       = get_flag(C_FLAG);
-    uint_fast16_t result = A + n + c_flag;
+    uint_fast16_t result = (uint_fast16_t) (A + n + c_flag);
 
     clear_flag_register();
     set_flag(result > BYTE_MASK, C_FLAG);
@@ -693,7 +680,6 @@ static void ADC_A_n(uint8_t n) {
 
     CPU_REG_A = (uint8_t) result;
 }
-#pragma GCC diagnostic pop
 
 void OPC_ADC_A_A(void) {
     ADC_A_n(CPU_REG_A);
