@@ -25,19 +25,20 @@ typedef enum flag {
 	Z_FLAG = 7,
 } Flag;
 
-typedef union Register {
+typedef union DoubleWordReg {
 	struct {
-		uint8_t high; // A, B, D, H
-		uint8_t low; // F, C, E, L
-	} bytes;
-	uint16_t word;
-} Register;
+		uint8_t hi; // A, B, D, H
+		uint8_t lo; // F, C, E, L
+	} words;
+	uint16_t dword;
+} DoubleWordReg;
+
 
 typedef struct CPU {
-	Register HL;
-	Register DE;
-	Register BC;
-	Register AF;
+	DoubleWordReg HL;
+	DoubleWordReg DE;
+	DoubleWordReg BC;
+	DoubleWordReg AF;
 
     uint16_t SP;
     uint16_t PC;
@@ -48,6 +49,22 @@ typedef struct CPU {
 } CPU;
 
 extern CPU cpu;
+
+#define CPU_DREG_HL cpu.HL.dword
+#define CPU_REG_H cpu.HL.words.hi
+#define CPU_REG_L cpu.HL.words.lo
+
+#define CPU_DREG_DE cpu.DE.dword
+#define CPU_REG_D cpu.DE.words.hi
+#define CPU_REG_E cpu.DE.words.lo
+
+#define CPU_DREG_BC cpu.BC.dword
+#define CPU_REG_B cpu.BC.words.hi
+#define CPU_REG_C cpu.BC.words.lo
+
+#define CPU_DREG_AF cpu.AF.dword
+#define CPU_REG_A cpu.AF.words.hi
+#define CPU_REG_F cpu.AF.words.lo
 
 void cpu_init(void);
 __attribute__((pure)) uint16_t cpu_get_cycle_count(void);
