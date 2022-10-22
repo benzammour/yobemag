@@ -38,13 +38,14 @@ __attribute((always_inline)) inline static void clear_flag_register(void) {
 
 __attribute__((always_inline)) inline static void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
     *register_one = register_two;
-    ++cpu.cycle_count;
 }
 
-void LD_8(uint8_t *addr) {
-    *addr = mmu_get_byte(cpu.PC);
-    cpu.PC++;
-    cpu.cycle_count += 2;
+void LD_REG_d8(uint8_t *addr) {
+    uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+    LD_REG_REG(addr, immediate);
+
+    cpu.PC += 2;
+    cpu.cycle_count += 8;
 }
 
 void REG_XOR(uint8_t *register_x, uint8_t register_y) {
@@ -89,9 +90,9 @@ static void optable_init(void) {
     instr_lookup[0x03] = OPC_INC_BC;
     instr_lookup[0x04] = OPC_INC_B;
     instr_lookup[0x05] = OPC_DEC_B;
-    instr_lookup[0x06] = OPC_LD_B;
-    instr_lookup[0x0d] = OPC_DEC_C;
-    instr_lookup[0x0e] = OPC_LD_C;
+    instr_lookup[0x06] = OPC_LD_B_d8;
+    instr_lookup[0x0D] = OPC_DEC_C;
+    instr_lookup[0x0E] = OPC_LD_C_d8;
     instr_lookup[0x12] = OPC_LD_DE_A;
     instr_lookup[0x15] = OPC_DEC_D;
     instr_lookup[0x1D] = OPC_DEC_E;
@@ -285,16 +286,16 @@ void OPC_DEC_B(void) {
     REG_DEC(&CPU_REG_B);
 }
 
-void OPC_LD_B(void) {
-    LD_8(&CPU_REG_B);
+void OPC_LD_B_d8(void) {
+    LD_REG_d8(&CPU_REG_B);
 }
 
 void OPC_DEC_C(void) {
     REG_DEC(&CPU_REG_C);
 }
 
-void OPC_LD_C(void) {
-    LD_8(&CPU_REG_C);
+void OPC_LD_C_d8(void) {
+    LD_REG_d8(&CPU_REG_C);
 }
 
 void OPC_LD_DE_A(void) {

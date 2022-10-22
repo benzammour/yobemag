@@ -82,7 +82,7 @@ __attribute((always_inline)) inline void clear_flag(Flag f) {
     CPU_REG_F &= (uint8_t) ~(1 << f);
 }
 
-void LD_8(uint8_t *addr);
+void LD_REG_d8(uint8_t *addr);
 void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);
 void REG_INC(uint8_t *reg);
@@ -93,9 +93,9 @@ void OPC_LD_BC_A(void);
 void OPC_INC_BC(void);
 void OPC_INC_B(void);
 void OPC_DEC_B(void);
-void OPC_LD_B(void);
+void OPC_LD_B_d8(void);
 void OPC_DEC_C(void);
-void OPC_LD_C(void);
+void OPC_LD_C_d8(void);
 void OPC_LD_DE_A(void);
 void OPC_DEC_D(void);
 void OPC_DEC_E(void);
