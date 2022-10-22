@@ -27,6 +27,10 @@ void lcd_init(void) {
     surface = SDL_GetWindowSurface(window);
 }
 
+void lcd_teardown(void) {
+    SDL_Quit();
+}
+
 bool lcd_step(void) {
     SDL_Event e;
     uint8_t const *key_states;

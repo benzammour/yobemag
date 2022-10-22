@@ -8,30 +8,22 @@
 #include "cli.h"
 #include "log.h"
 
-static void teardown(void) {
-    fflush(stderr);
-    fflush(stdout);
-    // Both of these functions are "secured" against calling before initialization
-    SDL_Quit();
-    rom_destroy();
-}
-
 int main(int const argc, char **const argv) {
-    // First thing we do is register exit hook
-    atexit(&teardown);
-
     CLIArguments cli_args;
     cli_parse(&cli_args, argc, argv);
 
     log_set_lvl(cli_args.logging_level);
+    atexit(log_teardown);
 
     rom_init(cli_args.rom_path);
+    atexit(rom_destroy);
     LOG_INFO("Successfully initialized ROM");
 
     mmu_init();
     LOG_INFO("Successfully initialized MMU");
 
     lcd_init();
+    atexit(lcd_teardown);
     LOG_INFO("Successfully initialized LCD");
 
     cpu_init();
@@ -48,5 +40,5 @@ int main(int const argc, char **const argv) {
     }
     LOG_INFO("Total number of iterations: %d", iterations);
 
-    return EXIT_SUCCESS;
+    exit(EXIT_SUCCESS);
 }

@@ -48,6 +48,11 @@ void log_set_lvl(LoggingLevel log_lvl) {
     LOG_INFO("Log level initialized to %d.", min_log_lvl);
 }
 
+void log_teardown(void) {
+    fflush(stderr);
+    fflush(stdout);
+}
+
 void log_exit(char const *const file_path, int const line_number, char const *const msg, ...) {
     va_list args;
     va_start(args, msg);
