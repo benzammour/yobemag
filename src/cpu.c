@@ -112,6 +112,7 @@ static void optable_init(void) {
     instr_lookup[0x45] = OPC_LD_B_L;
     instr_lookup[0x46] = OPC_LD_B_HL;
     instr_lookup[0x47] = OPC_LD_B_A;
+
     instr_lookup[0x48] = OPC_LD_C_B;
     instr_lookup[0x49] = OPC_LD_C_C;
     instr_lookup[0x4A] = OPC_LD_C_D;
@@ -119,7 +120,8 @@ static void optable_init(void) {
     instr_lookup[0x4C] = OPC_LD_C_H;
     instr_lookup[0x4D] = OPC_LD_C_L;
     instr_lookup[0x4E] = OPC_LD_C_HL;
-    instr_lookup[0x4F] = OPC_LD_C_HL;
+    instr_lookup[0x4F] = OPC_LD_C_A;
+
     instr_lookup[0x50] = OPC_LD_D_B;
     instr_lookup[0x51] = OPC_LD_D_C;
     instr_lookup[0x52] = OPC_LD_D_D;
@@ -395,35 +397,58 @@ void OPC_LD_B_A(void) {
 
 void OPC_LD_C_B(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_B);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_C(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_C);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_D(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_D);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_E(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_E);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_H(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_H);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_L(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_L);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_HL(void) {
     LD_REG_REG(&CPU_REG_C, mmu_get_byte(CPU_DREG_HL));
-    ++cpu.cycle_count;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
 }
 
 void OPC_LD_C_A(void) {
     LD_REG_REG(&CPU_REG_C, CPU_REG_A);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
 }
 
 void OPC_LD_D_B(void) {

@@ -41,7 +41,7 @@ ParameterizedTestParameters(ld_b_n, ld_b_n) {
 
 ParameterizedTest(LD_8bit_TestParams *params, ld_b_n, ld_b_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // setup cpu
-    uint16_t address = rand() % (0xFFFF);
+    uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC           = address;
 
     // setup cpu
@@ -68,7 +68,7 @@ Test(ld_b_n, ld_b_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     const uint8_t b             = 70;
     const uint8_t num           = 7;
     const uint8_t expected      = num;
-    const uint16_t address      = rand() % (0xFFFF);
+    const uint16_t address      = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     const uint16_t word_address = (rand() + 0x8000) % (0x10000);
 
     // setup cpu
@@ -89,28 +89,78 @@ Test(ld_b_n, ld_b_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-Test(sbc_a_n, ld_b_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode   = 0xDE;
-    const uint8_t a        = 70;
-    const uint8_t num      = 1;
-    const uint8_t expected = a - num - 1;
-    set_flag(1, C_FLAG);
+// TODO: correct this test
+// Test(ld_b_n, ld_b_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+//     const uint8_t opcode   = 0xDE;
+//     const uint8_t a        = 70;
+//     const uint8_t num      = 1;
+//     const uint8_t expected = a - num - 1;
+//     set_flag(1, C_FLAG);
 
-    const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+//     const uint16_t address = (rand() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+
+//     // setup cpu
+//     cpu.PC    = address;
+//     CPU_REG_A = a;
+//     mmu_write_byte(address, opcode);
+//     mmu_write_byte(address + 1, num);
+
+//     // do the actual emulation
+//     cpu_step();
+//     const uint8_t actual = CPU_REG_A;
+
+//     // check if value is correct
+//     cr_expect(eq(u8, actual, expected));
+
+//     // check if PC is updated correctly
+//     cr_expect(eq(u8, cpu.PC, address + 2));
+// }
+
+// LD C, n
+ParameterizedTestParameters(ld_c_n, ld_c_n) {
+    static LD_8bit_TestParams params[] = {
+        {0x48, 128, 1,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.hi), 1  },
+        {0x49, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.lo), 128},
+        {0x4A, 128, 2,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.hi), 2  },
+        {0x4B, 128, 3,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.lo), 3  },
+        {0x4C, 128, 4,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.hi), 4  },
+        {0x4D, 128, 5,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.lo), 5  },
+        {0x4F, 128, 6,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, AF),
+         offsetof(DoubleWordReg, words.hi), 6  },
+    };
+
+    // generate parameter set
+    return cr_make_param_array(LD_8bit_TestParams, params, sizeof(params) / sizeof(LD_8bit_TestParams));
+}
+
+ParameterizedTest(LD_8bit_TestParams *params, ld_c_n, ld_c_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    // setup cpu
+    uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    cpu.PC           = address;
+
+    // printf("address: %d\n", address);
 
     // setup cpu
-    cpu.PC    = address;
-    CPU_REG_A = a;
-    mmu_write_byte(address, opcode);
-    mmu_write_byte(address + 1, num);
+    uint8_t *goal_reg   = get_cpu_reg(params->l_dword_reg, params->l_word_offset);
+    uint8_t *source_reg = get_cpu_reg(params->r_dword_reg, params->r_word_offset);
+    *goal_reg           = params->lhs;
+    *source_reg         = params->rhs;
+
+    mmu_write_byte(address, params->opcode);
 
     // do the actual emulation
     cpu_step();
-    const uint8_t actual = CPU_REG_A;
 
     // check if value is correct
-    cr_expect(eq(u8, actual, expected));
+    uint8_t actual = *goal_reg;
+    cr_expect(eq(u8, actual, params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 2));
+    cr_expect(eq(u8, cpu.PC, address + 1));
 }
