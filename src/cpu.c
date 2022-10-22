@@ -14,7 +14,17 @@ typedef void (*op_function)(void);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 static void UNKNOWN_OPCODE(void) {
+
     LOG_ERROR("Unallowed/Unimplemented OP Code: 0x%x", cpu.opcode);
+
+#if defined(YOBEMAG_DEBUG)
+    static unsigned err_count = 0;
+    if (++err_count > 100) {
+        LOG_FATAL("Exceeded number of unallowed OP codes!");
+        exit(EXIT_FAILURE);
+    }
+#endif // defined(YOBEMAG_DEBUG)
+
 }
 #pragma GCC diagnostic pop
 
