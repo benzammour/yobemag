@@ -13,9 +13,25 @@ typedef void (*op_function)(void);
 // Function is used for instruction array initialization, not recognized by compiler
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
+
+#if defined(YOBEMAG_DEBUG)
+
 static void UNKNOWN_OPCODE(void) {
+    static unsigned err_count = 0;
     LOG_ERROR("Unallowed/Unimplemented OP Code: 0x%x", cpu.opcode);
+    if (++err_count > 100) {
+        YOBEMAG_EXIT("Exceeded number of unallowed OP codes!");
+    }
 }
+
+#else
+
+_Noreturn static void UNKNOWN_OPCODE(void) {
+    YOBEMAG_EXIT("An unsupported instruction was encountered: 0x%x", cpu.opcode);
+}
+
+#endif // defined(YOBEMAG_EXIT)
+
 #pragma GCC diagnostic pop
 
 static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = UNKNOWN_OPCODE};

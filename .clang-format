@@ -46,7 +46,7 @@ BreakBeforeBraces: Attach
 BreakBeforeTernaryOperators: true
 BreakStringLiterals: true
 
-ColumnLimit: 111
+ColumnLimit: 121
 
 ContinuationIndentWidth: 4
 
