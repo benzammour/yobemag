@@ -19,6 +19,11 @@ typedef enum LoggingLevel {
 void log_set_lvl(LoggingLevel log_lvl);
 
 /**
+ * @brief   Flash stdout and stderr on exit
+ */
+void log_teardown(void);
+
+/**
  * @brief 	Log a string to stderr with logging level ::FATAL formatted as
  * 			@p msg with parameters @p ...
  * 			This function is invoked by `#YOBEMAG_EXIT(msg, ...)`.
@@ -49,15 +54,19 @@ __attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, char co
  * This is necessary, since __VA_ARGS__ is a C GNU extension.
  * clang will not compile with -Werror, if this warning is not ignored here.
  * Ignoring is fine, since clang can handle this GNU extension.
+ *
+ * The second ignored diagnostic surpresses "Macro not used" messages.
  */
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wgnu-zero-variadic-macro-arguments"
+#pragma clang diagnostic ignored "-Wunused-macros"
 
 #define LOG_DEBUG(msg, ...)    log_str(DEBUG, "DEBUG", stdout, msg, ##__VA_ARGS__)
 #define LOG_INFO(msg, ...)     log_str(INFO, "INFO", stdout, msg, ##__VA_ARGS__)
 #define LOG_WARNING(msg, ...)  log_str(WARNING, "WARNING", stdout, msg, ##__VA_ARGS__)
 #define LOG_ERROR(msg, ...)    log_str(ERROR, "ERROR", stderr, msg, ##__VA_ARGS__)
 #define LOG_FATAL(msg, ...)    log_str(FATAL, "FATAL", stderr, msg, ##__VA_ARGS__)
+
 #define YOBEMAG_EXIT(msg, ...) log_exit(__FILE__, __LINE__, msg, ##__VA_ARGS__)
 
 #pragma clang diagnostic pop
