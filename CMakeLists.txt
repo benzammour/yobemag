@@ -102,7 +102,8 @@ if (${TEST})
         test/common/util.c
         test/alu_8bit_sub_test.c
         test/alu_8bit_lds_test.c
-        test/alu_8bit_sbc_test.c)
+        test/alu_8bit_sbc_test.c
+        test/cli_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")
