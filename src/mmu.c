@@ -62,6 +62,10 @@ uint16_t mmu_get_two_bytes(uint16_t addr) {
 }
 
 void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {
+    if (dest_addr < ROM_LIMIT) {
+        LOG_ERROR("Cannot write into %x as it is reserved for ROM space", dest_addr);
+    }
+
     mmu_write_byte(dest_addr, (uint8_t) value);
     mmu_write_byte(dest_addr + 1, (uint8_t) (value >> 8));
 }
