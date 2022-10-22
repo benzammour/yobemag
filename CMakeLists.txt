@@ -103,6 +103,7 @@ if (${TEST})
         test/common/util.c
         test/alu_8bit_add_test.c
         test/alu_8bit_adc_test.c
+        test/alu_8bit_and_test.c
         test/alu_8bit_lds_test.c
         test/alu_8bit_sbc_test.c
         test/alu_8bit_sub_test.c

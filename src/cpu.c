@@ -188,6 +188,17 @@ static void optable_init(void) {
     instr_lookup[0x87] = OPC_ADD_A_A;
     instr_lookup[0xC6] = OPC_ADD_A_d8;
 
+    // 8-bit ALU: ADC A,n
+    instr_lookup[0x88] = OPC_ADC_A_B;
+    instr_lookup[0x89] = OPC_ADC_A_C;
+    instr_lookup[0x8A] = OPC_ADC_A_D;
+    instr_lookup[0x8B] = OPC_ADC_A_E;
+    instr_lookup[0x8C] = OPC_ADC_A_H;
+    instr_lookup[0x8D] = OPC_ADC_A_L;
+    instr_lookup[0x8E] = OPC_ADC_A_HL;
+    instr_lookup[0x8F] = OPC_ADC_A_A;
+    instr_lookup[0xCE] = OPC_ADC_A_d8;
+
     // 8-bit ALU: SUB A,n
     instr_lookup[0x90] = OPC_SUB_A_B;
     instr_lookup[0x91] = OPC_SUB_A_C;
@@ -210,16 +221,16 @@ static void optable_init(void) {
     instr_lookup[0x9F] = OPC_SBC_A_A;
     instr_lookup[0xDE] = OPC_SBC_A_d8;
 
-    // 8-bit ALU: ADC A,n
-    instr_lookup[0x88] = OPC_ADC_A_B;
-    instr_lookup[0x89] = OPC_ADC_A_C;
-    instr_lookup[0x8A] = OPC_ADC_A_D;
-    instr_lookup[0x8B] = OPC_ADC_A_E;
-    instr_lookup[0x8C] = OPC_ADC_A_H;
-    instr_lookup[0x8D] = OPC_ADC_A_L;
-    instr_lookup[0x8E] = OPC_ADC_A_HL;
-    instr_lookup[0x8F] = OPC_ADC_A_A;
-    instr_lookup[0xCE] = OPC_ADC_A_d8;
+    // 8-bit ALU: AND A,n
+    instr_lookup[0xA0] = OPC_AND_A_B;
+    instr_lookup[0xA1] = OPC_AND_A_C;
+    instr_lookup[0xA2] = OPC_AND_A_D;
+    instr_lookup[0xA3] = OPC_AND_A_E;
+    instr_lookup[0xA4] = OPC_AND_A_H;
+    instr_lookup[0xA5] = OPC_AND_A_L;
+    instr_lookup[0xA6] = OPC_AND_A_HL;
+    instr_lookup[0xA7] = OPC_AND_A_A;
+    instr_lookup[0xE6] = OPC_AND_A_d8;
 
     // TODO: 0xA8
     // TODO: 0xA9
@@ -619,7 +630,7 @@ static void ADD_A_n(uint8_t n) {
     uint8_t n_nibble     = n & LO_NIBBLE_MASK;
     uint_fast16_t result = A + n;
 
-    clear_flag_register();
+    clear_flag_register(); // N is implicitly cleared
     set_flag(result > BYTE_MASK, C_FLAG);
     set_flag(A_nibble + n_nibble > LO_NIBBLE_MASK, H_FLAG);
     set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
@@ -689,7 +700,7 @@ static void ADC_A_n(uint8_t n) {
     uint8_t c_flag       = get_flag(C_FLAG);
     uint_fast16_t result = (uint_fast16_t) (A + n + c_flag);
 
-    clear_flag_register();
+    clear_flag_register(); // N is implicitly cleared
     set_flag(result > BYTE_MASK, C_FLAG);
     set_flag(A_nibble + n_nibble + c_flag > LO_NIBBLE_MASK, H_FLAG);
     set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
@@ -894,6 +905,71 @@ void OPC_SBC_A_HL(void) {
 void OPC_SBC_A_d8(void) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     SBC_A_n(immediate);
+    cpu.cycle_count += 8;
+    cpu.PC += 2;
+}
+
+static void AND_A_n(uint8_t n) {
+    uint8_t result = CPU_REG_A & n;
+
+    clear_flag_register(); // C and N are implicitly cleared
+    set_flag(!result, Z_FLAG);
+    set_flag(1, H_FLAG);
+
+    CPU_REG_A = result;
+}
+
+void OPC_AND_A_A(void) {
+    AND_A_n(CPU_REG_A);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_B(void) {
+    AND_A_n(CPU_REG_B);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_C(void) {
+    AND_A_n(CPU_REG_C);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_D(void) {
+    AND_A_n(CPU_REG_D);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_E(void) {
+    AND_A_n(CPU_REG_E);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_H(void) {
+    AND_A_n(CPU_REG_H);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_L(void) {
+    AND_A_n(CPU_REG_L);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_HL(void) {
+    AND_A_n(mmu_get_byte(CPU_DREG_HL));
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_AND_A_d8(void) {
+    uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+    AND_A_n(immediate);
     cpu.cycle_count += 8;
     cpu.PC += 2;
 }
