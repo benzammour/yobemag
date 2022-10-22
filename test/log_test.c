@@ -10,6 +10,7 @@
 
 Test(log, log_set_log_lvl, .init = cr_redirect_stderr) {
     log_set_lvl(INFO);
+    log_teardown();
 
     char buf[MAX_LOG_MSG_LENGTH] = {0};
     FILE *f_stderr               = cr_get_redirected_stderr();
@@ -22,6 +23,7 @@ Test(log, log_set_log_lvl, .init = cr_redirect_stderr) {
 
 Test(log, log_respect_log_lvl, .init = cr_redirect_stderr) {
     log_set_lvl(WARNING);
+    log_teardown();
 
     LOG_DEBUG("Debug message");
     LOG_WARNING("Warning message");
@@ -38,6 +40,7 @@ Test(log, log_respect_log_lvl, .init = cr_redirect_stderr) {
 Test(log, log_warn_about_clamping, .init = cr_redirect_stderr) {
     log_set_lvl(DEBUG - 1);
     log_set_lvl(FATAL + 1);
+    log_teardown();
 
     char buf[MAX_LOG_MSG_LENGTH] = {0};
     FILE *f_stderr               = cr_get_redirected_stderr();
