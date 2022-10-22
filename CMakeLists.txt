@@ -100,8 +100,11 @@ if (${TEST})
     set(TEST_FILES
         test/fixtures/cpu_mmu.c
         test/common/util.c
-        test/alu_8bit_sub_test.c
+        test/alu_8bit_add_test.c
+        test/alu_8bit_adc_test.c
         test/alu_8bit_lds_test.c
+        test/alu_8bit_sbc_test.c
+        test/alu_8bit_sub_test.c
         test/alu_8bit_sbc_test.c
         test/cli_test.c)
 
@@ -136,7 +139,7 @@ if (${TEST})
         elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
             if (${SANITIZE} STREQUAL "valgrind")
                 message("[${UPPER_PRODUCT_NAME}] Adding no compile flags for ${SANITIZE}")
-                add_custom_target(sanitize-test COMMAND valgrind --leak-check=yes ./${TEST_NAME} DEPENDS ${TEST_NAME})
+                add_custom_target(sanitize-test COMMAND valgrind --leak-check=yes --trace-children=yes ./${TEST_NAME} DEPENDS ${TEST_NAME})
             else()
                 message(FATAL_ERROR "[${UPPER_PRODUCT_NAME}] clang is required to run address, memory, or undefined sanitizers")
             endif()
