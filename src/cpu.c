@@ -40,9 +40,9 @@ __attribute__((always_inline)) inline static void LD_REG_REG(uint8_t *register_o
     *register_one = register_two;
 }
 
-void LD_REG_d8(uint8_t *addr) {
+static void LD_REG_d8(uint8_t *reg_addr) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
-    LD_REG_REG(addr, immediate);
+    LD_REG_REG(reg_addr, immediate);
 }
 
 void REG_XOR(uint8_t *register_x, uint8_t register_y) {

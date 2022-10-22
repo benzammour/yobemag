@@ -5,7 +5,7 @@
 #include "fixtures/cpu_mmu.h"
 #include "common/util.h"
 
-typedef struct LD_8bit_TestParams {
+typedef struct Ld8BitTestParams {
     uint8_t opcode;
     uint8_t lhs_val;
     uint8_t rhs_val;
@@ -14,9 +14,9 @@ typedef struct LD_8bit_TestParams {
     uint8_t r_dword_reg;
     uint8_t r_word_offset;
     uint8_t expected;
-} LD_8bit_TestParams;
+} Ld8BitTestParams;
 
-typedef struct LD_8bit_Special_TestParams {
+typedef struct Ld8BitSpecialTestParams {
     uint8_t opcode;
     uint8_t lhs_val;
     uint8_t rhs_val;
@@ -24,13 +24,13 @@ typedef struct LD_8bit_Special_TestParams {
     uint8_t l_word_offset;
     uint8_t expected;
     bool is_HL;
-} LD_8bit_Special_TestParams;
+} Ld8BitSpecialTestParams;
 
 /******************************************************
  *** LD m, n                                        ***
  ******************************************************/
 ParameterizedTestParameters(ld_m_n, ld_m_n) {
-    static LD_8bit_TestParams params[] = {
+    static Ld8BitTestParams params[] = {
   // LD B, n
         {0x40, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
          offsetof(DoubleWordReg, words.hi), 128},
@@ -145,10 +145,10 @@ ParameterizedTestParameters(ld_m_n, ld_m_n) {
     };
 
     // generate parameter set
-    return cr_make_param_array(LD_8bit_TestParams, params, sizeof(params) / sizeof(LD_8bit_TestParams));
+    return cr_make_param_array(Ld8BitTestParams, params, sizeof(params) / sizeof(Ld8BitTestParams));
 }
 
-ParameterizedTest(LD_8bit_TestParams *params, ld_m_n, ld_m_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(Ld8BitTestParams *params, ld_m_n, ld_m_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // setup cpu
     uint16_t address    = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     uint8_t *goal_reg   = get_cpu_reg(params->l_dword_reg, params->l_word_offset);
@@ -174,7 +174,7 @@ ParameterizedTest(LD_8bit_TestParams *params, ld_m_n, ld_m_n, .init = cpu_mmu_se
  *** LD n, HL and LD n,d8                           ***
  ******************************************************/
 ParameterizedTestParameters(ld_n_hl_d8, ld_n_hl_d8) {
-    static LD_8bit_Special_TestParams params[] = {
+    static Ld8BitSpecialTestParams params[] = {
         {0x46, 128, 12, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 12, true }, // LD B, HL
         {0x4E, 128, 12, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 12, true }, // LD C, HL
         {0x56, 128, 12, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 12, true }, // LD D, HL
@@ -192,11 +192,11 @@ ParameterizedTestParameters(ld_n_hl_d8, ld_n_hl_d8) {
         {0x3E, 128, 12, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 12, false}, // LD A, d8
     };
 
-    return cr_make_param_array(LD_8bit_Special_TestParams, params,
-                               sizeof(params) / sizeof(LD_8bit_Special_TestParams));
+    return cr_make_param_array(Ld8BitSpecialTestParams, params,
+                               sizeof(params) / sizeof(Ld8BitSpecialTestParams));
 }
 
-ParameterizedTest(LD_8bit_Special_TestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init = cpu_mmu_setup,
+ParameterizedTest(Ld8BitSpecialTestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     uint8_t opcode             = params->opcode;
     uint8_t value              = params->rhs_val;
