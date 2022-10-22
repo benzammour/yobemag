@@ -104,11 +104,14 @@ if (${TEST})
         test/alu_8bit_adc_test.c
         test/alu_8bit_lds_test.c
         test/alu_8bit_sub_test.c
-        test/alu_8bit_sbc_test.c)
+        test/alu_8bit_sbc_test.c
+        test/log_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")
     add_executable(${TEST_NAME} ${TEST_SOURCES})
+
+    target_compile_definitions(${TEST_NAME} PUBLIC YOBEMAG_TEST)
 
     if (${COVERAGE})
         if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
