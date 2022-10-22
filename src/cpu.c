@@ -20,14 +20,12 @@ static void UNKNOWN_OPCODE(void) {
     static unsigned err_count = 0;
     LOG_ERROR("Unallowed/Unimplemented OP Code: 0x%x", cpu.opcode);
     if (++err_count > 100) {
-        LOG_FATAL("Exceeded number of unallowed OP codes!");
-        exit(EXIT_FAILURE);
+        YOBEMAG_EXIT("Exceeded number of unallowed OP codes!");
     }
 
 #else
 
-    LOG_FATAL("An unsupported instruction was encountered: 0x%x", cpu.opcode);
-    exit(EXIT_FAILURE);
+    YOBEMAG_EXIT("An unsupported instruction was encountered: 0x%x", cpu.opcode);
 
 #endif // defined(YOBEMAG_DEBUG)
 }
