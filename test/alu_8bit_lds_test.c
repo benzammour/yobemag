@@ -26,6 +26,9 @@ typedef struct LD_8bit_Special_TestParams {
     bool is_HL;
 } LD_8bit_Special_TestParams;
 
+/******************************************************
+ *** LD m, n                                        ***
+ ******************************************************/
 void emulate_ld_instruction(LD_8bit_TestParams *params) {
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
@@ -50,9 +53,9 @@ void emulate_ld_instruction(LD_8bit_TestParams *params) {
     cr_expect(eq(u8, cpu.PC, address + 1));
 }
 
-// LD B, n
 ParameterizedTestParameters(ld_b_n, ld_b_n) {
     static LD_8bit_TestParams params[] = {
+  // LD B, n
         {0x40, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
          offsetof(DoubleWordReg, words.hi), 128},
         {0x41, 128, 1,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
@@ -67,46 +70,8 @@ ParameterizedTestParameters(ld_b_n, ld_b_n) {
          offsetof(DoubleWordReg, words.lo), 5  },
         {0x47, 128, 6,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, AF),
          offsetof(DoubleWordReg, words.hi), 6  },
-    };
 
-    // generate parameter set
-    return cr_make_param_array(LD_8bit_TestParams, params, sizeof(params) / sizeof(LD_8bit_TestParams));
-}
-
-ParameterizedTest(LD_8bit_TestParams *params, ld_b_n, ld_b_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_ld_instruction(params);
-}
-
-// LD B, HL
-Test(ld_b_n, ld_b_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    const uint8_t opcode        = 0x46;
-    const uint8_t b             = 70;
-    const uint8_t num           = 7;
-    const uint8_t expected      = num;
-    const uint16_t address      = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    const uint16_t word_address = (rand() + 0x8000) % (0x10000);
-
-    // setup cpu
-    cpu.PC      = address;
-    CPU_REG_B   = b;
-    CPU_DREG_HL = word_address;
-    mmu_write_byte(address, opcode);
-    mmu_write_byte(word_address, num);
-
-    // do the actual emulation
-    cpu_step();
-
-    // check if value is correct
-    const uint8_t actual = CPU_REG_B;
-    cr_expect(eq(u8, actual, expected));
-
-    // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
-}
-
-// LD C, n
-ParameterizedTestParameters(ld_c_n, ld_c_n) {
-    static LD_8bit_TestParams params[] = {
+ // LD C, n
         {0x48, 128, 1,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
          offsetof(DoubleWordReg, words.hi), 1  },
         {0x49, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
@@ -121,17 +86,51 @@ ParameterizedTestParameters(ld_c_n, ld_c_n) {
          offsetof(DoubleWordReg, words.lo), 5  },
         {0x4F, 128, 6,   offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), offsetof(CPU, AF),
          offsetof(DoubleWordReg, words.hi), 6  },
+
+ // LD D, n
+        {0x50, 128, 1,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.hi), 1  },
+        {0x51, 128, 128, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.lo), 128},
+        {0x52, 128, 2,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.hi), 2  },
+        {0x53, 128, 3,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.lo), 3  },
+        {0x54, 128, 4,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.hi), 4  },
+        {0x55, 128, 5,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.lo), 5  },
+        {0x57, 128, 6,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), offsetof(CPU, AF),
+         offsetof(DoubleWordReg, words.hi), 6  },
+
+ // LD E, n
+        {0x58, 128, 1,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.hi), 1  },
+        {0x59, 128, 128, offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.lo), 128},
+        {0x5A, 128, 2,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.hi), 2  },
+        {0x5B, 128, 3,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.lo), 3  },
+        {0x5C, 128, 4,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.hi), 4  },
+        {0x5D, 128, 5,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.lo), 5  },
+        {0x5F, 128, 6,   offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), offsetof(CPU, AF),
+         offsetof(DoubleWordReg, words.hi), 6  },
     };
 
     // generate parameter set
     return cr_make_param_array(LD_8bit_TestParams, params, sizeof(params) / sizeof(LD_8bit_TestParams));
 }
 
-ParameterizedTest(LD_8bit_TestParams *params, ld_c_n, ld_c_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(LD_8bit_TestParams *params, ld_b_n, ld_b_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate_ld_instruction(params);
 }
 
-// LD n, HL and LD n, d8
+/******************************************************
+ *** LD n, HL and LD n,d8                           ***
+ ******************************************************/
 ParameterizedTestParameters(ld_c_n, ld_c_hl) {
     static LD_8bit_Special_TestParams params[] = {
         {0x46, 128, 12, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 12, true }, // LD B, HL
