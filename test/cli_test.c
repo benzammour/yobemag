@@ -12,11 +12,6 @@
 
 #include "common/util.h"
 
-typedef struct CLI_params {
-    char **argv;
-    uint8_t argc;
-} CLI_params;
-
 Test(cli, cli_no_args, .exit_code = EXIT_FAILURE) {
     char *argv[] = {"./yobemag"};
     int argc     = 1;
@@ -133,14 +128,10 @@ Test(cli, cli_correct_with_log_lvl, .exit_code = EXIT_SUCCESS) {
     uint8_t actual_log_lvl   = cli_args.logging_level;
     uint8_t expected_log_lvl = 2;
 
-    // resolves discarded-qualifiers warning without removing const from CLIArguments
-    char *expected_rom_path = "../build/yobemag.gb";
-    int const len           = snprintf(NULL, 0, "%s", cli_args.rom_path);
-    char actual_rom_path[len + 1];
-    int c = snprintf(actual_rom_path, len + 1, "%s", cli_args.rom_path);
+    char const *expected_rom_path = "../build/yobemag.gb";
 
     cr_expect(eq(u8, actual_log_lvl, expected_log_lvl));
-    cr_expect(eq(str, actual_rom_path, expected_rom_path));
+    cr_assert_str_eq(cli_args.rom_path, expected_rom_path);
 }
 
 Test(cli, cli_correct_no_log_lvl, .exit_code = EXIT_SUCCESS) {
@@ -150,11 +141,7 @@ Test(cli, cli_correct_no_log_lvl, .exit_code = EXIT_SUCCESS) {
     CLIArguments cli_args;
     cli_parse(&cli_args, argc, argv);
 
-    // resolves discarded-qualifiers warning without removing const from CLIArguments
-    char *expected_rom_path = "../build/yobemag.gb";
-    int const len           = snprintf(NULL, 0, "%s", cli_args.rom_path);
-    char actual_rom_path[len + 1];
-    int c = snprintf(actual_rom_path, len + 1, "%s", cli_args.rom_path);
+    char const *expected_rom_path = "../build/yobemag.gb";
 
-    cr_expect(eq(str, actual_rom_path, expected_rom_path));
+    cr_assert_str_eq(cli_args.rom_path, expected_rom_path);
 }
