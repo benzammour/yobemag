@@ -16,4 +16,4 @@ jobs:
         with:
           config_file: '.clang-tidy'
           apt_packages: libsdl2-dev, libcriterion-dev
-          cmake_command: cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_C_COMPILER=clang . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
+          cmake_command: cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
