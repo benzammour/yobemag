@@ -34,7 +34,9 @@ Test(mmu, mmu_write_byte_to_rom, .init = cr_redirect_stderr) {
     while (fread(buf, 1, sizeof(buf), f_stderr) > 0) {};
     fclose(f_stderr);
 
-    cr_assert(strstr(buf, "reserved") != NULL);
+    cr_assert_not_null(strstr(buf, "reserved"));
+    cr_assert_not_null(strstr(buf, "0x100"));
+    cr_assert_not_null(strstr(buf, "ERROR"));
 }
 
 Test(mmu, mmu_write_byte_outside_rom, .exit_code = EXIT_SUCCESS) {
@@ -52,7 +54,9 @@ Test(mmu, mmu_write_two_bytes_to_rom, .init = cr_redirect_stderr) {
     while (fread(buf, 1, sizeof(buf), f_stderr) > 0) {};
     fclose(f_stderr);
 
-    cr_assert(strstr(buf, "reserved") != NULL);
+    cr_assert_not_null(strstr(buf, "reserved"));
+    cr_assert_not_null(strstr(buf, "0x7fff"));
+    cr_assert_not_null(strstr(buf, "ERROR"));
 }
 
 Test(mmu, mmu_write_two_bytes_outside_rom, .exit_code = EXIT_SUCCESS) {
