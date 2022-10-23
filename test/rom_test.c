@@ -34,6 +34,19 @@ Test(rom, rom_check_destruction, .exit_code = EXIT_SUCCESS, .init = cr_redirect_
     rom_destroy();
 }
 
+Test(rom, rom_invalid_destruction, .exit_code = EXIT_FAILURE, .init = cr_redirect_stderr) {
+    log_set_lvl(FATAL);
+
+    rom_destroy();
+
+    char buf[MAX_LOG_MSG_LENGTH] = {0};
+    FILE *f_stderr               = cr_get_redirected_stderr();
+    while (fread(buf, 1, sizeof(buf), f_stderr) > 0) {};
+    fclose(f_stderr);
+
+    cr_expect_not_null(strstr(buf, "munmap failed"));
+}
+
 Test(log, rom_setup, .exit_code = EXIT_SUCCESS, .init = cr_redirect_stderr) {
     log_set_lvl(INFO);
 

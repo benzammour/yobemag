@@ -100,7 +100,7 @@ void rom_init(char const *file_name) {
 }
 
 void rom_destroy(void) {
-    if (rom_bytes != NULL && munmap(rom_bytes, rom_size) == -1) {
+    if (munmap(rom_bytes, rom_size) == -1) {
         YOBEMAG_EXIT("munmap failed: %s", strerror(errno));
     }
 }
