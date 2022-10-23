@@ -3,6 +3,7 @@ on: [ pull_request ]
 
 jobs:
   clang-tidy-review:
+    if: ${{ !github.event.pull_request.draft }}
     name: Clang-tidy review
     runs-on: ubuntu-latest
 
@@ -10,7 +11,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Do clang-tidy review
+      - name: Clang-tidy review
         uses: ZedThree/clang-tidy-review@v0.10.0
         id: review
         with:
