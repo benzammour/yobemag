@@ -35,6 +35,7 @@ void log_set_lvl(LoggingLevel log_lvl) {
 
     // minimum logging level cannot be higher than fatal
     if (min_log_lvl > FATAL) {
+        min_log_lvl = WARNING;
         LOG_WARNING("Provided logging level %d is higher than FATAL (%d).", min_log_lvl, FATAL);
         min_log_lvl = FATAL;
     }
@@ -72,11 +73,12 @@ void log_exit(char const *const file_path, int const line_number, char const *co
     exit(EXIT_FAILURE);
 }
 
-void log_str(const LoggingLevel log_lvl, char const *const log_lvl_str, FILE *stream, char const *const msg,
-             ...) {
+void log_str(const LoggingLevel log_lvl, char const *const log_lvl_str, FILE *stream, char const *const msg, ...) {
     if (log_lvl < min_log_lvl)
         return;
 
+// This is necessary because Criterion is not correctly redirecting stdout.
+// Hence, we test the log messages by sending them through stderr (which works as intended)
 #if defined(YOBEMAG_TEST)
     stream = stderr;
 #endif
