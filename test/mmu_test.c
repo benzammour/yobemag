@@ -12,12 +12,19 @@
 #define MAX_PATH_LENGTH    (512)
 #define MAX_LOG_MSG_LENGTH (512)
 
+static const uint8_t partial_boot_rom[] = {0x31, 0xFE, 0xAF, 0x32, 0x0E, 0xE0, 0xF9, 0x06, 0x50};
+
 Test(mmu, mmu_init_with_rom_load, .exit_code = EXIT_SUCCESS) {
     char *file_path_copy                = strdup(__FILE__);
     char rom_file_path[MAX_PATH_LENGTH] = {0};
     snprintf(rom_file_path, MAX_PATH_LENGTH, "%s/../roms/yobemag.gb", dirname(file_path_copy));
     rom_init(rom_file_path);
     mmu_init();
+
+    // check samples of boot_rom
+    for (int i = 0; i <= 8; ++i) {
+        cr_assert(mmu_get_byte((1 << i) - 1) == partial_boot_rom[i]);
+    }
 }
 
 Test(mmu, mmu_get_byte_inside_rom, .exit_code = EXIT_SUCCESS) {
