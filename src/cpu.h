@@ -206,6 +206,43 @@ void OPC_ADD_A_HL(void);
  */
 void OPC_ADD_A_d8(void);
 
+void OPC_ADC_A_A(void);
+
+void OPC_ADC_A_B(void);
+
+void OPC_ADC_A_C(void);
+
+void OPC_ADC_A_D(void);
+
+void OPC_ADC_A_E(void);
+
+void OPC_ADC_A_H(void);
+
+void OPC_ADC_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 		  then adds the fetched byte to A together with
+ * 		  the carry flag.
+ *
+ * @note This instruction requires the PC to be incremented by 1,
+ *       but takes 8 CPU cycles because of fetching a byte from memory.
+ */
+void OPC_ADC_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 		  then adds the fetched byte to A together with
+ * 		  the carry flag.
+ *
+ * @warning PC cannot be incremented before this operation
+ * 			is completed since it reads the data from the
+ * 			opcode itself.
+ *
+ * @note This instruction requires the PC to be incremented by 2.
+ */
+void OPC_ADC_A_d8(void);
+
 /**
  * @brief Subtract the value stored in Register A from
  * 	      the value stored in A and store it back into A.
@@ -265,44 +302,6 @@ void OPC_SUB_A_HL(void);
  */
 void OPC_SUB_A_d8(void);
 
-// 8-bit ALU: ADC A,n
-void OPC_ADC_A_A(void);
-
-void OPC_ADC_A_B(void);
-
-void OPC_ADC_A_C(void);
-
-void OPC_ADC_A_D(void);
-
-void OPC_ADC_A_E(void);
-
-void OPC_ADC_A_H(void);
-
-void OPC_ADC_A_L(void);
-
-/**
- * @brief First fetches a byte from the address `HL`,
- * 		  then adds the fetched byte to A together with
- * 		  the carry flag.
- *
- * @note This instruction requires the PC to be incremented by 1,
- *       but takes 8 CPU cycles because of fetching a byte from memory.
- */
-void OPC_ADC_A_HL(void);
-
-/**
- * @brief First fetches an immediate byte from PC + 1,
- * 		  then adds the fetched byte to A together with
- * 		  the carry flag.
- *
- * @warning PC cannot be incremented before this operation
- * 			is completed since it reads the data from the
- * 			opcode itself.
- *
- * @note This instruction requires the PC to be incremented by 2.
- */
-void OPC_ADC_A_d8(void);
-
 /**
  * @brief Subtract the value stored in Register A from the value stored in A,
  * 	      additionally subtract the carry flag, then store it in A.
@@ -361,5 +360,40 @@ void OPC_SBC_A_HL(void);
  *          As this operation fetches a byte from memory, this takes 8 cycles.
  */
 void OPC_SBC_A_d8(void);
+
+void OPC_AND_A_A(void);
+
+void OPC_AND_A_B(void);
+
+void OPC_AND_A_C(void);
+
+void OPC_AND_A_D(void);
+
+void OPC_AND_A_E(void);
+
+void OPC_AND_A_H(void);
+
+void OPC_AND_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 		  then logical ands the fetched byte to A.
+ *
+ * @note This instruction requires the PC to be incremented by 1,
+ *       but takes 8 CPU cycles because of fetching a byte from memory.
+ */
+void OPC_AND_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 		  then logical ands the fetched byte to A.
+ *
+ * @warning PC cannot be incremented before this operation
+ * 			is completed since it reads the data from the
+ * 			opcode itself.
+ *
+ * @note This instruction requires the PC to be incremented by 2.
+ */
+void OPC_AND_A_d8(void);
 
 #endif // YOBEMAG_CPU_H
