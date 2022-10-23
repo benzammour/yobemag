@@ -20,9 +20,9 @@ Test(rom, rom_init_file_found, .exit_code = EXIT_SUCCESS, .init = cr_redirect_st
     char rom_file_path[MAX_PATH_LENGTH] = {0};
     snprintf(rom_file_path, MAX_PATH_LENGTH, "%s/../roms/yobemag.gb", dirname(file_path_copy));
 
-    cr_assert(get_rom_bytes() == NULL);
+    cr_expect_null(get_rom_bytes());
     rom_init(rom_file_path);
-    cr_assert(get_rom_bytes() != NULL);
+    cr_expect_not_null(get_rom_bytes());
 }
 
 Test(rom, rom_check_destruction, .exit_code = EXIT_SUCCESS, .init = cr_redirect_stderr) {
@@ -47,7 +47,7 @@ Test(log, rom_setup, .exit_code = EXIT_SUCCESS, .init = cr_redirect_stderr) {
     while (fread(buf, 1, sizeof(buf), f_stderr) > 0) {};
     fclose(f_stderr);
 
-    cr_assert(strstr(buf, "title") != NULL);
-    cr_assert(strstr(buf, "type") != NULL);
-    cr_assert(strstr(buf, "rom size") != NULL);
+    cr_expect_not_null(strstr(buf, "title"));
+    cr_expect_not_null(strstr(buf, "type"));
+    cr_expect_not_null(strstr(buf, "rom size"));
 }
