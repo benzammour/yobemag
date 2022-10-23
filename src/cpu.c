@@ -34,8 +34,8 @@ ATTR_NORETURN static void UNKNOWN_OPCODE(void) {
 
 #pragma GCC diagnostic pop
 
-static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = UNKNOWN_OPCODE};
-static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = UNKNOWN_OPCODE};
+static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
+static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
 
 CPU cpu = {
     .HL.dword = 0,
@@ -240,7 +240,7 @@ static void optable_init(void) {
     // TODO: 0xAF
     // TODO: 0xC3
 
-    cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
+    cb_prefixed_lookup[0x0] = &UNKNOWN_OPCODE;
 }
 
 /* ------------------ CPU Funcs */
