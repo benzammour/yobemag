@@ -176,6 +176,15 @@ static void optable_init(void) {
     instr_lookup[0x6F] = OPC_LD_L_A;
     instr_lookup[0x2E] = OPC_LD_L_d8;
 
+    instr_lookup[0x70] = OPC_LD_HL_B;
+    instr_lookup[0x71] = OPC_LD_HL_C;
+    instr_lookup[0x72] = OPC_LD_HL_D;
+    instr_lookup[0x73] = OPC_LD_HL_E;
+    instr_lookup[0x74] = OPC_LD_HL_H;
+    instr_lookup[0x75] = OPC_LD_HL_L;
+    instr_lookup[0x77] = OPC_LD_HL_A;
+    instr_lookup[0x36] = OPC_LD_HL_d8;
+
     instr_lookup[0x78] = OPC_LD_A_B;
     instr_lookup[0x79] = OPC_LD_A_C;
     instr_lookup[0x7A] = OPC_LD_A_D;
@@ -736,6 +745,63 @@ void OPC_LD_L_A(void) {
 
 void OPC_LD_L_d8(void) {
     LD_REG_d8(&CPU_REG_L);
+
+    cpu.PC += 2;
+    cpu.cycle_count += 8;
+}
+
+// LD HL, n
+void OPC_LD_HL_B(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_B);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_C(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_C);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_D(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_D);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_E(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_E);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_H(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_H);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_L(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_L);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_A(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_d8(void) {
+    LD_REG_d8(&CPU_REG_A);
 
     cpu.PC += 2;
     cpu.cycle_count += 8;
