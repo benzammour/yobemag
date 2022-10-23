@@ -103,11 +103,12 @@ if (${TEST})
         test/common/util.c
         test/alu_8bit_add_test.c
         test/alu_8bit_adc_test.c
-        test/alu_8bit_lds_test.c
-        test/alu_8bit_sbc_test.c
+        test/8bit_lds_test.c
         test/alu_8bit_sub_test.c
         test/alu_8bit_sbc_test.c
         test/cli_test.c
+        test/rom_test.c
+        test/mmu_test.c
         test/log_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
