@@ -22,6 +22,7 @@ message("[${UPPER_PRODUCT_NAME}] Using ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VE
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
     message("[${UPPER_PRODUCT_NAME}] Using -g")
     target_compile_options(${PRODUCT_NAME} PUBLIC -g)
+    target_compile_definitions(${PRODUCT_NAME} PUBLIC YOBEMAG_DEBUG)
 endif ()
 
 target_compile_options(${PRODUCT_NAME} PUBLIC
@@ -104,7 +105,8 @@ if (${TEST})
         test/alu_8bit_adc_test.c
         test/8bit_lds_test.c
         test/alu_8bit_sub_test.c
-        test/alu_8bit_sbc_test.c)
+        test/alu_8bit_sbc_test.c
+        test/cli_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")

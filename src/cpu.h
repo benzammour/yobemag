@@ -82,7 +82,6 @@ __attribute((always_inline)) inline void clear_flag(Flag f) {
     CPU_REG_F &= (uint8_t) ~(1 << f);
 }
 
-void LD_REG_d8(uint8_t *addr);
 void REG_XOR(uint8_t *register_x, uint8_t register_y);
 void REG_DEC(uint8_t *reg);
 void REG_INC(uint8_t *reg);
