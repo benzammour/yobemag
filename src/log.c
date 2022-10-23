@@ -72,10 +72,14 @@ void log_exit(char const *const file_path, int const line_number, char const *co
     exit(EXIT_FAILURE);
 }
 
-void log_str(const LoggingLevel log_lvl, char const *const log_lvl_str, FILE *const stream,
-             char const *const msg, ...) {
+void log_str(const LoggingLevel log_lvl, char const *const log_lvl_str, FILE *stream, char const *const msg,
+             ...) {
     if (log_lvl < min_log_lvl)
         return;
+
+#if defined(YOBEMAG_TEST)
+    stream = stderr;
+#endif
 
     va_list args;
     va_start(args, msg);
