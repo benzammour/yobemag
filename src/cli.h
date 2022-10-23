@@ -11,14 +11,14 @@
  * @brief Stores passed cli arguments for later use
  */
 typedef struct CLIArguments {
-	/**
-	 * @brief Indicates the minimum logging level (checked by ::log_str())
-	 */
+    /**
+     * @brief Indicates the minimum logging level (checked by ::log_str())
+     */
     LoggingLevel logging_level;
-	/**
-	 * @brief Propagated to ::rom_load() to create a memory map to rom file
-	 */
-    const char* rom_path;
+    /**
+     * @brief Propagated to ::rom_load() to create a memory map to rom file
+     */
+    char const *rom_path;
 } CLIArguments;
 
 /**
@@ -32,4 +32,4 @@ typedef struct CLIArguments {
  */
 void cli_parse(CLIArguments *cli_args, int argc, char **argv);
 
-#endif //YOBEMAG_CLI_H
+#endif // YOBEMAG_CLI_H

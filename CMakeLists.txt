@@ -22,6 +22,7 @@ message("[${UPPER_PRODUCT_NAME}] Using ${CMAKE_C_COMPILER} ${CMAKE_C_COMPILER_VE
 if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "DEBUG" OR CMAKE_BUILD_TYPE STREQUAL "debug")
     message("[${UPPER_PRODUCT_NAME}] Using -g")
     target_compile_options(${PRODUCT_NAME} PUBLIC -g)
+    target_compile_definitions(${PRODUCT_NAME} PUBLIC YOBEMAG_DEBUG)
 endif ()
 
 target_compile_options(${PRODUCT_NAME} PUBLIC
@@ -98,11 +99,22 @@ if (${TEST})
     set(TEST_NAME ${PRODUCT_NAME}_test)
 
     set(TEST_FILES
-        test/sample_unit_test.c)
+        test/fixtures/cpu_mmu.c
+        test/common/util.c
+        test/alu_8bit_add_test.c
+        test/alu_8bit_adc_test.c
+        test/8bit_lds_test.c
+        test/alu_8bit_sub_test.c
+        test/alu_8bit_sbc_test.c
+        test/cli_test.c
+        test/rom_test.c
+        test/mmu_test.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")
     add_executable(${TEST_NAME} ${TEST_SOURCES})
+
+    target_compile_definitions(${TEST_NAME} PUBLIC YOBEMAG_TEST)
 
     if (${COVERAGE})
         if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -131,7 +143,7 @@ if (${TEST})
         elseif (CMAKE_C_COMPILER_ID STREQUAL "GNU")
             if (${SANITIZE} STREQUAL "valgrind")
                 message("[${UPPER_PRODUCT_NAME}] Adding no compile flags for ${SANITIZE}")
-                add_custom_target(sanitize-test COMMAND valgrind --leak-check=yes ./${TEST_NAME} DEPENDS ${TEST_NAME})
+                add_custom_target(sanitize-test COMMAND valgrind --leak-check=yes --trace-children=yes ./${TEST_NAME} DEPENDS ${TEST_NAME})
             else()
                 message(FATAL_ERROR "[${UPPER_PRODUCT_NAME}] clang is required to run address, memory, or undefined sanitizers")
             endif()

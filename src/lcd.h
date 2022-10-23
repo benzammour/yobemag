@@ -8,6 +8,7 @@
 #include <SDL2/SDL.h>
 
 void lcd_init(void);
+void lcd_teardown(void);
 bool lcd_step(void);
 
-#endif //YOBEMAG_LCD_H
+#endif // YOBEMAG_LCD_H
