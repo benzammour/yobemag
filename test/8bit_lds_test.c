@@ -276,3 +276,29 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, opcode_addr + 1));
 }
+
+/******************************************************
+ *** LD HL, d8                                      ***
+ ******************************************************/
+Test(ld_hl_d8, ld_hl_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    uint8_t opcode             = 0x36;
+    uint8_t value              = 8;
+    uint16_t address_increment = 2;
+    uint16_t opcode_addr       = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint16_t byte_write_addr   = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+
+    // setup cpu and memory
+    cpu.PC      = opcode_addr;
+    CPU_DREG_HL = byte_write_addr;
+    mmu_write_byte(opcode_addr, opcode);
+    mmu_write_byte(opcode_addr + 1, value);
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    cr_expect(eq(u8, mmu_get_byte(byte_write_addr), value));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, opcode_addr + address_increment));
+}

@@ -801,10 +801,11 @@ void OPC_LD_HL_A(void) {
 }
 
 void OPC_LD_HL_d8(void) {
-    LD_REG_d8(&CPU_REG_A);
+    uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+    mmu_write_byte(CPU_DREG_HL, immediate);
 
     cpu.PC += 2;
-    cpu.cycle_count += 8;
+    cpu.cycle_count += 12;
 }
 
 // LD A, n
