@@ -1,0 +1,19 @@
+name: Clang-tidy review
+on: [ pull_request ]
+
+jobs:
+  clang-tidy-review:
+    name: Clang-tidy review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Do clang-tidy review
+        uses: ZedThree/clang-tidy-review@v0.10.0
+        id: review
+        with:
+          config_file: '.clang-tidy'
+          apt_packages: ninja-build, libsdl2-dev, libcriterion-dev
+          cmake_command: cmake -G Ninja -DCMAKE_BUILD_TYPE=release -DCMAKE_C_COMPILER=clang . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
