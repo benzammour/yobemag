@@ -15,5 +15,5 @@ jobs:
         id: review
         with:
           config_file: '.clang-tidy'
-          apt_packages: ninja-build, libsdl2-dev, libcriterion-dev
-          cmake_command: cmake -G Ninja -DCMAKE_BUILD_TYPE=release -DCMAKE_C_COMPILER=clang . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
+          apt_packages: libsdl2-dev, libcriterion-dev
+          cmake_command: cmake -DCMAKE_BUILD_TYPE=release -DCMAKE_C_COMPILER=clang . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
