@@ -227,3 +227,52 @@ ParameterizedTest(Ld8BitSpecialTestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + address_increment));
 }
+
+/******************************************************
+ *** LD HL, n                                       ***
+ ******************************************************/
+ParameterizedTestParameters(ld_hl_n, ld_hl_n) {
+    static Ld8BitTestParams params[] = {
+        {0x70, 128, 1, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.hi), 1},
+        {0x71, 128, 2, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, BC),
+         offsetof(DoubleWordReg, words.lo), 2},
+        {0x72, 128, 3, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.hi), 3},
+        {0x73, 128, 4, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, DE),
+         offsetof(DoubleWordReg, words.lo), 4},
+        {0x74, 128, 5, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.hi), 5},
+        {0x75, 120, 6, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, HL),
+         offsetof(DoubleWordReg, words.lo), 6},
+        {0x77, 128, 7, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), offsetof(CPU, AF),
+         offsetof(DoubleWordReg, words.hi), 7},
+    };
+
+    // generate parameter set
+    return cr_make_param_array(Ld8BitTestParams, params, sizeof(params) / sizeof(Ld8BitTestParams));
+}
+
+ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    // setup cpu
+    uint16_t opcode_addr     = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint16_t byte_write_addr = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint8_t *goal_reg        = get_cpu_reg(params->l_dword_reg, params->l_word_offset);
+    uint8_t *source_reg      = get_cpu_reg(params->r_dword_reg, params->r_word_offset);
+    cpu.PC                   = opcode_addr;
+
+    mmu_write_byte(opcode_addr, params->opcode);
+    CPU_DREG_HL = byte_write_addr;
+    *source_reg = params->rhs_val;
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    uint8_t actual = mmu_get_byte(CPU_DREG_HL);
+    cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d rhs: %d", params->expected, actual,
+              params->rhs_val);
+
+    // check if PC is updated correctly
+    cr_expect(eq(u8, cpu.PC, opcode_addr + 1));
+}
