@@ -241,6 +241,17 @@ static void optable_init(void) {
     instr_lookup[0xA7] = OPC_AND_A_A;
     instr_lookup[0xE6] = OPC_AND_A_d8;
 
+    // 8-bit ALU: OR A,n
+    instr_lookup[0xB0] = OPC_OR_A_B;
+    instr_lookup[0xB1] = OPC_OR_A_C;
+    instr_lookup[0xB2] = OPC_OR_A_D;
+    instr_lookup[0xB3] = OPC_OR_A_E;
+    instr_lookup[0xB4] = OPC_OR_A_H;
+    instr_lookup[0xB5] = OPC_OR_A_L;
+    instr_lookup[0xB6] = OPC_OR_A_HL;
+    instr_lookup[0xB7] = OPC_OR_A_A;
+    instr_lookup[0xF6] = OPC_OR_A_d8;
+
     // TODO: 0xA8
     // TODO: 0xA9
     // TODO: 0xAA
@@ -1165,6 +1176,70 @@ void OPC_AND_A_HL(void) {
 void OPC_AND_A_d8(void) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     AND_A_n(immediate);
+    cpu.cycle_count += 8;
+    cpu.PC += 2;
+}
+
+static void OR_A_n(uint8_t n) {
+    uint8_t result = CPU_REG_A | n;
+
+    clear_flag_register(); // C, H, and N are implicitly cleared
+    set_flag(!result, Z_FLAG);
+
+    CPU_REG_A = result;
+}
+
+void OPC_OR_A_A(void) {
+    OR_A_n(CPU_REG_A);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_B(void) {
+    OR_A_n(CPU_REG_B);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_C(void) {
+    OR_A_n(CPU_REG_C);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_D(void) {
+    OR_A_n(CPU_REG_D);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_E(void) {
+    OR_A_n(CPU_REG_E);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_H(void) {
+    OR_A_n(CPU_REG_H);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_L(void) {
+    OR_A_n(CPU_REG_L);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_HL(void) {
+    OR_A_n(mmu_get_byte(CPU_DREG_HL));
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_OR_A_d8(void) {
+    uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+    OR_A_n(immediate);
     cpu.cycle_count += 8;
     cpu.PC += 2;
 }

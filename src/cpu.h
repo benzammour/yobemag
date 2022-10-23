@@ -396,4 +396,39 @@ void OPC_AND_A_HL(void);
  */
 void OPC_AND_A_d8(void);
 
+void OPC_OR_A_A(void);
+
+void OPC_OR_A_B(void);
+
+void OPC_OR_A_C(void);
+
+void OPC_OR_A_D(void);
+
+void OPC_OR_A_E(void);
+
+void OPC_OR_A_H(void);
+
+void OPC_OR_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 		  then logical ands the fetched byte to A.
+ *
+ * @note This instruction requires the PC to be incremented by 1,
+ *       but takes 8 CPU cycles because of fetching a byte from memory.
+ */
+void OPC_OR_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 		  then logical ands the fetched byte to A.
+ *
+ * @warning PC cannot be incremented before this operation
+ * 			is completed since it reads the data from the
+ * 			opcode itself.
+ *
+ * @note This instruction requires the PC to be incremented by 2.
+ */
+void OPC_OR_A_d8(void);
+
 #endif // YOBEMAG_CPU_H

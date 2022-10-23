@@ -4,54 +4,7 @@
 
 #include "fixtures/cpu_mmu.h"
 #include "common/util.h"
-
-typedef struct TestParams {
-    uint8_t opcode;
-    uint8_t lhs;
-    uint8_t rhs;
-    size_t rhs_dreg_offset;
-    size_t rhs_reg_offset;
-    uint8_t expected;
-    int address_increment;
-    uint8_t F;
-} TestParams;
-
-typedef struct SpecialTestParams {
-    uint8_t opcode;
-    uint8_t lhs;
-    uint8_t rhs;
-    uint8_t expected;
-    uint8_t F;
-    bool is_HL;
-} SpecialTestParams;
-
-static void run_test(TestParams const *const params) {
-    // setup cpu
-    uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    cpu.PC           = address;
-    CPU_REG_A        = params->lhs;
-
-    // write rhs to desired register
-    uint8_t *target_reg = get_cpu_reg(params->rhs_dreg_offset, params->rhs_reg_offset);
-    *target_reg         = params->rhs;
-
-    mmu_write_byte(address, params->opcode);
-
-    // do the actual emulation
-    cpu_step();
-
-    // check flag register
-    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs,
-              params->opcode);
-
-    // check if value is correct
-    uint8_t actual = CPU_REG_A;
-    cr_expect(eq(u8, actual, params->expected), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs,
-              params->opcode);
-
-    // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));
-}
+#include "common/alu.h"
 
 ParameterizedTestParameters(AND_A_n, AND_A_n_msb) {
     static TestParams params[] = {
@@ -68,7 +21,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_msb) {
 }
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_msb, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    run_test(params);
+    emulate_inst(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_n_alternating) {
@@ -88,7 +41,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_alternating) {
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_alternating, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    run_test(params);
+    emulate_inst(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_n_full) {
@@ -106,7 +59,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_full) {
 }
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_full, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    run_test(params);
+    emulate_inst(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_HL_and_d8) {
@@ -131,34 +84,5 @@ ParameterizedTestParameters(AND_A_n, AND_A_HL_and_d8) {
 
 ParameterizedTest(SpecialTestParams *params, AND_A_n, AND_A_HL_and_d8, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    uint8_t opcode             = params->opcode;
-    uint8_t A                  = params->lhs;
-    uint8_t value              = params->rhs;
-    uint16_t address           = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    uint16_t address_increment = 1;
-
-    // setup cpu
-    cpu.PC    = address;
-    CPU_REG_A = A;
-    mmu_write_byte(address, opcode);
-    if (params->is_HL) {
-        uint16_t indirection_address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-        CPU_DREG_HL                  = indirection_address;
-        mmu_write_byte(indirection_address, value);
-    } else {
-        mmu_write_byte(address + 1, value);
-        ++address_increment;
-    }
-
-    // do the actual emulation
-    cpu_step();
-
-    // check flag register
-    cr_expect(eq(u8, CPU_REG_F, params->F));
-
-    // check if value is correct
-    cr_expect(eq(u8, CPU_REG_A, params->expected));
-
-    // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + address_increment));
+    emulate_HL_d8_inst(params);
 }

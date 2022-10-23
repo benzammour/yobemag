@@ -101,12 +101,14 @@ if (${TEST})
     set(TEST_FILES
         test/fixtures/cpu_mmu.c
         test/common/util.c
+        test/common/alu.c
         test/8bit_lds_test.c
         test/alu_8bit_add_test.c
         test/alu_8bit_adc_test.c
         test/alu_8bit_and_test.c
         test/alu_8bit_sub_test.c
         test/alu_8bit_sbc_test.c
+        test/alu_8bit_or_test.c
         test/cli_test.c
         test/rom_test.c
         test/mmu_test.c
