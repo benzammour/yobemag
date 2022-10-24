@@ -22,13 +22,11 @@ void emulate_instruction(TestParams const *const params) {
     cpu_step();
 
     // check flag register
-    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs,
-              params->opcode);
+    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
 
     // check if value is correct
     uint8_t actual = CPU_REG_A;
-    cr_expect(eq(u8, actual, params->expected), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs,
-              params->opcode);
+    cr_expect(eq(u8, actual, params->expected), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
 
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));

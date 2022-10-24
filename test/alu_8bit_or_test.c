@@ -38,8 +38,7 @@ ParameterizedTestParameters(OR_A_n, OR_A_n_alternating) {
     return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
 }
 
-ParameterizedTest(TestParams *params, OR_A_n, OR_A_n_alternating, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(TestParams *params, OR_A_n, OR_A_n_alternating, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate_instruction(params);
 }
 
@@ -81,7 +80,6 @@ ParameterizedTestParameters(OR_A_n, AND_A_HL_and_d8) {
     return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, OR_A_n, AND_A_HL_and_d8, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(SpecialTestParams *params, OR_A_n, AND_A_HL_and_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate_HL_d8_instruction(params);
 }
