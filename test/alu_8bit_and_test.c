@@ -64,19 +64,19 @@ ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_full, .init = cpu_mmu_set
 
 ParameterizedTestParameters(AND_A_n, AND_A_HL_and_d8) {
     static SpecialTestParams params[] = {
-        {0xA6, 255, 255, 255, 0b00100000, true },
-        {0xA6, 8,   8,   8,   0b00100000, true },
-        {0xA6, 128, 128, 128, 0b00100000, true },
-        {0xA6, 254, 1,   0,   0b10100000, true },
-        {0xA6, 0,   0,   0,   0b10100000, true },
-        {0xA6, 128, 129, 128, 0b00100000, true },
+        {0xA6, 255, 255, 255, 0b00100000, true,  false},
+        {0xA6, 8,   8,   8,   0b00100000, true,  false},
+        {0xA6, 128, 128, 128, 0b00100000, true,  false},
+        {0xA6, 254, 1,   0,   0b10100000, true,  false},
+        {0xA6, 0,   0,   0,   0b10100000, true,  false},
+        {0xA6, 128, 129, 128, 0b00100000, true,  false},
 
-        {0xE6, 255, 255, 255, 0b00100000, false},
-        {0xE6, 8,   8,   8,   0b00100000, false},
-        {0xE6, 128, 128, 128, 0b00100000, false},
-        {0xE6, 254, 1,   0,   0b10100000, false},
-        {0xE6, 0,   0,   0,   0b10100000, false},
-        {0xE6, 128, 129, 128, 0b00100000, false},
+        {0xE6, 255, 255, 255, 0b00100000, false, false},
+        {0xE6, 8,   8,   8,   0b00100000, false, false},
+        {0xE6, 128, 128, 128, 0b00100000, false, false},
+        {0xE6, 254, 1,   0,   0b10100000, false, false},
+        {0xE6, 0,   0,   0,   0b10100000, false, false},
+        {0xE6, 128, 129, 128, 0b00100000, false, false},
     };
 
     return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));

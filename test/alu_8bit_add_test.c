@@ -64,19 +64,19 @@ ParameterizedTest(TestParams *params, ADD_A_n, ADD_A_n_half_carry_and_carry, .in
 
 ParameterizedTestParameters(ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
     static SpecialTestParams params[] = {
-        {0x86, 255, 255, 254, 0b00110000, true },
-        {0x86, 8,   8,   16,  0b00100000, true },
-        {0x86, 128, 128, 0,   0b10010000, true },
-        {0x86, 254, 1,   255, 0b00000000, true },
-        {0x86, 0,   0,   0,   0b10000000, true },
-        {0x86, 128, 129, 1,   0b00010000, true },
+        {0x86, 255, 255, 254, 0b00110000, true,  false},
+        {0x86, 8,   8,   16,  0b00100000, true,  false},
+        {0x86, 128, 128, 0,   0b10010000, true,  false},
+        {0x86, 254, 1,   255, 0b00000000, true,  false},
+        {0x86, 0,   0,   0,   0b10000000, true,  false},
+        {0x86, 128, 129, 1,   0b00010000, true,  false},
 
-        {0xC6, 255, 255, 254, 0b00110000, false},
-        {0xC6, 8,   8,   16,  0b00100000, false},
-        {0xC6, 128, 128, 0,   0b10010000, false},
-        {0xC6, 254, 1,   255, 0b00000000, false},
-        {0xC6, 0,   0,   0,   0b10000000, false},
-        {0xC6, 128, 129, 1,   0b00010000, false},
+        {0xC6, 255, 255, 254, 0b00110000, false, false},
+        {0xC6, 8,   8,   16,  0b00100000, false, false},
+        {0xC6, 128, 128, 0,   0b10010000, false, false},
+        {0xC6, 254, 1,   255, 0b00000000, false, false},
+        {0xC6, 0,   0,   0,   0b10000000, false, false},
+        {0xC6, 128, 129, 1,   0b00010000, false, false},
     };
 
     return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
