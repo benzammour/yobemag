@@ -288,17 +288,15 @@ void cpu_init(void) {
 }
 
 void cpu_print_registers(void) {
-    LOG_DEBUG("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d", cpu.PC,
-              CPU_REG_A, CPU_REG_F, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E, CPU_REG_H, CPU_REG_L, cpu.SP,
-              cpu.cycle_count);
+    LOG_DEBUG("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d", cpu.PC, CPU_REG_A,
+              CPU_REG_F, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E, CPU_REG_H, CPU_REG_L, cpu.SP, cpu.cycle_count);
 }
 
 void cpu_step(void) {
     cpu.opcode = mmu_get_byte(cpu.PC);
 
     LOG_DEBUG("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X", cpu.PC, cpu.opcode,
-              mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), CPU_REG_A, CPU_REG_B, CPU_REG_C, CPU_REG_D,
-              CPU_REG_E);
+              mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), CPU_REG_A, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E);
 
     // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
@@ -388,6 +386,66 @@ void OPC_LD_HL_MINUS_A(void) {
 /******************************************************
  *** 8-BIT Loads                                    ***
  ******************************************************/
+void OPC_LD_BC_A(void) {
+    mmu_write_byte(CPU_DREG_BC, CPU_REG_A);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_DE_A(void) {
+    mmu_write_byte(CPU_DREG_DE, CPU_REG_A);
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_PLUS_A(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
+    ++CPU_DREG_HL;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_HL_MINUS_A(void) {
+    mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
+    --CPU_DREG_HL;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_A_BC(void) {
+    LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_BC));
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_A_DE(void) {
+    LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_DE));
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_A_HL_PLUS(void) {
+    LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
+    ++CPU_DREG_HL;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_LD_A_HL_MINUS(void) {
+    LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
+    --CPU_DREG_HL;
+
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
 // LD B, n
 void OPC_LD_B_B(void) {
     LD_REG_REG(&CPU_REG_B, CPU_REG_B);
