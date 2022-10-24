@@ -1,0 +1,1 @@
+Checks: '-*,performance-*,bugprone-*,mpi-*,misc-*,clang-analyzer-*,-clang-analyzer-cplusplus*,-clang-analyzer-valist.Uninitialized,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling'
