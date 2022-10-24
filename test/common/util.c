@@ -6,3 +6,7 @@ uint8_t *get_cpu_reg(size_t dreg_offset, size_t reg_offset) {
 
     return target_reg;
 }
+
+uint16_t *get_cpu_dreg(size_t dreg_offset) {
+    return (uint16_t *) ((char *) &cpu) + dreg_offset;
+}

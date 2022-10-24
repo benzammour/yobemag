@@ -26,6 +26,13 @@ typedef struct Ld8BitSpecialTestParams {
     bool is_HL;
 } Ld8BitSpecialTestParams;
 
+typedef struct Ld8BitNNTestParams {
+    uint8_t opcode;
+    uint8_t value;
+    uint8_t dword_reg_offset;
+    uint8_t expected;
+} Ld8BitNNTestParams;
+
 /******************************************************
  *** LD m, n                                        ***
  ******************************************************/
@@ -257,7 +264,6 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
     // setup cpu
     uint16_t opcode_addr     = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     uint16_t byte_write_addr = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    uint8_t *goal_reg        = get_cpu_reg(params->l_dword_reg, params->l_word_offset);
     uint8_t *source_reg      = get_cpu_reg(params->r_dword_reg, params->r_word_offset);
     cpu.PC                   = opcode_addr;
 
@@ -280,25 +286,36 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
 /******************************************************
  *** LD HL, d8                                      ***
  ******************************************************/
-Test(ld_hl_d8, ld_hl_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    uint8_t opcode             = 0x36;
-    uint8_t value              = 8;
-    uint16_t address_increment = 2;
-    uint16_t opcode_addr       = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    uint16_t byte_write_addr   = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+ParameterizedTestParameters(ld_hl_d8, ld_hl_d8) {
+    static Ld8BitNNTestParams params[] = {
+        {0x36, 12, offsetof(CPU, HL), 12}, // LD HL, d8
+    };
 
-    // setup cpu and memory
-    cpu.PC      = opcode_addr;
-    CPU_DREG_HL = byte_write_addr;
-    mmu_write_byte(opcode_addr, opcode);
-    mmu_write_byte(opcode_addr + 1, value);
+    return cr_make_param_array(Ld8BitNNTestParams, params, sizeof(params) / sizeof(Ld8BitNNTestParams));
+}
+
+ParameterizedTest(Ld8BitNNTestParams *params, ld_hl_d8, ld_hl_d8, .init = cpu_mmu_setup,
+                  .fini = cpu_teardown) {
+    uint8_t opcode               = params->opcode;
+    uint8_t value                = params->value;
+    uint16_t address_increment   = 2;
+    uint16_t address             = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint16_t indirection_address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint16_t *goal_reg           = get_cpu_dreg(params->dword_reg_offset);
+
+    // setup cpu
+    cpu.PC    = address;
+    *goal_reg = indirection_address;
+
+    mmu_write_byte(address, opcode);
+    mmu_write_byte(address + 1, value);
 
     // do the actual emulation
     cpu_step();
 
     // check if value is correct
-    cr_expect(eq(u8, mmu_get_byte(byte_write_addr), value));
+    cr_expect(eq(u8, mmu_get_byte(indirection_address), params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, opcode_addr + address_increment));
+    cr_expect(eq(u8, cpu.PC, address + address_increment));
 }
