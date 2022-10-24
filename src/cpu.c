@@ -48,7 +48,7 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void clear_flag_register(void) {
+__attribute__((always_inline)) inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
 
