@@ -1,12 +1,15 @@
+/** @file */
+
 #ifndef YOBEMAG_CPU_H
 #define YOBEMAG_CPU_H
 
 #include <stdint.h>
+#include "attributes.h"
 
 /**
  * Encodes bit positions for flag register A
  */
-typedef enum flag {
+typedef enum Flag {
     /**
      * @brief Carry flag
      */
@@ -70,15 +73,15 @@ void cpu_step(void);
 
 void cpu_print_registers(void);
 
-__attribute((always_inline)) inline uint8_t get_flag(Flag f) {
+ATTR_ALWAYS_INLINE inline uint8_t get_flag(Flag f) {
     return (CPU_REG_F >> f) & 1;
 }
 
-__attribute((always_inline)) inline void set_flag(uint8_t bit, Flag f) {
+ATTR_ALWAYS_INLINE inline void set_flag(uint8_t bit, Flag f) {
     CPU_REG_F |= bit << f;
 }
 
-__attribute((always_inline)) inline void clear_flag(Flag f) {
+ATTR_ALWAYS_INLINE inline void clear_flag(Flag f) {
     CPU_REG_F &= (uint8_t) ~(1 << f);
 }
 
@@ -172,8 +175,6 @@ void OPC_LD_A_L(void);
 void OPC_LD_A_HL(void);
 void OPC_LD_A_A(void);
 void OPC_LD_A_d8(void);
-
-uint16_t cpu_get_two_bytes(uint16_t addr);
 
 /******************************************************
  *** 8-BIT ALU                                      ***

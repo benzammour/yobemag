@@ -26,7 +26,7 @@ static void UNKNOWN_OPCODE(void) {
 
 #else
 
-_Noreturn static void UNKNOWN_OPCODE(void) {
+ATTR_NORETURN static void UNKNOWN_OPCODE(void) {
     YOBEMAG_EXIT("An unsupported instruction was encountered: 0x%x", cpu.opcode);
 }
 
@@ -34,8 +34,8 @@ _Noreturn static void UNKNOWN_OPCODE(void) {
 
 #pragma GCC diagnostic pop
 
-static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = UNKNOWN_OPCODE};
-static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = UNKNOWN_OPCODE};
+static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
+static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
 
 CPU cpu = {
     .HL.dword = 0,
@@ -48,11 +48,11 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void clear_flag_register(void) {
+ATTR_ALWAYS_INLINE inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
 
-__attribute__((always_inline)) inline static void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
+ATTR_ALWAYS_INLINE inline static void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
     *register_one = register_two;
 }
 
@@ -271,7 +271,7 @@ static void optable_init(void) {
     // TODO: 0xAF
     // TODO: 0xC3
 
-    cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
+    cb_prefixed_lookup[0x0] = &UNKNOWN_OPCODE;
 }
 
 /* ------------------ CPU Funcs */
