@@ -21,7 +21,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_msb) {
 }
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_msb, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_n_alternating) {
@@ -41,7 +41,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_alternating) {
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_alternating, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_n_full) {
@@ -59,7 +59,7 @@ ParameterizedTestParameters(AND_A_n, AND_A_n_full) {
 }
 
 ParameterizedTest(TestParams *params, AND_A_n, AND_A_n_full, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(AND_A_n, AND_A_HL_and_d8) {
@@ -84,5 +84,5 @@ ParameterizedTestParameters(AND_A_n, AND_A_HL_and_d8) {
 
 ParameterizedTest(SpecialTestParams *params, AND_A_n, AND_A_HL_and_d8, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    emulate_HL_d8_inst(params);
+    emulate_HL_d8_instruction(params);
 }

@@ -6,7 +6,7 @@
 #include "mmu.h"
 #include "alu.h"
 
-void emulate_inst(TestParams const *const params) {
+void emulate_instruction(TestParams const *const params) {
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC           = address;
@@ -34,7 +34,7 @@ void emulate_inst(TestParams const *const params) {
     cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));
 }
 
-void emulate_HL_d8_inst(SpecialTestParams const *const params) {
+void emulate_HL_d8_instruction(SpecialTestParams const *const params) {
     uint8_t opcode             = params->opcode;
     uint8_t A                  = params->lhs;
     uint8_t value              = params->rhs;

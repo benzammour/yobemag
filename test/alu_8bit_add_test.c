@@ -21,7 +21,7 @@ ParameterizedTestParameters(ADD_A_n, ADD_A_n_carry) {
 }
 
 ParameterizedTest(TestParams *params, ADD_A_n, ADD_A_n_carry, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADD_A_n, ADD_A_n_half_carry) {
@@ -40,7 +40,7 @@ ParameterizedTestParameters(ADD_A_n, ADD_A_n_half_carry) {
 
 ParameterizedTest(TestParams *params, ADD_A_n, ADD_A_n_half_carry, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADD_A_n, ADD_A_n_half_carry_and_carry) {
@@ -59,7 +59,7 @@ ParameterizedTestParameters(ADD_A_n, ADD_A_n_half_carry_and_carry) {
 
 ParameterizedTest(TestParams *params, ADD_A_n, ADD_A_n_half_carry_and_carry, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
@@ -84,5 +84,5 @@ ParameterizedTestParameters(ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
 
 ParameterizedTest(SpecialTestParams *params, ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow,
                   .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_HL_d8_inst(params);
+    emulate_HL_d8_instruction(params);
 }
