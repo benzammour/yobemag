@@ -1,0 +1,26 @@
+name: Clang-tidy review
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  clang-tidy-review:
+    if: ${{ !github.event.pull_request.draft }}
+    name: Clang-tidy review
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Clang-tidy review
+        uses: ZedThree/clang-tidy-review@v0.10.0
+        id: review
+        with:
+          config_file: '.clang-tidy'
+          apt_packages: libsdl2-dev, libcriterion-dev
+          cmake_command: cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
