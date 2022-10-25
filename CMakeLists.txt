@@ -135,7 +135,7 @@ if (${TEST})
     add_custom_target(test COMMAND ./${TEST_NAME} DEPENDS ${TEST_NAME})
 endif ()
 
-if (${SANITIZE})
+if (DEFINED SANITIZE)
     if (CMAKE_C_COMPILER_ID STREQUAL "Clang")
         if (NOT ${SANITIZE} STREQUAL "valgrind")
             message("[${UPPER_PRODUCT_NAME}] Adding -fsanitize=${SANITIZE} and necessary compiler flags")
