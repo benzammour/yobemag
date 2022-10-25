@@ -265,7 +265,7 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
     // do the actual emulation
     cpu_step();
 
-    // check if value is corr ect
+    // check if value is correct
     uint8_t actual = mmu_get_byte(CPU_DREG_HL);
     cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d rhs: %d", params->expected, actual, params->rhs_val);
 

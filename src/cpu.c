@@ -460,11 +460,7 @@ void OPC_LD_A_FF00C(void) {
 }
 
 void OPC_LD_a16_A(void) {
-    uint16_t intermediate;
-
-    uint8_t lsbyte = mmu_get_byte(cpu.PC + 1);
-    uint8_t msbyte = mmu_get_byte(cpu.PC + 2);
-    intermediate   = (uint16_t) ((msbyte << 8) | lsbyte);
+    uint16_t intermediate = mmu_get_two_bytes(cpu.PC + 1);
 
     mmu_write_byte(intermediate, CPU_REG_A);
 
@@ -473,11 +469,7 @@ void OPC_LD_a16_A(void) {
 }
 
 void OPC_LD_A_a16(void) {
-    uint16_t intermediate;
-
-    uint8_t lsbyte = mmu_get_byte(cpu.PC + 1);
-    uint8_t msbyte = mmu_get_byte(cpu.PC + 2);
-    intermediate   = (uint16_t) ((msbyte << 8) | lsbyte);
+    uint16_t intermediate = mmu_get_two_bytes(cpu.PC + 1);
 
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(intermediate));
 
