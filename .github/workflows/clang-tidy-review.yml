@@ -22,5 +22,5 @@ jobs:
         id: review
         with:
           config_file: '.clang-tidy'
-          apt_packages: libsdl2-dev, libcriterion-dev
+          apt_packages: libsdl2-dev,libcriterion-dev
           cmake_command: cmake . -DCMAKE_EXPORT_COMPILE_COMMANDS=on
