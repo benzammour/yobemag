@@ -35,7 +35,7 @@ Use these targets with `make <Target>`
 |            | Default target, builds the `yobemag` executable                                                                                |
 | `test`     | Builds the `yobemag_test` executable that runs unit tests from [`test/`](https://github.com/Benzammour/yobemag/tree/main/test) |
 | `sanitize` | Runs `yobemag` or `yobemag_test` (depending on `TEST=<0/1>`) with the specified sanitizer (see [`OPTIMIZE`](###CMake-Options)) |
-| `install`  |                                                                                                                                |
+| `install`  | Builds the default target and copies it to `~/.local/bin/yobemag`. You can uninstall by just removing the binary.              |
 
 ## Test
 
