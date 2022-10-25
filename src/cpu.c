@@ -119,6 +119,14 @@ static void optable_init(void) {
     instr_lookup[0x2A] = OPC_LD_A_HL_PLUS;
     instr_lookup[0x3A] = OPC_LD_A_HL_MINUS;
 
+    instr_lookup[0xE0] = OPC_LD_FF00a8_A;
+    instr_lookup[0xE2] = OPC_LD_FF00C_A;
+    instr_lookup[0xF0] = OPC_LD_A_FF00a8;
+    instr_lookup[0xF2] = OPC_LD_A_FF00C;
+
+    instr_lookup[0xEA] = OPC_LD_a16_A;
+    instr_lookup[0xFA] = OPC_LD_A_a16;
+
     instr_lookup[0x40] = OPC_LD_B_B;
     instr_lookup[0x41] = OPC_LD_B_C;
     instr_lookup[0x42] = OPC_LD_B_D;
@@ -445,7 +453,7 @@ void OPC_LD_a16_A(void) {
     uint8_t msbyte = mmu_get_byte(cpu.PC + 2);
     intermediate   = (uint16_t) ((msbyte << 8) | lsbyte);
 
-    mmu_write_byte(mmu_get_byte(intermediate), CPU_REG_A);
+    mmu_write_byte(intermediate, CPU_REG_A);
 
     cpu.cycle_count += 16;
     cpu.PC += 3;

@@ -5,6 +5,9 @@
 #include "fixtures/cpu_mmu.h"
 #include "common/util.h"
 
+/******************************************************
+ *** LD m, n                                        ***
+ ******************************************************/
 typedef struct Ld8BitTestParams {
     uint8_t opcode;
     uint8_t lhs_val;
@@ -16,26 +19,6 @@ typedef struct Ld8BitTestParams {
     uint8_t expected;
 } Ld8BitTestParams;
 
-typedef struct Ld8BitSpecialTestParams {
-    uint8_t opcode;
-    uint8_t lhs_val;
-    uint8_t rhs_val;
-    uint8_t l_dword_reg;
-    uint8_t l_word_offset;
-    uint8_t expected;
-    bool is_HL;
-} Ld8BitSpecialTestParams;
-
-typedef struct Ld8BitNNxTestParams {
-    uint8_t opcode;
-    uint8_t value;
-    uint8_t dword_reg_offset;
-    uint8_t expected;
-} Ld8BitNNxTestParams;
-
-/******************************************************
- *** LD m, n                                        ***
- ******************************************************/
 ParameterizedTestParameters(ld_m_n, ld_m_n) {
     static Ld8BitTestParams params[] = {
   // LD B, n
@@ -180,6 +163,16 @@ ParameterizedTest(Ld8BitTestParams *params, ld_m_n, ld_m_n, .init = cpu_mmu_setu
 /******************************************************
  *** LD n, HL and LD n,d8                           ***
  ******************************************************/
+typedef struct Ld8BitSpecialTestParams {
+    uint8_t opcode;
+    uint8_t lhs_val;
+    uint8_t rhs_val;
+    uint8_t l_dword_reg;
+    uint8_t l_word_offset;
+    uint8_t expected;
+    bool is_HL;
+} Ld8BitSpecialTestParams;
+
 ParameterizedTestParameters(ld_n_hl_d8, ld_n_hl_d8) {
     static Ld8BitSpecialTestParams params[] = {
         {0x46, 128, 12, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 12, true }, // LD B, HL
@@ -283,6 +276,13 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
 /******************************************************
  *** LD HL, d8                                      ***
  ******************************************************/
+typedef struct Ld8BitNNxTestParams {
+    uint8_t opcode;
+    uint8_t value;
+    uint8_t dword_reg_offset;
+    uint8_t expected;
+} Ld8BitNNxTestParams;
+
 ParameterizedTestParameters(ld_hl_d8, ld_hl_d8) {
     static Ld8BitNNxTestParams params[] = {
         {0x36, 12, offsetof(CPU, HL), 12}, // LD HL, d8
@@ -324,8 +324,8 @@ typedef struct Ld8BitxNNTestParams {
     uint8_t lhs_val;
     uint8_t rhs_val;
     uint8_t dword_reg_offset;
-    uint8_t r_dword_reg;
-    uint8_t r_word_offset;
+    uint8_t single_reg_dword_offset;
+    uint8_t single_reg_word_offset;
     uint8_t expected;
     uint8_t type; // 0="normal", 1=HL++, 2=HL--
 } Ld8BitxNNTestParams;
@@ -376,10 +376,10 @@ ParameterizedTest(Ld8BitxNNTestParams *params, ld_nn_x, ld_nn_x, .init = cpu_mmu
 
 ParameterizedTestParameters(ld_nn_x, ld_x_nn) {
     static Ld8BitxNNTestParams params[] = {
-        {0x0A, 128, 1, offsetof(CPU, BC), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 0},
-        {0x1A, 128, 1, offsetof(CPU, DE), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 0},
-        {0x2A, 128, 1, offsetof(CPU, HL), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 1},
-        {0x3A, 128, 1, offsetof(CPU, HL), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 2},
+        {0x0A, 128, 1, offsetof(CPU, BC), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 0}, // LD A, (BC)
+        {0x1A, 128, 1, offsetof(CPU, DE), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 0}, // LD A, (DE)
+        {0x2A, 128, 1, offsetof(CPU, HL), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 1}, // LD A, (HL++)
+        {0x3A, 128, 1, offsetof(CPU, HL), offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 2}, // LD A, (HL--)
     };
 
     // generate parameter set
@@ -391,7 +391,7 @@ ParameterizedTest(Ld8BitxNNTestParams *params, ld_nn_x, ld_x_nn, .init = cpu_mmu
     uint8_t value                = params->rhs_val;
     uint16_t address_increment   = 1;
     uint16_t indirection_address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
-    uint8_t *goal_reg            = get_cpu_reg(params->r_dword_reg, params->r_word_offset);
+    uint8_t *goal_reg            = get_cpu_reg(params->single_reg_dword_offset, params->single_reg_word_offset);
     uint16_t *source_reg         = get_cpu_dreg(params->dword_reg_offset);
     uint16_t address             = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
 
@@ -419,4 +419,157 @@ ParameterizedTest(Ld8BitxNNTestParams *params, ld_nn_x, ld_x_nn, .init = cpu_mmu
     } else if (params->type == 2) {
         cr_expect(eq(u16, (backup - 1), CPU_DREG_HL));
     }
+}
+
+/******************************************************
+ *** LD (FF00+m), A und LD A, (FF00+m)              ***
+ ******************************************************/
+typedef struct Ld8Bit_Ex_Fx_TestParams {
+    uint8_t opcode;
+    uint8_t value;
+    uint8_t expected;
+    uint8_t type; // 0 := (m = a8), 1 := (m = CPU_REG_C)
+} Ld8Bit_Ex_Fx_TestParams;
+
+ParameterizedTestParameters(ld_nn_x, ld_ff00_m_n) {
+    static Ld8Bit_Ex_Fx_TestParams params[] = {
+        {0xE0, 1, 1, 0}, // LD (FF00+a8), A
+        {0xE2, 1, 1, 1}, // LD (FF00+C), A
+    };
+
+    // generate parameter set
+    return cr_make_param_array(Ld8Bit_Ex_Fx_TestParams, params, sizeof(params) / sizeof(Ld8Bit_Ex_Fx_TestParams));
+}
+
+ParameterizedTest(Ld8Bit_Ex_Fx_TestParams *params, ld_nn_x, ld_ff00_m_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    // setup cpu
+    uint16_t opcode_addr = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    cpu.PC               = opcode_addr;
+
+    uint8_t indirection_offset;
+    if (params->type == 0) { // LD (FF00+a8), A
+        indirection_offset = 0x5;
+    } else { // LD (FF00+C), A
+        CPU_REG_C          = 0x6;
+        indirection_offset = CPU_REG_C;
+    }
+    uint16_t indirection_address = 0xFF00 + indirection_offset;
+
+    uint8_t address_increment = 1;
+    if (params->type == 0) { // LD (FF00+a8), A
+        ++address_increment;
+    }
+
+    mmu_write_byte(opcode_addr, params->opcode);
+    mmu_write_byte(opcode_addr + 1, indirection_offset);
+
+    CPU_REG_A = params->value;
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    uint8_t actual = mmu_get_byte(indirection_address);
+    cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d value: %d", params->expected, actual, params->value);
+
+    // check if PC is updated correctly
+    cr_expect(eq(u16, cpu.PC, opcode_addr + address_increment));
+}
+
+ParameterizedTestParameters(ld_nn_x, ld_n_ff00_m) {
+    static Ld8Bit_Ex_Fx_TestParams params[] = {
+        {0xF0, 1, 1, 0}, // LD A, (FF00+a8)
+        {0xF2, 1, 1, 1}, // LD A, (FF00+C)
+    };
+
+    // generate parameter set
+    return cr_make_param_array(Ld8Bit_Ex_Fx_TestParams, params, sizeof(params) / sizeof(Ld8Bit_Ex_Fx_TestParams));
+}
+
+ParameterizedTest(Ld8Bit_Ex_Fx_TestParams *params, ld_nn_x, ld_n_ff00_m, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    // setup cpu
+    uint16_t opcode_addr = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    cpu.PC               = opcode_addr;
+
+    uint8_t indirection_offset;
+    if (params->type == 0) { // LD (FF00+a8), A
+        indirection_offset = 0x5;
+    } else { // LD (FF00+C), A
+        CPU_REG_C          = 0x6;
+        indirection_offset = CPU_REG_C;
+    }
+    uint16_t indirection_address = 0xFF00 + indirection_offset;
+
+    uint8_t address_increment = 1;
+    if (params->type == 0) { // LD (FF00+a8), A
+        ++address_increment;
+    }
+
+    mmu_write_byte(opcode_addr, params->opcode);
+    mmu_write_byte(opcode_addr + 1, indirection_offset);
+    mmu_write_byte(indirection_address, params->value);
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    uint8_t actual = CPU_REG_A;
+    cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d value: %d", params->expected, actual, params->value);
+
+    // check if PC is updated correctly
+    cr_expect(eq(u16, cpu.PC, opcode_addr + address_increment));
+}
+
+/******************************************************
+ *** LD (a16+m), A und LD A, (a16)                  ***
+ ******************************************************/
+Test(ld_a16, ld_a16_A, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    uint16_t opcode_addr         = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint8_t lsbyte               = 0x01;
+    uint8_t msbyte               = 0x90;
+    uint16_t indirection_address = (uint16_t) ((msbyte << 8) | lsbyte);
+    uint8_t address_increment    = 3;
+    uint8_t value                = 111;
+    cpu.PC                       = opcode_addr;
+
+    mmu_write_byte(opcode_addr, 0xEA);
+    mmu_write_byte(opcode_addr + 1, lsbyte);
+    mmu_write_byte(opcode_addr + 2, msbyte);
+
+    CPU_REG_A = value;
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    uint8_t actual = mmu_get_byte(indirection_address);
+    cr_expect(eq(u8, actual, value));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u16, cpu.PC, opcode_addr + address_increment));
+}
+
+Test(ld_a16, ld_A_a16, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    uint16_t opcode_addr         = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
+    uint8_t lsbyte               = 0x01;
+    uint8_t msbyte               = 0x90;
+    uint16_t indirection_address = (uint16_t) ((msbyte << 8) | lsbyte);
+    uint8_t address_increment    = 3;
+    uint8_t value                = 111;
+    cpu.PC                       = opcode_addr;
+
+    mmu_write_byte(opcode_addr, 0xFA);
+    mmu_write_byte(opcode_addr + 1, lsbyte);
+    mmu_write_byte(opcode_addr + 2, msbyte);
+    mmu_write_byte(indirection_address, value);
+
+    // do the actual emulation
+    cpu_step();
+
+    // check if value is correct
+    uint8_t actual = CPU_REG_A;
+    cr_expect(eq(u8, actual, value));
+
+    // check if PC is updated correctly
+    cr_expect(eq(u16, cpu.PC, opcode_addr + address_increment));
 }
