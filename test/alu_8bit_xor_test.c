@@ -8,15 +8,15 @@
 
 ParameterizedTestParameters(XOR_A_n, XOR_A_n_same_destruction) {
     const uint8_t alternate    = 0b10101010;
-    const uint8_t f_wanted     = 0x00 | (1 << Z_FLAG);
+    const uint8_t f_expected   = 0x00 | (1 << Z_FLAG);
     static TestParams params[] = {
-        {0xA8, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 0, 1, f_wanted},
-        {0xA9, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 0, 1, f_wanted},
-        {0xAA, alternate, alternate, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 0, 1, f_wanted},
-        {0xAB, alternate, alternate, offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), 0, 1, f_wanted},
-        {0xAC, alternate, alternate, offsetof(CPU, HL), offsetof(DoubleWordReg, words.hi), 0, 1, f_wanted},
-        {0xAD, alternate, alternate, offsetof(CPU, HL), offsetof(DoubleWordReg, words.lo), 0, 1, f_wanted},
-        {0xAF, alternate, alternate, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 0, 1, f_wanted},
+        {0xA8, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
+        {0xA9, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 0, 1, f_expected},
+        {0xAA, alternate, alternate, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
+        {0xAB, alternate, alternate, offsetof(CPU, DE), offsetof(DoubleWordReg, words.lo), 0, 1, f_expected},
+        {0xAC, alternate, alternate, offsetof(CPU, HL), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
+        {0xAD, alternate, alternate, offsetof(CPU, HL), offsetof(DoubleWordReg, words.lo), 0, 1, f_expected},
+        {0xAF, alternate, alternate, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
     };
 
     return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
