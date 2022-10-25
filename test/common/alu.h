@@ -22,8 +22,8 @@ typedef struct SpecialTestParams {
     bool uses_borrow;
 } SpecialTestParams;
 
-void emulate_inst(TestParams const *params);
+void emulate_instruction(TestParams const *params);
 
-void emulate_HL_d8_inst(SpecialTestParams const *params);
+void emulate_HL_d8_instruction(SpecialTestParams const *params);
 
 #endif // YOBEMAG_ALU_H

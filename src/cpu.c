@@ -34,8 +34,8 @@ _Noreturn static void UNKNOWN_OPCODE(void) {
 
 #pragma GCC diagnostic pop
 
-static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = UNKNOWN_OPCODE};
-static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = UNKNOWN_OPCODE};
+static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
+static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
 
 CPU cpu = {
     .HL.dword = 0,
@@ -48,7 +48,7 @@ CPU cpu = {
     0,
 };
 
-__attribute((always_inline)) inline static void clear_flag_register(void) {
+__attribute__((always_inline)) inline static void clear_flag_register(void) {
     CPU_REG_F = 0;
 }
 
@@ -271,6 +271,19 @@ static void optable_init(void) {
     instr_lookup[0xB6] = OPC_OR_A_HL;
     instr_lookup[0xB7] = OPC_OR_A_A;
     instr_lookup[0xF6] = OPC_OR_A_d8;
+
+    // 8-bit ALU: XOR A,n
+    instr_lookup[0xA8] = OPC_XOR_A_B;
+    instr_lookup[0xA9] = OPC_XOR_A_C;
+    instr_lookup[0xAA] = OPC_XOR_A_D;
+    instr_lookup[0xAB] = OPC_XOR_A_E;
+    instr_lookup[0xAC] = OPC_XOR_A_H;
+    instr_lookup[0xAD] = OPC_XOR_A_L;
+    instr_lookup[0xAE] = OPC_XOR_A_HL;
+    instr_lookup[0xAF] = OPC_XOR_A_A;
+    instr_lookup[0xEE] = OPC_XOR_A_d8;
+
+    // TODO: 0xC3
 
     cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
 }
@@ -1391,6 +1404,67 @@ void OPC_OR_A_HL(void) {
 void OPC_OR_A_d8(void) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     OR_A_n(immediate);
+    cpu.cycle_count += 8;
+    cpu.PC += 2;
+}
+
+static void XOR_A_n(uint8_t n) {
+    clear_flag_register();
+
+    CPU_REG_A ^= n;
+    set_flag((CPU_REG_A == 0x00), Z_FLAG);
+}
+
+void OPC_XOR_A_A(void) {
+    XOR_A_n(CPU_REG_A);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_B(void) {
+    XOR_A_n(CPU_REG_B);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_C(void) {
+    XOR_A_n(CPU_REG_C);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_D(void) {
+    XOR_A_n(CPU_REG_D);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_E(void) {
+    XOR_A_n(CPU_REG_E);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_H(void) {
+    XOR_A_n(CPU_REG_H);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_L(void) {
+    XOR_A_n(CPU_REG_L);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_HL(void) {
+    XOR_A_n(mmu_get_byte(CPU_DREG_HL));
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_XOR_A_d8(void) {
+    XOR_A_n(mmu_get_byte(cpu.PC + 1));
     cpu.cycle_count += 8;
     cpu.PC += 2;
 }
