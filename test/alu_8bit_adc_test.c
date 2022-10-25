@@ -20,11 +20,10 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_no_borrow) {
     return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_borrow) {
@@ -41,11 +40,10 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_borrow) {
     return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_borrow, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_no_borrow) {
@@ -66,7 +64,7 @@ ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_no_borrow, .in
                   .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_borrow) {
@@ -83,11 +81,10 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_borrow) {
     return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_borrow) {
@@ -108,7 +105,7 @@ ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_borr
                   .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow) {
@@ -129,7 +126,7 @@ ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_no_b
                   .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_inst(params);
+    emulate_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
@@ -166,8 +163,8 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
     return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow,
-                  .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(SpecialTestParams *params, ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow, .init = cpu_mmu_setup,
+                  .fini = cpu_teardown) {
     set_flag(params->uses_borrow, C_FLAG);
-    emulate_HL_d8_inst(params);
+    emulate_HL_d8_instruction(params);
 }

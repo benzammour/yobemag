@@ -199,12 +199,10 @@ ParameterizedTestParameters(ld_n_hl_d8, ld_n_hl_d8) {
         {0x3E, 128, 12, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 12, false}, // LD A, d8
     };
 
-    return cr_make_param_array(Ld8BitSpecialTestParams, params,
-                               sizeof(params) / sizeof(Ld8BitSpecialTestParams));
+    return cr_make_param_array(Ld8BitSpecialTestParams, params, sizeof(params) / sizeof(Ld8BitSpecialTestParams));
 }
 
-ParameterizedTest(Ld8BitSpecialTestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(Ld8BitSpecialTestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     uint8_t opcode             = params->opcode;
     uint8_t value              = params->rhs_val;
     uint16_t address_increment = 1;
@@ -276,8 +274,7 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
 
     // check if value is correct
     uint8_t actual = mmu_get_byte(CPU_DREG_HL);
-    cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d rhs: %d", params->expected, actual,
-              params->rhs_val);
+    cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d rhs: %d", params->expected, actual, params->rhs_val);
 
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, opcode_addr + 1));
@@ -294,8 +291,7 @@ ParameterizedTestParameters(ld_hl_d8, ld_hl_d8) {
     return cr_make_param_array(Ld8BitNNTestParams, params, sizeof(params) / sizeof(Ld8BitNNTestParams));
 }
 
-ParameterizedTest(Ld8BitNNTestParams *params, ld_hl_d8, ld_hl_d8, .init = cpu_mmu_setup,
-                  .fini = cpu_teardown) {
+ParameterizedTest(Ld8BitNNTestParams *params, ld_hl_d8, ld_hl_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     uint8_t opcode               = params->opcode;
     uint8_t value                = params->value;
     uint16_t address_increment   = 2;

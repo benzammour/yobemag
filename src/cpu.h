@@ -439,4 +439,14 @@ void OPC_OR_A_HL(void);
  */
 void OPC_OR_A_d8(void);
 
+void OPC_XOR_A_A(void);
+void OPC_XOR_A_B(void);
+void OPC_XOR_A_C(void);
+void OPC_XOR_A_D(void);
+void OPC_XOR_A_E(void);
+void OPC_XOR_A_H(void);
+void OPC_XOR_A_L(void);
+void OPC_XOR_A_d8(void);
+void OPC_XOR_A_HL(void);
+
 #endif // YOBEMAG_CPU_H
