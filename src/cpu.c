@@ -61,15 +61,6 @@ static void LD_REG_d8(uint8_t *reg_addr) {
     LD_REG_REG(reg_addr, immediate);
 }
 
-void REG_XOR(uint8_t *register_x, uint8_t register_y) {
-    *register_x ^= register_y;
-
-    clear_flag_register();
-    set_flag(!(*register_x), Z_FLAG);
-
-    cpu.cycle_count += 1;
-}
-
 void REG_DEC(uint8_t *reg) {
     (*reg)--;
 
