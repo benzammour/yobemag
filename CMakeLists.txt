@@ -110,6 +110,7 @@ if (${TEST})
         test/alu_8bit_sbc_test.c
         test/alu_8bit_or_test.c
         test/alu_8bit_xor_test.c
+        test/alu_8bit_cp_test.c
         test/cli_test.c
         test/rom_test.c
         test/mmu_test.c

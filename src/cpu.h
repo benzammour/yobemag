@@ -438,14 +438,136 @@ void OPC_OR_A_HL(void);
  */
 void OPC_OR_A_d8(void);
 
+/**
+ * @brief XOR the value stored in Register A to the value stored in Register A.
+ */
 void OPC_XOR_A_A(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_B(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_C(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_D(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_E(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_H(void);
+
+/**
+ * @brief XOR the value stored in Register B with the value stored in Register A
+ *        and store it in Register A.
+ */
 void OPC_XOR_A_L(void);
-void OPC_XOR_A_d8(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ *        then XORs the byte with the value stored in Register A
+ * 	      and store it in Register A.
+ *
+ * @note Since this operation fetches a byte from memory, it takes 8 cycles.
+ */
 void OPC_XOR_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 	      then XORs the byte with the value stored in Register A
+ * 	      and store it in Register A.
+ *
+ * @warning PC cannot be incremented before this operation is completed
+ * 			since it reads the data from the opcode itself.
+ *
+ * @note Since this operation fetches a byte from memory, it takes 8 cycles.
+ */
+void OPC_XOR_A_d8(void);
+
+/**
+ * @brief Compare the value stored in Register A to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_A(void);
+
+/**
+ * @brief Compare the value stored in Register B to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_B(void);
+
+/**
+ * @brief Compare the value stored in Register C to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_C(void);
+
+/**
+ * @brief Compare the value stored in Register D to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_D(void);
+
+/**
+ * @brief Compare the value stored in Register E to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_E(void);
+
+/**
+ * @brief Compare the value stored in Register H to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_H(void);
+
+/**
+ * @brief Compare the value stored in Register L to the value stored in Register A.
+ *
+ * @note This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_L(void);
+
+/**
+ * @brief First fetches a byte from the address `HL`,
+ * 	      then compares it to the value stored in Register A.
+ *
+ * @note Since this operation fetches a byte from memory, it takes 8 cycles.
+ *       This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_HL(void);
+
+/**
+ * @brief First fetches an immediate byte from PC + 1,
+ * 	      then compares it to the value stored in Register A.
+ *
+ * @warning PC cannot be incremented before this operation is completed
+ * 			since it reads the data from the opcode itself.
+ *
+ * @note Since this operation fetches a byte from memory, it takes 8 cycles.
+ *       This instruction only sets flags, but does not save the result into Register A.
+ */
+void OPC_CP_A_d8(void);
 
 #endif // YOBEMAG_CPU_H
