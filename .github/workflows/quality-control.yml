@@ -73,7 +73,7 @@ jobs:
         run: |
           mkdir build
           cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=${{ matrix.config.sanitizer }} -DTEST=1 . -B build
-          ninja -j 0 -C build sanitize-test
+          ninja -j 0 -C build sanitize
 
   unit-tests:
     name: Criterion Unit Tests
