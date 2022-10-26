@@ -75,15 +75,12 @@ void REG_DEC(uint8_t *reg) {
 }
 
 void REG_INC(uint8_t *reg) {
+    uint8_t original_value = *reg;
     (*reg)++;
 
-    set_flag((*reg & 0xF) == 0, H_FLAG);
-    set_flag(1, N_FLAG);
     set_flag(!(*reg), Z_FLAG);
-
-    // TODO: This is 4 in most and 12 in one case,
-    //  	 add where this function is called
-    cpu.cycle_count += 1;
+    set_flag((((original_value) & LO_NIBBLE_MASK) + 1)> LO_NIBBLE_MASK, H_FLAG);
+    set_flag(0, N_FLAG);
 }
 
 static void optable_init(void) {
