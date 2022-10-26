@@ -90,7 +90,7 @@ Test(cli, cli_lt_than_long_min, .exit_code = EXIT_FAILURE, .init = cr_redirect_s
 
 Test(cli, cli_gt_than_int_max, .exit_code = EXIT_FAILURE, .init = cr_redirect_stderr) {
     char buf[50];
-    snprintf(buf, 50, "%li9", LONG_MAX);
+    snprintf(buf, 50, "%i9", INT_MAX);
 
     char *argv[] = {"./yobemag", "-l", buf};
     int argc     = sizeof(argv) / sizeof(char *);
@@ -101,7 +101,7 @@ Test(cli, cli_gt_than_int_max, .exit_code = EXIT_FAILURE, .init = cr_redirect_st
 
 Test(cli, cli_lt_than_int_min, .exit_code = EXIT_FAILURE, .init = cr_redirect_stderr) {
     char buf[50];
-    snprintf(buf, 50, "%li9", LONG_MIN);
+    snprintf(buf, 50, "%i9", INT_MIN);
 
     char *argv[] = {"./yobemag", "-l", buf};
     int argc     = sizeof(argv) / sizeof(char *);

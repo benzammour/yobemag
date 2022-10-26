@@ -61,7 +61,7 @@ ParameterizedTest(TestParams *params, ADD_A_n, ADD_A_n_half_carry_and_carry, .in
     emulate_instruction(params);
 }
 
-ParameterizedTestParameters(ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
+ParameterizedTestParameters(ADD_A_n, ADD_A_HL_and_d8_borrow_and_no_borrow) {
     static SpecialTestParams params[] = {
         {0x86, 255, 255, 254, 0b00110000, true,  false},
         {0x86, 8,   8,   16,  0b00100000, true,  false},
@@ -81,7 +81,7 @@ ParameterizedTestParameters(ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
     return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, ADD_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow, .init = cpu_mmu_setup,
+ParameterizedTest(SpecialTestParams *params, ADD_A_n, ADD_A_HL_and_d8_borrow_and_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     emulate_HL_d8_instruction(params);
 }

@@ -61,15 +61,6 @@ static void LD_REG_d8(uint8_t *reg_addr) {
     LD_REG_REG(reg_addr, immediate);
 }
 
-void REG_XOR(uint8_t *register_x, uint8_t register_y) {
-    *register_x ^= register_y;
-
-    clear_flag_register();
-    set_flag(!(*register_x), Z_FLAG);
-
-    cpu.cycle_count += 1;
-}
-
 void REG_DEC(uint8_t *reg) {
     (*reg)--;
 
@@ -282,6 +273,17 @@ static void optable_init(void) {
     instr_lookup[0xAE] = OPC_XOR_A_HL;
     instr_lookup[0xAF] = OPC_XOR_A_A;
     instr_lookup[0xEE] = OPC_XOR_A_d8;
+
+    // 8-bit ALU: CP A,n
+    instr_lookup[0xB8] = OPC_CP_A_B;
+    instr_lookup[0xB9] = OPC_CP_A_C;
+    instr_lookup[0xBA] = OPC_CP_A_D;
+    instr_lookup[0xBB] = OPC_CP_A_E;
+    instr_lookup[0xBC] = OPC_CP_A_H;
+    instr_lookup[0xBD] = OPC_CP_A_L;
+    instr_lookup[0xBE] = OPC_CP_A_HL;
+    instr_lookup[0xBF] = OPC_CP_A_A;
+    instr_lookup[0xFE] = OPC_CP_A_d8;
 
     // TODO: 0xC3
 
@@ -1072,56 +1074,48 @@ static void ADC_A_n(uint8_t n) {
 
 void OPC_ADC_A_A(void) {
     ADC_A_n(CPU_REG_A);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_B(void) {
     ADC_A_n(CPU_REG_B);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_C(void) {
     ADC_A_n(CPU_REG_C);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_D(void) {
     ADC_A_n(CPU_REG_D);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_E(void) {
     ADC_A_n(CPU_REG_E);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_H(void) {
     ADC_A_n(CPU_REG_H);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_L(void) {
     ADC_A_n(CPU_REG_L);
-
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_HL(void) {
     ADC_A_n(mmu_get_byte(CPU_DREG_HL));
-
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
@@ -1129,7 +1123,6 @@ void OPC_ADC_A_HL(void) {
 void OPC_ADC_A_d8(void) {
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     ADC_A_n(immediate);
-
     cpu.cycle_count += 8;
     cpu.PC += 2;
 }
@@ -1457,6 +1450,72 @@ void OPC_XOR_A_HL(void) {
 
 void OPC_XOR_A_d8(void) {
     XOR_A_n(mmu_get_byte(cpu.PC + 1));
+    cpu.cycle_count += 8;
+    cpu.PC += 2;
+}
+
+static void CP_A_n(uint8_t n) {
+    uint8_t A      = CPU_REG_A;
+    uint8_t result = A - n;
+
+    clear_flag_register();
+    set_flag(!result, Z_FLAG);
+    set_flag(1, N_FLAG);
+    set_flag((n & LO_NIBBLE_MASK) > (A & LO_NIBBLE_MASK), H_FLAG);
+    set_flag(n > A, C_FLAG);
+}
+
+void OPC_CP_A_A(void) {
+    CP_A_n(CPU_REG_A);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_B(void) {
+    CP_A_n(CPU_REG_B);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_C(void) {
+    CP_A_n(CPU_REG_C);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_D(void) {
+    CP_A_n(CPU_REG_D);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_E(void) {
+    CP_A_n(CPU_REG_E);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_H(void) {
+    CP_A_n(CPU_REG_H);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_L(void) {
+    CP_A_n(CPU_REG_L);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_HL(void) {
+    CP_A_n(mmu_get_byte(CPU_DREG_HL));
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_CP_A_d8(void) {
+    uint8_t immediate = mmu_get_byte(cpu.PC + 1);
+    CP_A_n(immediate);
     cpu.cycle_count += 8;
     cpu.PC += 2;
 }
