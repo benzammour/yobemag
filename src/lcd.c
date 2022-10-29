@@ -33,7 +33,7 @@ void lcd_teardown(void) {
 
 bool lcd_step(void) {
     SDL_Event e;
-    uint8_t const *key_states;
+    const uint8_t *key_states;
 
     key_states = SDL_GetKeyboardState(NULL);
 

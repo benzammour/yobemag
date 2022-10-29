@@ -25,20 +25,20 @@ AlwaysBreakBeforeMultilineStrings: false
 BitFieldColonSpacing: Both
 
 BraceWrapping:
-  AfterCaseLabel:  false
+  AfterCaseLabel: false
   AfterControlStatement: Never
-  AfterEnum:       false
-  AfterFunction:   false
-  AfterNamespace:  false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
   AfterObjCDeclaration: false
-  AfterStruct:     false
-  AfterUnion:      false
+  AfterStruct: false
+  AfterUnion: false
   AfterExternBlock: false
-  BeforeCatch:     false
-  BeforeElse:      false
+  BeforeCatch: false
+  BeforeElse: false
   BeforeLambdaBody: false
-  BeforeWhile:     false
-  IndentBraces:    false
+  BeforeWhile: false
+  IndentBraces: false
   SplitEmptyFunction: false
 
 BreakBeforeBinaryOperators: NonAssignment
@@ -86,7 +86,7 @@ PenaltyIndentedWhitespace: 0
 PointerAlignment: Right
 
 QualifierAlignment: Custom
-QualifierOrder: ['inline', 'static', 'restrict', 'type', 'const', 'volatile' ]
+QualifierOrder: [ 'inline', 'static', 'const', 'volatile', 'restrict', 'type' ]
 
 ReflowComments: true
 
