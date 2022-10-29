@@ -27,8 +27,8 @@ typedef enum flag {
 
 typedef union DoubleWordReg {
     struct {
-        uint8_t hi; // A, B, D, H
         uint8_t lo; // F, C, E, L
+        uint8_t hi; // A, B, D, H
     } words;
     uint16_t dword;
 } DoubleWordReg;
