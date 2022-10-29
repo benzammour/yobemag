@@ -56,10 +56,12 @@ void emulate_HL_d8_instruction(SpecialTestParams const *const params) {
     cpu_step();
 
     // check flag register
-    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
+    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x, uses_borrow: %d", params->lhs, params->rhs,
+              params->opcode, params->uses_borrow);
 
     // check if value is correct
-    cr_expect(eq(u8, CPU_REG_A, params->expected), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
+    cr_expect(eq(u8, CPU_REG_A, params->expected), "l: %d, r: %d, op: 0x%x, uses_borrow: %d", params->lhs, params->rhs,
+              params->opcode, params->uses_borrow);
 
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + address_increment));
