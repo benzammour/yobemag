@@ -74,12 +74,6 @@ static void optable_init(void) {
     instr_lookup[0x00] = OPC_NOP;
     instr_lookup[0x03] = OPC_INC_BC;
     instr_lookup[0x04] = OPC_INC_B;
-    instr_lookup[0x05] = OPC_DEC_B;
-    instr_lookup[0x0D] = OPC_DEC_C;
-    instr_lookup[0x15] = OPC_DEC_D;
-    instr_lookup[0x1D] = OPC_DEC_E;
-    instr_lookup[0x25] = OPC_DEC_H;
-    instr_lookup[0x2D] = OPC_DEC_L;
     instr_lookup[0x31] = OPC_LD_SP;
 
     // 8-bit loads
