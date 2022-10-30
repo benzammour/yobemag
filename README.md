@@ -1,6 +1,6 @@
 # yobemag
 
-[![build](https://github.com/benzammour/yobemag/actions/workflows/quality-control.yml/badge.svg)](https://github.com/Benzammour/yobemag)
+[![build](https://github.com/benzammour/yobemag/actions/workflows/sonarcloud.yml/badge.svg?branch=main)](https://github.com/Benzammour/yobemag/actions)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Benzammour_yobemag&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Benzammour_yobemag)
 [![License](https://img.shields.io/github/license/Benzammour/yobemag)](https://github.com/Benzammour/yobemag/blob/main/LICENSE)
 
