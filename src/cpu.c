@@ -74,20 +74,20 @@ void REG_DEC(uint8_t *reg) {
     cpu.cycle_count += 1;
 }
 
-void REG_INC(uint8_t *reg) {
-    uint8_t original_value = *reg;
-    (*reg)++;
-
-    set_flag(!(*reg), Z_FLAG);
-    set_flag((((original_value) & LO_NIBBLE_MASK) + 1)> LO_NIBBLE_MASK, H_FLAG);
-    set_flag(0, N_FLAG);
-}
-
 static void optable_init(void) {
     // Set up lookup table
     instr_lookup[0x00] = OPC_NOP;
     instr_lookup[0x03] = OPC_INC_BC;
+    
     instr_lookup[0x04] = OPC_INC_B;
+    instr_lookup[0x0C] = OPC_INC_C;
+    instr_lookup[0x14] = OPC_INC_D;
+    instr_lookup[0x1C] = OPC_INC_E;
+    instr_lookup[0x24] = OPC_INC_H;
+    instr_lookup[0x2C] = OPC_INC_L;
+    instr_lookup[0x34] = OPC_INC_HL;
+    instr_lookup[0x3C] = OPC_INC_A;
+    
     instr_lookup[0x05] = OPC_DEC_B;
     instr_lookup[0x0D] = OPC_DEC_C;
     instr_lookup[0x15] = OPC_DEC_D;
@@ -329,9 +329,73 @@ void OPC_INC_BC(void) {
     cpu.cycle_count += 2;
 }
 
-void OPC_INC_B(void) {
-    REG_INC(&CPU_REG_B);
+
+void INC_n(uint8_t *reg) {
+    ++(*reg);
+
+    set_flag(!(*reg), Z_FLAG);
+    set_flag(((*reg) & 0x10) == 0x10, H_FLAG);
+    set_flag(0, N_FLAG);
 }
+
+void OPC_INC_B(void) {
+    INC_n(&CPU_REG_B);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_C(void) {
+    INC_n(&CPU_REG_C);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_D(void) {
+    INC_n(&CPU_REG_D);
+    
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_E(void) {
+    INC_n(&CPU_REG_E);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_H(void) {
+    INC_n(&CPU_REG_H);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_L(void) {
+    INC_n(&CPU_REG_L);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_A(void) {
+    INC_n(&CPU_REG_A);
+
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_INC_HL(void) {
+    uint8_t value = mmu_get_byte(CPU_DREG_HL);
+    INC_n(&value);
+    mmu_write_byte(CPU_DREG_HL, value);
+
+    cpu.cycle_count += 12;
+    ++cpu.PC;
+}
+
 
 void OPC_DEC_B(void) {
     REG_DEC(&CPU_REG_B);

@@ -1,6 +1,9 @@
 #ifndef YOBEMAG_ALU_H
 #define YOBEMAG_ALU_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef struct TestParams {
     uint8_t opcode;
     uint8_t lhs;

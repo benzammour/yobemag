@@ -83,13 +83,22 @@ __attribute((always_inline)) inline void clear_flag(Flag f) {
 }
 
 void REG_DEC(uint8_t *reg);
-void REG_INC(uint8_t *reg);
+void INC_n(uint8_t *reg);
 
 void OPC_NOP(void);
 void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);
 void OPC_INC_BC(void);
+
 void OPC_INC_B(void);
+void OPC_INC_C(void);
+void OPC_INC_D(void);
+void OPC_INC_E(void);
+void OPC_INC_H(void);
+void OPC_INC_L(void);
+void OPC_INC_HL(void);
+void OPC_INC_A(void);
+
 void OPC_DEC_B(void);
 void OPC_DEC_C(void);
 void OPC_DEC_D(void);
