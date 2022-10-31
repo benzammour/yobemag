@@ -8,7 +8,7 @@
 
 ParameterizedTestParameters(INC_n, INC_n) {
     static TestParams params[] = {
-        // half carry
+  // half carry
         {0x04, 0, 15, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
         {0x0C, 0, 15, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 16, 1, 0b00100000},
         {0x14, 0, 15, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
@@ -22,7 +22,7 @@ ParameterizedTestParameters(INC_n, INC_n) {
 }
 
 ParameterizedTest(TestParams *params, INC_n, INC_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    CPU_REG_F = 0;
+    clear_flag_register();
 
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
@@ -48,10 +48,9 @@ ParameterizedTest(TestParams *params, INC_n, INC_n, .init = cpu_mmu_setup, .fini
     cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));
 }
 
-
 ParameterizedTestParameters(INC_n, INC_n_HL) {
     static SpecialTestParams params[] = {
-        {0x34, 0, 0, 1,  0b00000000, true, false},
+        {0x34, 0, 0,  1,  0b00000000, true, false},
         {0x34, 0, 15, 16, 0b00100000, true, false}, // half-carry
     };
 
@@ -59,7 +58,7 @@ ParameterizedTestParameters(INC_n, INC_n_HL) {
 }
 
 ParameterizedTest(SpecialTestParams *params, INC_n, INC_n_HL, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    CPU_REG_F = 0;
+    clear_flag_register();
 
     uint8_t opcode             = params->opcode;
     uint8_t value              = params->rhs;
@@ -86,5 +85,6 @@ ParameterizedTest(SpecialTestParams *params, INC_n, INC_n_HL, .init = cpu_mmu_se
               params->opcode, params->uses_borrow);
 
     // check if PC is updated correctly
-    cr_expect(eq(u16, cpu.PC, address + address_increment), "cpu.PC: %d, address: %d, address-increment: 0x%x", cpu.PC, address, address_increment);
+    cr_expect(eq(u16, cpu.PC, address + address_increment), "cpu.PC: %d, address: %d, address-increment: 0x%x", cpu.PC,
+              address, address_increment);
 }
