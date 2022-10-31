@@ -1,6 +1,9 @@
 #ifndef YOBEMAG_ALU_H
 #define YOBEMAG_ALU_H
 
+#include <stdbool.h>
+#include <stdint.h>
+
 typedef struct TestParams {
     uint8_t opcode;
     uint8_t lhs;
@@ -22,8 +25,8 @@ typedef struct SpecialTestParams {
     bool uses_borrow;
 } SpecialTestParams;
 
-void emulate_instruction(TestParams const *params);
+void emulate_instruction(const TestParams *params);
 
-void emulate_HL_d8_instruction(SpecialTestParams const *params);
+void emulate_HL_d8_instruction(const SpecialTestParams *params);
 
 #endif // YOBEMAG_ALU_H

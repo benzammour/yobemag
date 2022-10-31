@@ -6,7 +6,7 @@
 #include "mmu.h"
 #include "alu.h"
 
-void emulate_instruction(TestParams const *const params) {
+void emulate_instruction(const TestParams *const params) {
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC           = address;
@@ -32,7 +32,7 @@ void emulate_instruction(TestParams const *const params) {
     cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));
 }
 
-void emulate_HL_d8_instruction(SpecialTestParams const *const params) {
+void emulate_HL_d8_instruction(const SpecialTestParams *const params) {
     uint8_t opcode             = params->opcode;
     uint8_t A                  = params->lhs;
     uint8_t value              = params->rhs;
@@ -56,10 +56,12 @@ void emulate_HL_d8_instruction(SpecialTestParams const *const params) {
     cpu_step();
 
     // check flag register
-    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
+    cr_expect(eq(u8, CPU_REG_F, params->F), "l: %d, r: %d, op: 0x%x, uses_borrow: %d", params->lhs, params->rhs,
+              params->opcode, params->uses_borrow);
 
     // check if value is correct
-    cr_expect(eq(u8, CPU_REG_A, params->expected), "l: %d, r: %d, op: 0x%x", params->lhs, params->rhs, params->opcode);
+    cr_expect(eq(u8, CPU_REG_A, params->expected), "l: %d, r: %d, op: 0x%x, uses_borrow: %d", params->lhs, params->rhs,
+              params->opcode, params->uses_borrow);
 
     // check if PC is updated correctly
     cr_expect(eq(u8, cpu.PC, address + address_increment));

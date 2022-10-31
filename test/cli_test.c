@@ -120,7 +120,7 @@ Test(cli, cli_correct_with_log_lvl, .exit_code = EXIT_SUCCESS, .init = cr_redire
     LoggingLevel actual_log_lvl   = cli_args.logging_level;
     LoggingLevel expected_log_lvl = 2;
 
-    char const *expected_rom_path = "../build/yobemag.gb";
+    const char *expected_rom_path = "../build/yobemag.gb";
 
     cr_expect(eq(int, actual_log_lvl, expected_log_lvl));
     cr_assert_str_eq(cli_args.rom_path, expected_rom_path);
@@ -133,7 +133,7 @@ Test(cli, cli_correct_no_log_lvl, .exit_code = EXIT_SUCCESS, .init = cr_redirect
     CLIArguments cli_args;
     cli_parse(&cli_args, argc, argv);
 
-    char const *expected_rom_path = "../build/yobemag.gb";
+    const char *expected_rom_path = "../build/yobemag.gb";
 
     cr_assert_str_eq(cli_args.rom_path, expected_rom_path);
 }

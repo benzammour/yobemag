@@ -34,7 +34,7 @@ void log_teardown(void);
  * @param 	msg 		Format string for the log message
  * @param 	...			Parameters for format string
  */
-_Noreturn __attribute__((format(printf, 3, 4))) void log_exit(char const *file_path, int line_number, char const *msg,
+_Noreturn __attribute__((format(printf, 3, 4))) void log_exit(const char *file_path, int line_number, const char *msg,
                                                               ...);
 
 /**
@@ -47,8 +47,8 @@ _Noreturn __attribute__((format(printf, 3, 4))) void log_exit(char const *file_p
  * @param   msg         Format string for the log message
  * @param   ...         Parameters for format string
  */
-__attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, char const *log_lvl_str, FILE *stream,
-                                                   char const *msg, ...);
+__attribute__((format(printf, 4, 5))) void log_str(LoggingLevel log_lvl, const char *log_lvl_str, FILE *stream,
+                                                   const char *msg, ...);
 
 /*
  * This is necessary, since __VA_ARGS__ is a C GNU extension.

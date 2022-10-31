@@ -16,7 +16,7 @@ typedef struct CLIArguments {
     /**
      * @brief Propagated to ::rom_load() to create a memory map to rom file
      */
-    char const *rom_path;
+    const char *rom_path;
 } CLIArguments;
 
 /**

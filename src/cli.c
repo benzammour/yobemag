@@ -11,17 +11,17 @@
  *** LOCAL VARIABLES                                ***
  ******************************************************/
 
-static char const *usage_str = "Usage: yobemag [-l <0..4>] <ROM>";
+static const char *usage_str = "Usage: yobemag [-l <0..4>] <ROM>";
 
 /******************************************************
  *** LOCAL METHODS                                  ***
  ******************************************************/
 
-static void safe_strtol(char const *const str_to_conv, int *const store_into) {
+static void safe_strtol(const char *const str_to_conv, int *const store_into) {
     errno = 0;
 
     char *end;
-    long const strtol_in = strtol(str_to_conv, &end, 10);
+    const long strtol_in = strtol(str_to_conv, &end, 10);
 
     if (end == str_to_conv) {
         YOBEMAG_EXIT("strtol failed: %s not a decimal number", str_to_conv);
@@ -42,7 +42,7 @@ static void safe_strtol(char const *const str_to_conv, int *const store_into) {
  *** EXPOSED METHODS                                ***
  ******************************************************/
 
-void cli_parse(CLIArguments *const cli_args, int const argc, char **const argv) {
+void cli_parse(CLIArguments *const cli_args, const int argc, char **const argv) {
     if (argc < 2) {
         YOBEMAG_EXIT("No ROM path specified! %s", usage_str);
     }

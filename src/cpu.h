@@ -82,20 +82,20 @@ __attribute((always_inline)) inline void clear_flag(Flag f) {
     CPU_REG_F &= (uint8_t) ~(1 << f);
 }
 
-void REG_DEC(uint8_t *reg);
+__attribute__((always_inline)) inline void clear_flag_register(void) {
+    CPU_REG_F = 0;
+}
+
 void REG_INC(uint8_t *reg);
 
 void OPC_NOP(void);
+
 void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);
+
 void OPC_INC_BC(void);
 void OPC_INC_B(void);
-void OPC_DEC_B(void);
-void OPC_DEC_C(void);
-void OPC_DEC_D(void);
-void OPC_DEC_E(void);
-void OPC_DEC_H(void);
-void OPC_DEC_L(void);
+
 void OPC_LD_SP(void);
 void OPC_LD_DE_A(void);
 void OPC_LD_HL_PLUS_A(void);
@@ -579,5 +579,49 @@ void OPC_CP_A_HL(void);
  *       This instruction only sets flags, but does not save the result into Register A.
  */
 void OPC_CP_A_d8(void);
+
+/**
+ * @brief Decrement the value stored in Register A.
+ */
+void OPC_DEC_A(void);
+
+/**
+ * @brief Decrement the value stored in Register B.
+ */
+void OPC_DEC_B(void);
+
+/**
+ * @brief Decrement the value stored in Register C.
+ */
+void OPC_DEC_C(void);
+
+/**
+ * @brief Decrement the value stored in Register D.
+ */
+void OPC_DEC_D(void);
+
+/**
+ * @brief Decrement the value stored in Register E.
+ */
+void OPC_DEC_E(void);
+
+/**
+ * @brief Decrement the value stored in Register H.
+ */
+void OPC_DEC_H(void);
+
+/**
+ * @brief Decrement the value stored in Register L.
+ */
+void OPC_DEC_L(void);
+
+/**
+ * @brief Decrement the value stored at address `HL`.
+ *
+ * @note This instruction fetches a byte from address `HL`.
+ *       Decrements it and then writes the decremented byte
+ *       back to the address `HL`. Hence it takes 12 cycles.
+ */
+void OPC_DEC_HL(void);
 
 #endif // YOBEMAG_CPU_H

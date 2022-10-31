@@ -54,7 +54,7 @@ void log_teardown(void) {
     fflush(stdout);
 }
 
-void log_exit(char const *const file_path, int const line_number, char const *const msg, ...) {
+void log_exit(const char *const file_path, const int line_number, const char *const msg, ...) {
     va_list args;
     va_start(args, msg);
 
@@ -62,7 +62,7 @@ void log_exit(char const *const file_path, int const line_number, char const *co
     get_time(time_str);
 
     char *file_path_copy  = strdup(file_path);
-    char const *file_name = basename(file_path_copy);
+    const char *file_name = basename(file_path_copy);
 
     fprintf(stderr, "%10s – %s – %s:%d - ", "FATAL", time_str, file_name, line_number);
     vfprintf(stderr, msg, args);
@@ -73,7 +73,7 @@ void log_exit(char const *const file_path, int const line_number, char const *co
     exit(EXIT_FAILURE);
 }
 
-void log_str(const LoggingLevel log_lvl, char const *const log_lvl_str, FILE *stream, char const *const msg, ...) {
+void log_str(const LoggingLevel log_lvl, const char *const log_lvl_str, FILE *stream, const char *const msg, ...) {
     if (log_lvl < min_log_lvl)
         return;
 
