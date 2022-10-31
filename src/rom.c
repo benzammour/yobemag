@@ -17,7 +17,7 @@
 #define CARTRIDGE_TYPE_ADDR  (0x147)
 #define CARTRIDGE_SIZE_ADDR  (0x148)
 
-static char const *cartridge_types[0xFF + 1] = {
+static const char *cartridge_types[0xFF + 1] = {
     [0x00] = "ROM ONLY",
     [0x01] = "MBC1",
     [0x02] = "MBC1+RAM",
@@ -51,7 +51,7 @@ static char const *cartridge_types[0xFF + 1] = {
     [0xFF] = "HuC1+RAM+BATTERY",
 };
 
-static char const *rom_sizes[] = {
+static const char *rom_sizes[] = {
     [0x00] = "32KByte (no ROM banking)", [0x01] = "64KByte (4 banks)",   [0x02] = "64KByte (4 banks)",
     [0x03] = "256KByte (16 banks",       [0x04] = "512KByte (32 banks)", [0x05] = "1MByte (64 banks)",
     [0x06] = "2MByte (128 banks)",       [0x07] = "4MByte (256 banks)",  [0x08] = "8MByte (512 banks)",
@@ -82,7 +82,7 @@ static void rom_setup(void) {
  *** EXPOSED METHODS                                ***
  ******************************************************/
 
-void rom_init(char const *file_name) {
+void rom_init(const char *file_name) {
     int f = open(file_name, O_RDONLY);
     if (f == -1)
         YOBEMAG_EXIT("Opening file %s failed: %s", file_name, strerror(errno));

@@ -48,10 +48,6 @@ CPU cpu = {
     0,
 };
 
-__attribute__((always_inline)) inline static void clear_flag_register(void) {
-    CPU_REG_F = 0;
-}
-
 __attribute__((always_inline)) inline static void LD_REG_REG(uint8_t *register_one, uint8_t register_two) {
     *register_one = register_two;
 }
@@ -61,24 +57,11 @@ static void LD_REG_d8(uint8_t *reg_addr) {
     LD_REG_REG(reg_addr, immediate);
 }
 
-void REG_DEC(uint8_t *reg) {
-    (*reg)--;
-
-    // Flag C is not affected
-    set_flag((*reg & 0xF) == 0xF, H_FLAG);
-    set_flag(1, N_FLAG);
-    set_flag(!(*reg), Z_FLAG);
-
-    // TODO: This is 4 in most and 12 in one case,
-    //  	 add where this function is called
-    cpu.cycle_count += 1;
-}
-
 static void optable_init(void) {
     // Set up lookup table
     instr_lookup[0x00] = OPC_NOP;
     instr_lookup[0x03] = OPC_INC_BC;
-    
+
     instr_lookup[0x04] = OPC_INC_B;
     instr_lookup[0x0C] = OPC_INC_C;
     instr_lookup[0x14] = OPC_INC_D;
@@ -87,13 +70,7 @@ static void optable_init(void) {
     instr_lookup[0x2C] = OPC_INC_L;
     instr_lookup[0x34] = OPC_INC_HL;
     instr_lookup[0x3C] = OPC_INC_A;
-    
-    instr_lookup[0x05] = OPC_DEC_B;
-    instr_lookup[0x0D] = OPC_DEC_C;
-    instr_lookup[0x15] = OPC_DEC_D;
-    instr_lookup[0x1D] = OPC_DEC_E;
-    instr_lookup[0x25] = OPC_DEC_H;
-    instr_lookup[0x2D] = OPC_DEC_L;
+
     instr_lookup[0x31] = OPC_LD_SP;
 
     // 8-bit loads
@@ -282,6 +259,16 @@ static void optable_init(void) {
     instr_lookup[0xBF] = OPC_CP_A_A;
     instr_lookup[0xFE] = OPC_CP_A_d8;
 
+    // 8-bit ALU: DEC n
+    instr_lookup[0x05] = OPC_DEC_B;
+    instr_lookup[0x0D] = OPC_DEC_C;
+    instr_lookup[0x15] = OPC_DEC_D;
+    instr_lookup[0x1D] = OPC_DEC_E;
+    instr_lookup[0x25] = OPC_DEC_H;
+    instr_lookup[0x2D] = OPC_DEC_L;
+    instr_lookup[0x35] = OPC_DEC_HL;
+    instr_lookup[0x3D] = OPC_DEC_A;
+
     // TODO: 0xC3
 
     cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
@@ -329,7 +316,6 @@ void OPC_INC_BC(void) {
     cpu.cycle_count += 2;
 }
 
-
 void INC_n(uint8_t *reg) {
     ++(*reg);
 
@@ -354,7 +340,7 @@ void OPC_INC_C(void) {
 
 void OPC_INC_D(void) {
     INC_n(&CPU_REG_D);
-    
+
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
@@ -394,31 +380,6 @@ void OPC_INC_HL(void) {
 
     cpu.cycle_count += 12;
     ++cpu.PC;
-}
-
-
-void OPC_DEC_B(void) {
-    REG_DEC(&CPU_REG_B);
-}
-
-void OPC_DEC_C(void) {
-    REG_DEC(&CPU_REG_C);
-}
-
-void OPC_DEC_D(void) {
-    REG_DEC(&CPU_REG_D);
-}
-
-void OPC_DEC_E(void) {
-    REG_DEC(&CPU_REG_E);
-}
-
-void OPC_DEC_H(void) {
-    REG_DEC(&CPU_REG_H);
-}
-
-void OPC_DEC_L(void) {
-    REG_DEC(&CPU_REG_L);
 }
 
 void OPC_LD_SP(void) {
@@ -1579,4 +1540,70 @@ void OPC_CP_A_d8(void) {
     CP_A_n(immediate);
     cpu.cycle_count += 8;
     cpu.PC += 2;
+}
+
+static void DEC_n(uint8_t *const addr) {
+    // Simplifications made for half carry flag check:
+    // (*addr & LO_NIBBLE_MASK) < (n & LO_NIBBLE_MASK) where n = 1
+    // (*addr & LO_NIBBLE_MASK) < (1 & LO_NIBBLE_MASK)
+    // (*addr & LO_NIBBLE_MASK) < 1
+    // (*addr & LO_NIBBLE_MASK) == 0
+    set_flag(!(*addr & LO_NIBBLE_MASK), H_FLAG);
+
+    --(*addr);
+
+    set_flag(!(*addr), Z_FLAG);
+    set_flag(1, N_FLAG);
+
+    // Flag C is not affected
+}
+
+void OPC_DEC_A(void) {
+    DEC_n(&CPU_REG_A);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_B(void) {
+    DEC_n(&CPU_REG_B);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_C(void) {
+    DEC_n(&CPU_REG_C);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_D(void) {
+    DEC_n(&CPU_REG_D);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_E(void) {
+    DEC_n(&CPU_REG_E);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_H(void) {
+    DEC_n(&CPU_REG_H);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_L(void) {
+    DEC_n(&CPU_REG_L);
+    cpu.cycle_count += 4;
+    ++cpu.PC;
+}
+
+void OPC_DEC_HL(void) {
+    uint8_t value = mmu_get_byte(CPU_DREG_HL);
+    DEC_n(&value);
+    mmu_write_byte(CPU_DREG_HL, value);
+    cpu.cycle_count += 12;
+    ++cpu.PC;
 }

@@ -8,7 +8,7 @@
 #include "cli.h"
 #include "log.h"
 
-int main(int const argc, char **const argv) {
+int main(const int argc, char **const argv) {
     CLIArguments cli_args;
     cli_parse(&cli_args, argc, argv);
 
