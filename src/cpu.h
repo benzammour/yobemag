@@ -94,7 +94,6 @@ void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);
 
 void OPC_INC_BC(void);
-void OPC_INC_B(void);
 
 void OPC_LD_SP(void);
 void OPC_LD_DE_A(void);
@@ -579,6 +578,50 @@ void OPC_CP_A_HL(void);
  *       This instruction only sets flags, but does not save the result into Register A.
  */
 void OPC_CP_A_d8(void);
+
+/**
+ * @brief Increment the value stored in Register B.
+ */
+void OPC_INC_B(void);
+
+/**
+ * @brief Increment the value stored in Register C.
+ */
+void OPC_INC_C(void);
+
+/**
+ * @brief Increment the value stored in Register D.
+ */
+void OPC_INC_D(void);
+
+/**
+ * @brief Increment the value stored in Register E.
+ */
+void OPC_INC_E(void);
+
+/**
+ * @brief Increment the value stored in Register H.
+ */
+void OPC_INC_H(void);
+
+/**
+ * @brief Increment the value stored in Register L.
+ */
+void OPC_INC_L(void);
+
+/**
+ * @brief Increment the value stored at address `HL`.
+ *
+ * @note This instruction fetches a byte from address `HL`.
+ *       Increments it and then writes the decremented byte
+ *       back to the address `HL`. Hence it takes 12 cycles.
+ */
+void OPC_INC_HL(void);
+
+/**
+ * @brief Increment the value stored in Register A.
+ */
+void OPC_INC_A(void);
 
 /**
  * @brief Decrement the value stored in Register A.
