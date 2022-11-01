@@ -112,11 +112,12 @@ if (${TEST})
         test/alu_8bit_xor_test.c
         test/alu_8bit_cp_test.c
         test/alu_8bit_dec_test.c
+        test/alu_8bit_inc_test.c
         test/cli_test.c
         test/rom_test.c
         test/mmu_test.c
         test/log_test.c
-        test/alu_8bit_inc_test.c)
+        test/jump_tests.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")

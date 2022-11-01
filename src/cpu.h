@@ -100,6 +100,37 @@ void OPC_JP_C(void);
 
 void OPC_INC_BC(void);
 
+/******************************************************
+ *** Misc                                           ***
+ ******************************************************/
+
+/**
+ * @brief If Zero Flag is not set, we add an immediate signed byte
+ *        to the PC and jump to it.
+ */
+void OPC_JR_NZ(void);
+
+/**
+ * @brief If Carry Flag is not set, we add an immediate signed byte
+ *        to the PC and jump to it.
+ */
+void OPC_JR_NC(void);
+
+/**
+ * @brief If Zero Flag is set, we add an immediate signed byte
+ *        to the PC and jump to it.
+ */
+void OPC_JR_Z(void);
+
+/**
+ * @brief If Carry Flag is set, we add an immediate signed byte
+ *        to the PC and jump to it.
+ */
+void OPC_JR_C(void);
+
+/******************************************************
+ *** 8-BIT Loads                                    ***
+ ******************************************************/
 void OPC_LD_SP(void);
 void OPC_LD_DE_A(void);
 void OPC_LD_HL_PLUS_A(void);
