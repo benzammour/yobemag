@@ -93,6 +93,11 @@ void OPC_NOP(void);
 void OPC_LD_BC(void);
 void OPC_LD_BC_A(void);
 
+void OPC_JP_NZ(void);
+void OPC_JP_NC(void);
+void OPC_JP_Z(void);
+void OPC_JP_C(void);
+
 void OPC_INC_BC(void);
 
 void OPC_LD_SP(void);

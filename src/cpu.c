@@ -62,6 +62,11 @@ static void optable_init(void) {
     instr_lookup[0x00] = OPC_NOP;
     instr_lookup[0x03] = OPC_INC_BC;
 
+    instr_lookup[0xC2] = OPC_JP_NZ;
+    instr_lookup[0xD2] = OPC_JP_NC;
+    instr_lookup[0xCA] = OPC_JP_Z;
+    instr_lookup[0xDA] = OPC_JP_C;
+
     instr_lookup[0x31] = OPC_LD_SP;
 
     // 8-bit loads
@@ -321,6 +326,37 @@ void OPC_LD_SP(void) {
     cpu.SP = mmu_get_byte(cpu.PC);
     cpu.PC += 2;
     cpu.cycle_count += 3;
+}
+
+static void OPC_JP_cc_a16(uint8_t bit, uint8_t branching_condition) {
+    uint16_t n = mmu_get_two_bytes(cpu.PC + 1);
+
+    // doing the PC increment before the opcode's override because we are emulating
+    // 3 CPU cycles beforehand (fetching opcode in cpu_step, and fetching n above)
+    cpu.PC += 3;
+
+    if (bit == branching_condition) {
+        cpu.PC = n;
+        cpu.cycle_count += 16;
+    } else {
+        cpu.cycle_count += 12;
+    }
+}
+
+void OPC_JP_NZ(void) {
+    OPC_JP_cc_a16(get_flag(Z_FLAG), 0);
+}
+
+void OPC_JP_NC(void) {
+    OPC_JP_cc_a16(get_flag(C_FLAG), 0);
+}
+
+void OPC_JP_Z(void) {
+    OPC_JP_cc_a16(get_flag(Z_FLAG), 1);
+}
+
+void OPC_JP_C(void) {
+    OPC_JP_cc_a16(get_flag(C_FLAG), 1);
 }
 
 /******************************************************
