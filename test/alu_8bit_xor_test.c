@@ -7,9 +7,9 @@
 #include "common/alu.h"
 
 ParameterizedTestParameters(XOR_A_n, XOR_A_n_same_destruction) {
-    const uint8_t alternate    = 0b10101010;
-    const uint8_t f_expected   = 0x00 | (1 << Z_FLAG);
-    static TestParams params[] = {
+    const uint8_t alternate       = 0b10101010;
+    const uint8_t f_expected      = 0x00 | (1 << Z_FLAG);
+    static ALUTestParams params[] = {
         {0xA8, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
         {0xA9, alternate, alternate, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 0, 1, f_expected},
         {0xAA, alternate, alternate, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
@@ -19,16 +19,17 @@ ParameterizedTestParameters(XOR_A_n, XOR_A_n_same_destruction) {
         {0xAF, alternate, alternate, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 0, 1, f_expected},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, XOR_A_n, XOR_A_n_same_destruction, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_instruction(params);
+ParameterizedTest(ALUTestParams *params, XOR_A_n, XOR_A_n_same_destruction, .init = cpu_mmu_setup,
+                  .fini = cpu_teardown) {
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(XOR_A_n, XOR_A_HL_and_d8) {
-    const uint8_t f_z_set             = 0x00 | (1 << Z_FLAG);
-    static SpecialTestParams params[] = {
+    const uint8_t f_z_set                = 0x00 | (1 << Z_FLAG);
+    static ALUSpecialTestParams params[] = {
         {0xAE, 255, 255, 0,   f_z_set, true,  false},
         {0xAE, 8,   8,   0,   f_z_set, true,  false},
         {0xAE, 128, 128, 0,   f_z_set, true,  false},
@@ -44,9 +45,9 @@ ParameterizedTestParameters(XOR_A_n, XOR_A_HL_and_d8) {
         {0xEE, 128, 129, 1,   0,       false, false},
     };
 
-    return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
+    return cr_make_param_array(ALUSpecialTestParams, params, sizeof(params) / sizeof(ALUSpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, XOR_A_n, XOR_A_HL_and_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    emulate_HL_d8_instruction(params);
+ParameterizedTest(ALUSpecialTestParams *params, XOR_A_n, XOR_A_HL_and_d8, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+    alu_emulate_8bit_HL_d8_instruction(params);
 }

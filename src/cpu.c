@@ -276,6 +276,12 @@ static void optable_init(void) {
     instr_lookup[0x35] = OPC_DEC_HL;
     instr_lookup[0x3D] = OPC_DEC_A;
 
+    // 16-bit ALU: ADD HL,n
+    instr_lookup[0x09] = OPC_ADD_HL_BC;
+    instr_lookup[0x19] = OPC_ADD_HL_DE;
+    instr_lookup[0x29] = OPC_ADD_HL_HL;
+    instr_lookup[0x39] = OPC_ADD_HL_SP;
+
     // TODO: 0xC3
 
     cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
@@ -992,7 +998,7 @@ static void ADD_A_n(uint8_t n) {
     uint_fast16_t result = A + n;
 
     clear_flag_register(); // N is implicitly cleared
-    set_flag(result > BYTE_MASK, C_FLAG);
+    set_flag(result > UINT8_MAX, C_FLAG);
     set_flag(A_nibble + n_nibble > LO_NIBBLE_MASK, H_FLAG);
     set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
 
@@ -1058,12 +1064,12 @@ static void ADC_A_n(uint8_t n) {
     uint8_t A            = CPU_REG_A;
     uint8_t A_nibble     = A & LO_NIBBLE_MASK;
     uint8_t n_nibble     = n & LO_NIBBLE_MASK;
-    uint8_t c_flag       = get_flag(C_FLAG);
-    uint_fast16_t result = (uint_fast16_t) (A + n + c_flag);
+    uint8_t carry        = get_flag(C_FLAG);
+    uint_fast16_t result = (uint_fast16_t) (A + n + carry);
 
     clear_flag_register(); // N is implicitly cleared
     set_flag(result > BYTE_MASK, C_FLAG);
-    set_flag(A_nibble + n_nibble + c_flag > LO_NIBBLE_MASK, H_FLAG);
+    set_flag(A_nibble + n_nibble + carry > LO_NIBBLE_MASK, H_FLAG);
     set_flag((result &= BYTE_MASK) == 0, Z_FLAG);
 
     CPU_REG_A = (uint8_t) result;
@@ -1646,5 +1652,43 @@ void OPC_DEC_HL(void) {
     DEC_n(&value);
     mmu_write_byte(CPU_DREG_HL, value);
     cpu.cycle_count += 12;
+    ++cpu.PC;
+}
+
+/******************************************************
+ *** 16-BIT ALU                                      ***
+ ******************************************************/
+static void ADD_HL_n(uint16_t n) {
+    uint_fast32_t result = CPU_DREG_HL + n;
+
+    set_flag(result > UINT16_MAX, C_FLAG);
+    set_flag(((CPU_DREG_HL & 0xFFF) + (n & 0xFFF)) > 0xFFF, H_FLAG);
+    clear_flag(N_FLAG);
+    // Flag Z is not affected
+
+    CPU_DREG_HL = (uint16_t) result;
+}
+
+void OPC_ADD_HL_BC(void) {
+    ADD_HL_n(CPU_DREG_BC);
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_ADD_HL_DE(void) {
+    ADD_HL_n(CPU_DREG_DE);
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_ADD_HL_HL(void) {
+    ADD_HL_n(CPU_DREG_HL);
+    cpu.cycle_count += 8;
+    ++cpu.PC;
+}
+
+void OPC_ADD_HL_SP(void) {
+    ADD_HL_n(cpu.SP);
+    cpu.cycle_count += 8;
     ++cpu.PC;
 }

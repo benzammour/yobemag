@@ -7,7 +7,7 @@
 #include "common/alu.h"
 
 ParameterizedTestParameters(INC_n, INC_n) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
   // half carry
         {0x04, 0, 15, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
         {0x0C, 0, 15, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 16, 1, 0b00100000},
@@ -18,12 +18,10 @@ ParameterizedTestParameters(INC_n, INC_n) {
         {0x3C, 0, 15, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, INC_n, INC_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    clear_flag_register();
-
+ParameterizedTest(ALUTestParams *params, INC_n, INC_n, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC           = address;
@@ -49,17 +47,15 @@ ParameterizedTest(TestParams *params, INC_n, INC_n, .init = cpu_mmu_setup, .fini
 }
 
 ParameterizedTestParameters(INC_n, INC_n_HL) {
-    static SpecialTestParams params[] = {
+    static ALUSpecialTestParams params[] = {
         {0x34, 0, 0,  1,  0b00000000, true, false},
         {0x34, 0, 15, 16, 0b00100000, true, false}, // half-carry
     };
 
-    return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
+    return cr_make_param_array(ALUSpecialTestParams, params, sizeof(params) / sizeof(ALUSpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, INC_n, INC_n_HL, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    clear_flag_register();
-
+ParameterizedTest(ALUSpecialTestParams *params, INC_n, INC_n_HL, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     uint8_t opcode             = params->opcode;
     uint8_t value              = params->rhs;
     uint16_t address           = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;

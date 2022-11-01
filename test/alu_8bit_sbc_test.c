@@ -43,7 +43,7 @@ Test(sbc_a_n, sbc_a_a_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, (address + 1)));
+    cr_expect(eq(u16, cpu.PC, (address + 1)));
 }
 
 Test(sbc_a_n, sbc_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -72,7 +72,7 @@ Test(sbc_a_n, sbc_a_b_only_half_borrow, .init = cpu_mmu_setup, .fini = cpu_teard
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -101,7 +101,7 @@ Test(sbc_a_n, sbc_a_c_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -118,7 +118,7 @@ Test(sbc_a_n, sbc_a_d_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -135,7 +135,7 @@ Test(sbc_a_n, sbc_a_e_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -152,7 +152,7 @@ Test(sbc_a_n, sbc_a_h_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -169,7 +169,7 @@ Test(sbc_a_n, sbc_a_l_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -197,7 +197,7 @@ Test(sbc_a_n, sbc_a_hl_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 Test(sbc_a_n, sbc_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -223,7 +223,7 @@ Test(sbc_a_n, sbc_a_d8_res_only, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 2));
+    cr_expect(eq(u16, cpu.PC, address + 2));
 }
 
 Test(sbc_a_n, sbc_check_integer_promotion, .init = cpu_mmu_setup, .fini = cpu_teardown) {
@@ -244,5 +244,5 @@ Test(sbc_a_n, sbc_check_integer_promotion, .init = cpu_mmu_setup, .fini = cpu_te
     cr_expect(eq(u8, actual, expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }

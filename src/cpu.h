@@ -218,7 +218,6 @@ uint16_t cpu_get_two_bytes(uint16_t addr);
  *** 8-BIT ALU                                      ***
  ******************************************************/
 
-// 8-bit ALU: ADD A,n
 void OPC_ADD_A_A(void);
 
 void OPC_ADD_A_B(void);
@@ -697,5 +696,37 @@ void OPC_DEC_L(void);
  *       back to the address `HL`. Hence it takes 12 cycles.
  */
 void OPC_DEC_HL(void);
+
+/******************************************************
+ *** 16-BIT ALU                                      ***
+ ******************************************************/
+
+/**
+ * @brief Add double word register `BC` to double word register `HL`.
+ *
+ * @note This instruction requires 8 cycles.
+ */
+void OPC_ADD_HL_BC(void);
+
+/**
+ * @brief Add double word register `DE` to double word register `HL`.
+ *
+ * @note This instruction requires 8 cycles.
+ */
+void OPC_ADD_HL_DE(void);
+
+/**
+ * @brief Add double word register `HL` to double word register `HL`.
+ *
+ * @note This instruction requires 8 cycles.
+ */
+void OPC_ADD_HL_HL(void);
+
+/**
+ * @brief Add double word register `SP` to double word register `HL`.
+ *
+ * @note This instruction requires 8 cycles.
+ */
+void OPC_ADD_HL_SP(void);
 
 #endif // YOBEMAG_CPU_H

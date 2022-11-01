@@ -157,7 +157,7 @@ ParameterizedTest(Ld8BitTestParams *params, ld_m_n, ld_m_n, .init = cpu_mmu_setu
     cr_expect(eq(u8, actual, params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + 1));
+    cr_expect(eq(u16, cpu.PC, address + 1));
 }
 
 /******************************************************
@@ -223,7 +223,7 @@ ParameterizedTest(Ld8BitSpecialTestParams *params, ld_n_hl_d8, ld_n_hl_d8, .init
     cr_expect(eq(u8, *goal_reg, params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + address_increment));
+    cr_expect(eq(u16, cpu.PC, address + address_increment));
 }
 
 /******************************************************
@@ -270,7 +270,7 @@ ParameterizedTest(Ld8BitTestParams *params, ld_hl_n, ld_hl_n, .init = cpu_mmu_se
     cr_expect(eq(u8, actual, params->expected), "ex: %d act: %d rhs: %d", params->expected, actual, params->rhs_val);
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, opcode_addr + 1));
+    cr_expect(eq(u16, cpu.PC, opcode_addr + 1));
 }
 
 /******************************************************
@@ -313,7 +313,7 @@ ParameterizedTest(Ld8BitNNxTestParams *params, ld_hl_d8, ld_hl_d8, .init = cpu_m
     cr_expect(eq(u8, mmu_get_byte(indirection_address), params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + address_increment));
+    cr_expect(eq(u16, cpu.PC, address + address_increment));
 }
 
 /******************************************************
@@ -411,7 +411,7 @@ ParameterizedTest(Ld8BitxNNTestParams *params, ld_nn_x, ld_x_nn, .init = cpu_mmu
     cr_expect(eq(u8, *goal_reg, params->expected));
 
     // check if PC is updated correctly
-    cr_expect(eq(u8, cpu.PC, address + address_increment));
+    cr_expect(eq(u16, cpu.PC, address + address_increment));
 
     // check if HL is updated correctly
     if (params->type == 1) {
