@@ -17,14 +17,14 @@ make
 
 Use these options with `-D<Option>=<Value>`.
 
-| Option             | Values                                                   | Explanation                                                                                                                                       | Requires         |
-|--------------------|----------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|------------------|
-| `CMAKE_BUILD_TYPE` | `DEBUG`,`RELEASE`                                        | `DEBUG` adds the `-g` compiler flag and the `YOBEMAG_DEBUG` compile definition                                                                    | -                |
-| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`                     | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)                                                   | Compiler support |
-| `CMAKE_C_COMPILER` | Supported: `gcc` (11), `clang` (11, 12, 13, 14)          | The supported versions are used by our pipeline and guarantee compatibility                                                                       | -                |
-| `TEST`             | `0`, `1`                                                 | Disables/Enables building tests                                                                                                                   | -                |
-| `COVERAGE`         | `0`, `1`                                                 | Removes/Adds instrumentation required for coverage reports                                                                                        | `TEST=1`         |
-| `SANITIZE`         | gcc: `valgrind`, clang: `address`, `memory`, `undefined` | For `valgrind`, it runs the test executable with valgrind.<br>For the rest, the tests are instrumented with sanitizers but just run as executable | `clang` OR `gcc` |
+| Option             | Values                                                   | Explanation                                                                                                                   | Requires         |
+|--------------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------|
+| `CMAKE_BUILD_TYPE` | `DEBUG`,`RELEASE`                                        | `DEBUG` adds the `-g` compiler flag and the `YOBEMAG_DEBUG` compile definition                                                | -                |
+| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`                     | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)                               | Compiler support |
+| `CMAKE_C_COMPILER` | Supported: `gcc` (11), `clang` (11, 12, 13, 14)          | The supported versions are used by our pipeline and guarantee compatibility                                                   | -                |
+| `TEST`             | `0`, `1`                                                 | Disables/Enables building tests                                                                                               | -                |
+| `COVERAGE`         | `0`, `1`                                                 | Removes/Adds instrumentation required for coverage reports                                                                    | `TEST=1`         |
+| `SANITIZE`         | gcc: `valgrind`, clang: `address`, `memory`, `undefined` | `valgrind`: runs the executable with valgrind.<br>`address`, `memory`, `undefined`: instrument the executable with sanitizers | `clang` OR `gcc` |
 
 ### Build Targets
 
@@ -34,7 +34,7 @@ Use these targets with `make <Target>`
 |------------|--------------------------------------------------------------------------------------------------------------------------------|
 |            | Default target, builds the `yobemag` executable                                                                                |
 | `test`     | Builds the `yobemag_test` executable that runs unit tests from [`test/`](https://github.com/Benzammour/yobemag/tree/main/test) |
-| `sanitize` | Runs `yobemag` or `yobemag_test` (depending on `TEST=<0/1>`) with the specified sanitizer (see [`OPTIMIZE`](###CMake-Options)) |
+| `sanitize` | Runs `yobemag` or `yobemag_test` (depending on `TEST=<0/1>`) with the specified sanitizer (see [`SANITIZE`](#CMake-Options))   |
 | `install`  | Builds the default target and copies it to `~/.local/bin/yobemag`. You can uninstall by just removing the binary.              |
 
 ## Test
@@ -64,12 +64,12 @@ You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/cool-feature`)
+2. Create your Feature Branch (`git checkout -b feature-<cool-feature-name>`)
 3. Implement your desired Feature!
-3. Commit your Changes (`git commit -am 'Add some cool-feature'`)
-4. Push to the Branch (`git push origin feature/cool-feature`)
-5. Create a new [Pull Request](https://github.com/benzammour/yobemag/pulls)
-
+4. Add your Files to the Staging Area (`git add <your-files>`)
+5. Commit your Changes (`git commit -m 'feat: add some cool feature description here!'`)
+6. Push to the Branch (`git push origin feature-<cool-feature-name>`)
+7. Create a new [Pull Request](https://github.com/benzammour/yobemag/pulls)
 
 ### Pre-commit hooks
 
