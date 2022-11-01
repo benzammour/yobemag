@@ -17,17 +17,28 @@ typedef struct JrNZTestParams {
 
 ParameterizedTestParameters(jr_cc_n, jr_cc_n) {
     static JrNZTestParams params[] = {
-  // take the branch
+  // take the branch - positive
         {0x20, 101, Z_FLAG, 0, true },
         {0x30, 101, C_FLAG, 0, true },
         {0x28, 101, Z_FLAG, 1, true },
         {0x38, 101, C_FLAG, 1, true },
+ // take the branch - negative
+        {0x20, -50, Z_FLAG, 0, true },
+        {0x30, -50, C_FLAG, 0, true },
+        {0x28, -50, Z_FLAG, 1, true },
+        {0x38, -50, C_FLAG, 1, true },
 
- // don't take the branch
+ // don't take the branch - positive
         {0x20, 101, Z_FLAG, 1, false},
         {0x30, 101, C_FLAG, 1, false},
         {0x28, 101, Z_FLAG, 0, false},
         {0x38, 101, C_FLAG, 0, false},
+
+ // don't take the branch - negative
+        {0x20, -50, Z_FLAG, 1, false},
+        {0x30, -50, C_FLAG, 1, false},
+        {0x28, -50, Z_FLAG, 0, false},
+        {0x38, -50, C_FLAG, 0, false},
     };
 
     // generate parameter set
