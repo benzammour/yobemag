@@ -23,6 +23,8 @@ Test(rom, rom_init_file_found, .exit_code = EXIT_SUCCESS, .init = cr_redirect_st
     cr_expect_null(get_rom_bytes());
     rom_init(rom_file_path);
     cr_expect_not_null(get_rom_bytes());
+
+    free(file_path_copy);
 }
 
 Test(rom, rom_check_destruction, .exit_code = EXIT_SUCCESS, .init = cr_redirect_stderr) {
@@ -32,6 +34,8 @@ Test(rom, rom_check_destruction, .exit_code = EXIT_SUCCESS, .init = cr_redirect_
 
     rom_init(rom_file_path);
     rom_destroy();
+
+    free(file_path_copy);
 }
 
 Test(rom, rom_invalid_destruction, .exit_code = EXIT_FAILURE, .init = cr_redirect_stderr) {
@@ -63,4 +67,6 @@ Test(log, rom_setup, .exit_code = EXIT_SUCCESS, .init = cr_redirect_stderr) {
     cr_expect_not_null(strstr(buf, "title"));
     cr_expect_not_null(strstr(buf, "type"));
     cr_expect_not_null(strstr(buf, "rom size"));
+
+    free(file_path_copy);
 }
