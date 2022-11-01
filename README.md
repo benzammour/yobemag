@@ -64,11 +64,12 @@ You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/cool-feature`)
+2. Create your Feature Branch (`git checkout -b feature-<cool-feature-name>`)
 3. Implement your desired Feature!
-4. Commit your Changes (`git commit -am 'Add some cool-feature'`)
-5. Push to the Branch (`git push origin feature/cool-feature`)
-6. Create a new [Pull Request](https://github.com/benzammour/yobemag/pulls)
+4. Add your Files to the Staging Area (`git add <your-files>`)
+5. Commit your Changes (`git commit -m 'feat: add some cool feature description here!'`)
+6. Push to the Branch (`git push origin feature-<cool-feature-name>`)
+7. Create a new [Pull Request](https://github.com/benzammour/yobemag/pulls)
 
 ### Pre-commit hooks
 
