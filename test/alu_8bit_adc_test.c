@@ -7,7 +7,7 @@
 #include "common/alu.h"
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_no_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 0, 1, 0b10010000},
         {0x89, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 0, 1, 0b10010000},
         {0x8A, 128, 128, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 0, 1, 0b10010000},
@@ -17,17 +17,17 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_no_borrow) {
         {0x8F, 128, 128, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 0, 1, 0b10010000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_carry_no_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 1, 1, 0b00010000},
         {0x89, 128, 128, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 1, 1, 0b00010000},
         {0x8A, 128, 128, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 1, 1, 0b00010000},
@@ -37,17 +37,17 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_carry_borrow) {
         {0x8F, 128, 128, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 1, 1, 0b00010000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_carry_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_carry_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_no_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 8, 8, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
         {0x89, 8, 8, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 16, 1, 0b00100000},
         {0x8A, 8, 8, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
@@ -57,18 +57,18 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_no_borrow) {
         {0x8F, 8, 8, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 16, 1, 0b00100000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_no_borrow, .init = cpu_mmu_setup,
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_half_carry_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 8, 8, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 17, 1, 0b00100000},
         {0x89, 8, 8, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 17, 1, 0b00100000},
         {0x8A, 8, 8, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 17, 1, 0b00100000},
@@ -78,17 +78,18 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_borrow) {
         {0x8F, 8, 8, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 17, 1, 0b00100000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init = cpu_mmu_setup, .fini = cpu_teardown) {
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_half_carry_borrow, .init = cpu_mmu_setup,
+                  .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 255, 255, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 255, 1, 0b00110000},
         {0x89, 255, 255, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 255, 1, 0b00110000},
         {0x8A, 255, 255, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 255, 1, 0b00110000},
@@ -98,18 +99,18 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_borrow) {
         {0x8F, 255, 255, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 255, 1, 0b00110000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_borrow, .init = cpu_mmu_setup,
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag ON
     set_flag(1, C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x88, 255, 255, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 254, 1, 0b00110000},
         {0x89, 255, 255, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 254, 1, 0b00110000},
         {0x8A, 255, 255, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 254, 1, 0b00110000},
@@ -119,18 +120,18 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow) {
         {0x8F, 255, 255, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 254, 1, 0b00110000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow, .init = cpu_mmu_setup,
+ParameterizedTest(ALUTestParams *params, ADC_A_n, ADC_A_n_half_carry_and_carry_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     // turn carry flag OFF
     clear_flag(C_FLAG);
-    emulate_instruction(params);
+    alu_emulate_8bit_instruction(params);
 }
 
 ParameterizedTestParameters(ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
-    static SpecialTestParams params[] = {
+    static ALUSpecialTestParams params[] = {
         {0x8E, 255, 255, 255, 0b00110000, true,  true },
         {0x8E, 8,   8,   17,  0b00100000, true,  true },
         {0x8E, 128, 128, 1,   0b00010000, true,  true },
@@ -160,15 +161,15 @@ ParameterizedTestParameters(ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow) {
         {0xCE, 128, 129, 1,   0b00010000, false, false},
     };
 
-    return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
+    return cr_make_param_array(ALUSpecialTestParams, params, sizeof(params) / sizeof(ALUSpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow, .init = cpu_mmu_setup,
+ParameterizedTest(ALUSpecialTestParams *params, ADC_A_n, ADC_A_HL_and_d8_borrow_and_no_borrow, .init = cpu_mmu_setup,
                   .fini = cpu_teardown) {
     if (params->uses_borrow) {
         set_flag(1, C_FLAG);
     } else {
         clear_flag(C_FLAG);
     }
-    emulate_HL_d8_instruction(params);
+    alu_emulate_8bit_HL_d8_instruction(params);
 }

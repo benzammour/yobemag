@@ -113,6 +113,7 @@ if (${TEST})
         test/alu_8bit_cp_test.c
         test/alu_8bit_dec_test.c
         test/alu_8bit_inc_test.c
+        test/alu_16bit_add_test.c
         test/cli_test.c
         test/rom_test.c
         test/mmu_test.c

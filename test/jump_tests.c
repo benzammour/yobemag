@@ -50,8 +50,7 @@ ParameterizedTest(JrNZTestParams *params, jr_cc_n, jr_cc_n, .init = cpu_mmu_setu
     uint16_t opcode_address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC                  = opcode_address;
 
-    // set_flag(0,*) does nothing, but the flag is still cleared due to clear_flag_register()
-    clear_flag_register();
+    // set_flag(0,*) does nothing, but the flag is still cleared due to clear_flag_register() in .init fixture
     set_flag(params->flag_value, params->flag);
 
     mmu_write_byte(opcode_address, params->opcode);
@@ -68,5 +67,5 @@ ParameterizedTest(JrNZTestParams *params, jr_cc_n, jr_cc_n, .init = cpu_mmu_setu
         branching_addition = 0;
     }
 
-    cr_expect(eq(u8, cpu.PC, opcode_address + 2 + branching_addition));
+    cr_expect(eq(u16, cpu.PC, opcode_address + 2 + branching_addition));
 }

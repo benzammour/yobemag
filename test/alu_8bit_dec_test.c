@@ -6,7 +6,7 @@
 #include "common/util.h"
 #include "common/alu.h"
 
-static void emulate(const TestParams *const params) {
+static void emulate(const ALUTestParams *const params) {
     // setup cpu
     uint16_t address = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
     cpu.PC           = address;
@@ -31,7 +31,7 @@ static void emulate(const TestParams *const params) {
     cr_expect(eq(u8, cpu.PC, (address + params->address_increment)));
 }
 
-void emulate_HL(const SpecialTestParams *const params) {
+void emulate_HL(const ALUSpecialTestParams *const params) {
     uint8_t opcode             = params->opcode;
     uint8_t value              = params->rhs;
     uint16_t address           = (random() % (MEM_SIZE - ROM_LIMIT)) + ROM_LIMIT;
@@ -61,7 +61,7 @@ void emulate_HL(const SpecialTestParams *const params) {
 }
 
 ParameterizedTestParameters(DEC_n, DEC_n_half_carry) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x05, 0, 16, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 15, 1, 0b01100000},
         {0x0D, 0, 16, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 15, 1, 0b01100000},
         {0x15, 0, 16, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 15, 1, 0b01100000},
@@ -71,16 +71,15 @@ ParameterizedTestParameters(DEC_n, DEC_n_half_carry) {
         {0x3D, 0, 16, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 15, 1, 0b01100000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, DEC_n, DEC_n_half_carry, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    clear_flag_register();
+ParameterizedTest(ALUTestParams *params, DEC_n, DEC_n_half_carry, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate(params);
 }
 
 ParameterizedTestParameters(DEC_n, DEC_n_zero) {
-    static TestParams params[] = {
+    static ALUTestParams params[] = {
         {0x05, 0, 1, offsetof(CPU, BC), offsetof(DoubleWordReg, words.hi), 0, 1, 0b11000000},
         {0x0D, 0, 1, offsetof(CPU, BC), offsetof(DoubleWordReg, words.lo), 0, 1, 0b11000000},
         {0x15, 0, 1, offsetof(CPU, DE), offsetof(DoubleWordReg, words.hi), 0, 1, 0b11000000},
@@ -90,24 +89,22 @@ ParameterizedTestParameters(DEC_n, DEC_n_zero) {
         {0x3D, 0, 1, offsetof(CPU, AF), offsetof(DoubleWordReg, words.hi), 0, 1, 0b11000000},
     };
 
-    return cr_make_param_array(TestParams, params, sizeof(params) / sizeof(TestParams));
+    return cr_make_param_array(ALUTestParams, params, sizeof(params) / sizeof(ALUTestParams));
 }
 
-ParameterizedTest(TestParams *params, DEC_n, DEC_n_zero, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    clear_flag_register();
+ParameterizedTest(ALUTestParams *params, DEC_n, DEC_n_zero, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate(params);
 }
 
 ParameterizedTestParameters(DEC_n, DEC_n_HL) {
-    static SpecialTestParams params[] = {
+    static ALUSpecialTestParams params[] = {
         {0x35, 0, 1,  0,  0b11000000, true, false},
         {0x35, 0, 16, 15, 0b01100000, true, false},
     };
 
-    return cr_make_param_array(SpecialTestParams, params, sizeof(params) / sizeof(SpecialTestParams));
+    return cr_make_param_array(ALUSpecialTestParams, params, sizeof(params) / sizeof(ALUSpecialTestParams));
 }
 
-ParameterizedTest(SpecialTestParams *params, DEC_n, DEC_n_HL, .init = cpu_mmu_setup, .fini = cpu_teardown) {
-    clear_flag_register();
+ParameterizedTest(ALUSpecialTestParams *params, DEC_n, DEC_n_HL, .init = cpu_mmu_setup, .fini = cpu_teardown) {
     emulate_HL(params);
 }
