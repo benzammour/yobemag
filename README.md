@@ -4,6 +4,12 @@
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Benzammour_yobemag&metric=coverage)](https://sonarcloud.io/summary/new_code?id=Benzammour_yobemag)
 [![License](https://img.shields.io/github/license/Benzammour/yobemag)](https://github.com/Benzammour/yobemag/blob/main/LICENSE)
 
+## Requirements
+
+- GNU C17
+- SDL2 (on debian-based systems: `libsdl2-dev`)
+- Criterion test suite for unit tests (on debian-based systems: `libcriterion-dev`)
+
 ## Build
 
 ```shell
@@ -20,7 +26,7 @@ Use these options with `-D<Option>=<Value>`.
 | Option             | Values                                                   | Explanation                                                                                                                   | Requires         |
 |--------------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------|
 | `CMAKE_BUILD_TYPE` | `DEBUG`,`RELEASE`                                        | `DEBUG` adds the `-g` compiler flag and the `YOBEMAG_DEBUG` compile definition                                                | -                |
-| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`                     | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)                               | Compiler support |
+| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`, `g`                | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)                               | Compiler support |
 | `CMAKE_C_COMPILER` | Supported: `gcc` (11), `clang` (11, 12, 13, 14)          | The supported versions are used by our pipeline and guarantee compatibility                                                   | -                |
 | `TEST`             | `0`, `1`                                                 | Disables/Enables building tests                                                                                               | -                |
 | `COVERAGE`         | `0`, `1`                                                 | Removes/Adds instrumentation required for coverage reports                                                                    | `TEST=1`         |

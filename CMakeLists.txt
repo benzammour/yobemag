@@ -85,6 +85,7 @@ endif ()
 
 set_property(TARGET ${PRODUCT_NAME} PROPERTY C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS ON)
 
 target_link_libraries(${PRODUCT_NAME} PUBLIC -lm -lSDL2 -pthread)
 
