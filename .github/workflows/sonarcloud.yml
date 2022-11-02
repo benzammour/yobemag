@@ -9,22 +9,32 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install ninja-build libsdl2-dev libcriterion-dev -y
-          pip install gcovr==5.0
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: ninja-build libsdl2-dev libcriterion-dev
+          version: 1.0
+
+      - name: Install mold
+        uses: rui314/setup-mold@v1
+
+      - name: Install gcovr
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - run: pip install gcovr==5.0
 
       - name: Run Criterion test suite
         run: |
-          mkdir build
-          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 -DOPTIMIZE=0 . -B build
-          ninja -j 0 -C build test
+          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 .
+          ninja -j 0 test
+          readelf -p .comment yobemag_test
 
       - name: Run gcov
         run: |
@@ -77,9 +87,11 @@ jobs:
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get install libsdl2-dev gcc-multilib ninja-build libcriterion-dev -y
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: libsdl2-dev gcc-multilib ninja-build libcriterion-dev
+          version: 1.0
 
       - name: Run build-wrapper
         run: |
