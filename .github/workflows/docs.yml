@@ -19,8 +19,12 @@ jobs:
           packages: doxygen sphinx-doc
           version: 1.0
 
-      - name: Install dependencies
-        run: |
+      - name: Install gcovr
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - run: |
           pip3 install sphinx-rtd-theme breathe sphinx-sitemap m2r2
           pip3 uninstall mistune -y
           pip3 install mistune==0.8.4

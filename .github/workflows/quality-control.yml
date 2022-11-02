@@ -83,7 +83,6 @@ jobs:
       - name: Run Criterion test suite with sanitizers
         run: |
           cmake -G Ninja -DCMAKE_C_COMPILER=clang-14 -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=${{ matrix.sanitizer }} -DTEST=1 .
-          touch report
           ninja -j 0 sanitize &> report
           cat report
           ! grep "ERROR" report; exit $?
@@ -109,7 +108,11 @@ jobs:
         uses: rui314/setup-mold@v1
 
       - name: Install gcovr
-        run: pip install gcovr==5.0
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+      - run: pip install gcovr==5.0
 
       - name: Run Criterion test suite
         run: |
@@ -168,9 +171,11 @@ jobs:
           unzip -o $HOME/.sonar/build-wrapper-linux-x86.zip -d $HOME/.sonar/
           echo "$HOME/.sonar/build-wrapper-linux-x86" >> $GITHUB_PATH
 
-      - name: Install Dependencies
-        run: |
-          sudo apt-get install libsdl2-dev gcc-multilib ninja-build libcriterion-dev -y
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: libsdl2-dev gcc-multilib ninja-build libcriterion-dev
+          version: 1.0
 
       - name: Run build-wrapper
         run: |
