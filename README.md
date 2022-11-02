@@ -17,14 +17,14 @@ make
 
 Use these options with `-D<Option>=<Value>`.
 
-| Option             | Values                                                   | Explanation                                                                                                                   | Requires         |
-|--------------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|------------------|
-| `CMAKE_BUILD_TYPE` | `DEBUG`,`RELEASE`                                        | `DEBUG` adds the `-g` compiler flag and the `YOBEMAG_DEBUG` compile definition                                                | -                |
-| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`                     | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html)                               | Compiler support |
-| `CMAKE_C_COMPILER` | Supported: `gcc` (11), `clang` (11, 12, 13, 14)          | The supported versions are used by our pipeline and guarantee compatibility                                                   | -                |
-| `TEST`             | `0`, `1`                                                 | Disables/Enables building tests                                                                                               | -                |
-| `COVERAGE`         | `0`, `1`                                                 | Removes/Adds instrumentation required for coverage reports                                                                    | `TEST=1`         |
-| `SANITIZE`         | gcc: `valgrind`, clang: `address`, `memory`, `undefined` | `valgrind`: runs the executable with valgrind.<br>`address`, `memory`, `undefined`: instrument the executable with sanitizers | `clang` OR `gcc` |
+| Option             | Values                                          | Explanation                                                                                     | Requires         |
+|--------------------|-------------------------------------------------|-------------------------------------------------------------------------------------------------|------------------|
+| `CMAKE_BUILD_TYPE` | `DEBUG`,`RELEASE`                               | `DEBUG` adds the `-g` compiler flag and the `YOBEMAG_DEBUG` compile definition                  | -                |
+| `OPTIMIZE`         | `0`, `1`, `2`, `3`, `fast`, `s`, `z`            | See, e.g., [GCC optimization options](https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html) | Compiler support |
+| `CMAKE_C_COMPILER` | Supported: `gcc` (11), `clang` (11, 12, 13, 14) | The supported versions are used by our pipeline and guarantee compatibility                     | -                |
+| `TEST`             | `0`, `1`                                        | Disables/Enables building tests                                                                 | -                |
+| `COVERAGE`         | `0`, `1`                                        | Removes/Adds instrumentation required for coverage reports                                      | `TEST=1`         |
+| `SANITIZE`         | `address`, `undefined`                          | `address`, `undefined`: instrument the executable with sanitizers                               | `clang`          |
 
 ### Build Targets
 

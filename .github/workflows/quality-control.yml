@@ -12,20 +12,25 @@ jobs:
         build-type: [ Debug, Release ]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install ninja-build libsdl2-dev libcriterion-dev -y
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: ninja-build libsdl2-dev libcriterion-dev
+          version: 1.0
+
+      - name: Install mold
+        uses: rui314/setup-mold@v1
 
       - name: Build
         run: |
           cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.compiler }} -DCMAKE_BUILD_TYPE=${{ matrix.build-type }} .
           ninja -j 0
+          readelf -p .comment yobemag
 
   static-analysis:
     name: Static Analysis
@@ -33,15 +38,16 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install libsdl2-dev gcc-12 -y
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: libsdl2-dev gcc-12
+          version: 1.0
 
       - name: Run GCC Static Analyzer
         run: |
@@ -52,28 +58,35 @@ jobs:
     name: Criterion Unit Tests with Sanitizers
     needs: [ static-analysis ]
     runs-on: ubuntu-22.04
+    env:
+      ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:halt_on_error=1
+      UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
     strategy:
       matrix:
-        config: [ { compiler: gcc, sanitizer: valgrind },
-                  { compiler: clang-14, sanitizer: address },
-                  { compiler: clang-14, sanitizer: undefined } ]
+        sanitizer: [ address, undefined ]
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install ninja-build libsdl2-dev libcriterion-dev valgrind -y
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: ninja-build libsdl2-dev libcriterion-dev
+          version: 1.0
 
-      - name: Run Criterion test suite with sanitizer
+      - name: Install mold
+        uses: rui314/setup-mold@v1
+
+      - name: Run Criterion test suite with sanitizers
         run: |
-          mkdir build
-          cmake -G Ninja -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=${{ matrix.config.sanitizer }} -DTEST=1 . -B build
-          ninja -j 0 -C build sanitize
+          cmake -G Ninja -DCMAKE_C_COMPILER=clang-14 -DCMAKE_BUILD_TYPE=Debug -DSANITIZE=${{ matrix.sanitizer }} -DTEST=1 .
+          touch report
+          ninja -j 0 sanitize &> report
+          cat report
+          ! grep "ERROR" report; exit $?
 
   unit-tests:
     name: Criterion Unit Tests
@@ -81,22 +94,28 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: 'true'
           fetch-depth: 0
 
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install ninja-build libsdl2-dev libcriterion-dev -y
-          pip install gcovr==5.0
+      - name: Install/Cache apt packages
+        uses: awalsh128/cache-apt-pkgs-action@v1.1.2
+        with:
+          packages: ninja-build libsdl2-dev libcriterion-dev
+          version: 1.0
+
+      - name: Install mold
+        uses: rui314/setup-mold@v1
+
+      - name: Install gcovr
+        run: pip install gcovr==5.0
 
       - name: Run Criterion test suite
         run: |
-          mkdir build
-          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 . -B build
-          ninja -j 0 -C build test
+          cmake -G Ninja -DCMAKE_C_COMPILER=gcc -DCMAKE_BUILD_TYPE=Debug -DCOVERAGE=1 -DTEST=1 .
+          ninja -j 0 test
+          readelf -p .comment yobemag_test
 
       - name: Run gcov
         run: |
@@ -118,7 +137,7 @@ jobs:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
