@@ -117,7 +117,8 @@ if (${TEST})
         test/rom_test.c
         test/mmu_test.c
         test/log_test.c
-        test/jump_tests.c)
+        test/jr_cc_n.c
+        test/jp_cc_n.c)
 
     set(TEST_SOURCES ${TEST_FILES} ${SRC_FILES})
     list(REMOVE_ITEM TEST_SOURCES "src/main.c")

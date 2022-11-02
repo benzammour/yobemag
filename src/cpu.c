@@ -70,6 +70,11 @@ static void optable_init(void) {
     instr_lookup[0x28] = OPC_JR_Z;
     instr_lookup[0x38] = OPC_JR_C;
 
+    instr_lookup[0xC2] = OPC_JP_NZ;
+    instr_lookup[0xD2] = OPC_JP_NC;
+    instr_lookup[0xCA] = OPC_JP_Z;
+    instr_lookup[0xDA] = OPC_JP_C;
+
     // 8-bit loads
     instr_lookup[0x02] = OPC_LD_BC_A;
     instr_lookup[0x12] = OPC_LD_DE_A;
@@ -361,6 +366,34 @@ void OPC_JR_Z(void) {
 
 void OPC_JR_C(void) {
     OPC_JR_cc_n(get_flag(C_FLAG), 1);
+}
+
+static void OPC_JP_cc_a16(uint8_t bit, uint8_t branching_condition) {
+    uint16_t n = mmu_get_two_bytes(cpu.PC + 1);
+
+    if (bit == branching_condition) {
+        cpu.PC = n;
+        cpu.cycle_count += 16;
+    } else {
+        cpu.PC += 3;
+        cpu.cycle_count += 12;
+    }
+}
+
+void OPC_JP_NZ(void) {
+    OPC_JP_cc_a16(get_flag(Z_FLAG), 0);
+}
+
+void OPC_JP_NC(void) {
+    OPC_JP_cc_a16(get_flag(C_FLAG), 0);
+}
+
+void OPC_JP_Z(void) {
+    OPC_JP_cc_a16(get_flag(Z_FLAG), 1);
+}
+
+void OPC_JP_C(void) {
+    OPC_JP_cc_a16(get_flag(C_FLAG), 1);
 }
 
 /******************************************************
