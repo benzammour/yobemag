@@ -25,6 +25,8 @@ Test(mmu, mmu_init_with_rom_load, .exit_code = EXIT_SUCCESS) {
     for (int i = 0; i <= 8; ++i) {
         cr_assert(mmu_get_byte((1 << i) - 1) == partial_boot_rom[i]);
     }
+
+    free(file_path_copy);
 }
 
 Test(mmu, mmu_get_byte_inside_rom, .exit_code = EXIT_SUCCESS) {
