@@ -703,4 +703,52 @@ void OPC_DEC_L(void);
  */
 void OPC_DEC_HL(void);
 
+/**
+ * @brief Push PC onto the stack and load 0x0030 into PC.
+ *
+ */
+void OPC_RST_30(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0000 into PC.
+ *
+ */
+void OPC_RST_00(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0010 into PC.
+ *
+ */
+void OPC_RST_10(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0020 into PC.
+ *
+ */
+void OPC_RST_20(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0038 into PC.
+ *
+ */
+void OPC_RST_38(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0008 into PC.
+ *
+ */
+void OPC_RST_08(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0018 into PC.
+ *
+ */
+void OPC_RST_18(void);
+
+/**
+ * @brief Push PC onto the stack and load 0x0028 into PC.
+ *
+ */
+void OPC_RST_28(void);
+
 #endif // YOBEMAG_CPU_H
