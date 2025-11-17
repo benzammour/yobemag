@@ -1,6 +1,12 @@
 #include "mmu.h"
+#include "cpu.h"
 #include "log.h"
 #include "rom.h"
+#include <cstdint>
+#include <stdint.h>
+#include <sys/types.h>
+
+void dump_hex(const uint8_t *data, size_t size);
 
 /******************************************************
  *** LOCAL VARIABLES                                ***
@@ -33,6 +39,10 @@ static const uint8_t boot_rom[BOOT_ROM_SIZE] = {
  *** EXPOSED METHODS                                ***
  ******************************************************/
 
+void mmu_print_memory(void) {
+    dump_hex(mem, sizeof(mem));
+}
+
 void mmu_init(void) {
     const uint8_t *rom_bytes = get_rom_bytes();
 
@@ -50,7 +60,7 @@ uint8_t mmu_get_byte(uint16_t addr) {
 
 void mmu_write_byte(uint16_t dest_addr, uint8_t value) {
     if (dest_addr < ROM_LIMIT) {
-        LOG_ERROR("Cannot write into 0x%x as it is reserved for ROM space", dest_addr);
+        LOG_ERROR("Cannot write 0x%02x into 0x%02x as it is reserved for ROM space", value, dest_addr);
     }
 
     mem[dest_addr] = value;
@@ -67,4 +77,44 @@ void mmu_write_two_bytes(uint16_t dest_addr, uint16_t value) {
 
     mmu_write_byte(dest_addr, (uint8_t) value);
     mmu_write_byte(dest_addr + 1, (uint8_t) (value >> 8));
+}
+
+void mmu_stack_push(uint16_t push_value) {
+    uint8_t upper = (uint8_t) (push_value >> 8);
+    uint8_t lower = (uint8_t) (push_value & 0xFF);
+    cpu.SP--;
+    mmu_write_byte(cpu.SP, upper);
+    cpu.SP--;
+    mmu_write_byte(cpu.SP, lower);
+
+    LOG_DEBUG("Push %04x to %02x", push_value, cpu.SP);
+}
+
+void dump_hex(const uint8_t *data, size_t size) {
+    unsigned char ascii[17];
+    size_t i, j;
+    ascii[16] = '\0';
+    for (i = 0; i < size; ++i) {
+        printf("%02X ", data[i]);
+        if (data[i] >= ' ' && data[i] <= '~') {
+            ascii[i % 16] = data[i];
+        } else {
+            ascii[i % 16] = '.';
+        }
+        if ((i + 1) % 8 == 0 || i + 1 == size) {
+            printf(" ");
+            if ((i + 1) % 16 == 0) {
+                printf("|  %s \n", ascii);
+            } else if (i + 1 == size) {
+                ascii[(i + 1) % 16] = '\0';
+                if ((i + 1) % 16 <= 8) {
+                    printf(" ");
+                }
+                for (j = (i + 1) % 16; j < 16; ++j) {
+                    printf("   ");
+                }
+                printf("|  %s \n", ascii);
+            }
+        }
+    }
 }

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 
 #include "mmu.h"
@@ -5,7 +6,7 @@
 #include "log.h"
 
 #define LO_NIBBLE_MASK (0x0F)
-//#define HI_NIBBLE_MASK (0xF0)
+// #define HI_NIBBLE_MASK (0xF0)
 #define BYTE_MASK      (0xFF)
 
 typedef void (*op_function)(void);
@@ -33,6 +34,9 @@ _Noreturn static void UNKNOWN_OPCODE(void) {
 #endif // defined(YOBEMAG_EXIT)
 
 #pragma GCC diagnostic pop
+
+// internal prototypes
+void OPC_RST_x(uint16_t address);
 
 static op_function instr_lookup[0xFF + 1]       = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
 static op_function cb_prefixed_lookup[0xFF + 1] = {[0 ... 0xFF] = &UNKNOWN_OPCODE};
@@ -281,6 +285,11 @@ static void optable_init(void) {
     instr_lookup[0x35] = OPC_DEC_HL;
     instr_lookup[0x3D] = OPC_DEC_A;
 
+    instr_lookup[0xCF] = OPC_RST_08;
+    instr_lookup[0xDF] = OPC_RST_18;
+    instr_lookup[0xEF] = OPC_RST_28;
+    instr_lookup[0xFF] = OPC_RST_38;
+
     // TODO: 0xC3
 
     cb_prefixed_lookup[0x0] = UNKNOWN_OPCODE;
@@ -300,35 +309,45 @@ void cpu_init(void) {
 }
 
 void cpu_print_registers(void) {
-    LOG_DEBUG("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d", cpu.PC, CPU_REG_A,
-              CPU_REG_F, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E, CPU_REG_H, CPU_REG_L, cpu.SP, cpu.cycle_count);
+    LOG_INFO("PC: %04X AF: %02X%02X, BC: %02X%02X, DE: %02X%02X, HL: %02X%02X, SP: %04X, cycles: %d", cpu.PC, CPU_REG_A,
+             CPU_REG_F, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E, CPU_REG_H, CPU_REG_L, cpu.SP, cpu.cycle_count);
 }
 
 void cpu_step(void) {
     cpu.opcode = mmu_get_byte(cpu.PC);
 
-    LOG_DEBUG("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X", cpu.PC, cpu.opcode,
-              mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), CPU_REG_A, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E);
+    LOG_DEBUG("Prior to Instruction:");
+    LOG_DEBUG("PC %04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X; F: %02X; SP: %04X", cpu.PC, cpu.opcode,
+              mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), CPU_REG_A, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E,
+              CPU_REG_F, cpu.SP);
 
     // Get and Execute c.opcode
     (*(instr_lookup[cpu.opcode]))();
-
     // We cannot know (here) the exact number of increments that the PC and cycle count need,
     // hence the instructions themselves do it
+
+    LOG_DEBUG("After the Instruction:");
+    LOG_DEBUG("PC %04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X; F: %02X", cpu.PC, cpu.opcode,
+              mmu_get_byte(cpu.PC + 1), mmu_get_byte(cpu.PC + 2), CPU_REG_A, CPU_REG_B, CPU_REG_C, CPU_REG_D, CPU_REG_E,
+              CPU_REG_F);
+    LOG_DEBUG("-----------------");
 }
 
 // OP-Codes
 void OPC_NOP(void) {
+    LOG_DEBUG("OPC_NOP(void)");
     ++cpu.cycle_count;
     ++cpu.PC;
 }
 
 void OPC_INC_BC(void) {
+    LOG_DEBUG("OPC_INC_BC(void)");
     ++CPU_DREG_BC;
     cpu.cycle_count += 2;
 }
 
 void OPC_LD_SP(void) {
+    LOG_DEBUG("OPC_LD_SP(void)");
     cpu.SP = mmu_get_byte(cpu.PC);
     cpu.PC += 2;
     cpu.cycle_count += 3;
@@ -338,6 +357,7 @@ void OPC_LD_SP(void) {
  *** Misc                                           ***
  ******************************************************/
 static void OPC_JR_cc_n(uint8_t bit, uint8_t branching_condition) {
+    LOG_DEBUG("OPC_JR_cc_n(uint8_t bit, uint8_t branching_condition)");
     int8_t n = (int8_t) mmu_get_byte(cpu.PC + 1);
 
     // doing the PC increment before the opcode's override because we are emulating
@@ -353,22 +373,27 @@ static void OPC_JR_cc_n(uint8_t bit, uint8_t branching_condition) {
 }
 
 void OPC_JR_NZ(void) {
+    LOG_DEBUG("OPC_JR_NZ(void)");
     OPC_JR_cc_n(get_flag(Z_FLAG), 0);
 }
 
 void OPC_JR_NC(void) {
+    LOG_DEBUG("OPC_JR_NC(void)");
     OPC_JR_cc_n(get_flag(C_FLAG), 0);
 }
 
 void OPC_JR_Z(void) {
+    LOG_DEBUG("OPC_JR_Z(void)");
     OPC_JR_cc_n(get_flag(Z_FLAG), 1);
 }
 
 void OPC_JR_C(void) {
+    LOG_DEBUG("OPC_JR_C(void)");
     OPC_JR_cc_n(get_flag(C_FLAG), 1);
 }
 
 static void OPC_JP_cc_a16(uint8_t bit, uint8_t branching_condition) {
+    LOG_DEBUG("OPC_JP_cc_a16(uint8_t bit, uint8_t branching_condition)");
     uint16_t n = mmu_get_two_bytes(cpu.PC + 1);
 
     if (bit == branching_condition) {
@@ -381,18 +406,22 @@ static void OPC_JP_cc_a16(uint8_t bit, uint8_t branching_condition) {
 }
 
 void OPC_JP_NZ(void) {
+    LOG_DEBUG("OPC_JP_NZ(void)");
     OPC_JP_cc_a16(get_flag(Z_FLAG), 0);
 }
 
 void OPC_JP_NC(void) {
+    LOG_DEBUG("OPC_JP_NC(void)");
     OPC_JP_cc_a16(get_flag(C_FLAG), 0);
 }
 
 void OPC_JP_Z(void) {
+    LOG_DEBUG("OPC_JP_Z(void)");
     OPC_JP_cc_a16(get_flag(Z_FLAG), 1);
 }
 
 void OPC_JP_C(void) {
+    LOG_DEBUG("OPC_JP_C(void)");
     OPC_JP_cc_a16(get_flag(C_FLAG), 1);
 }
 
@@ -400,6 +429,7 @@ void OPC_JP_C(void) {
  *** 8-BIT Loads                                    ***
  ******************************************************/
 void OPC_LD_BC_A(void) {
+    LOG_DEBUG("OPC_LD_BC_A(void)");
     mmu_write_byte(CPU_DREG_BC, CPU_REG_A);
 
     cpu.cycle_count += 8;
@@ -407,6 +437,7 @@ void OPC_LD_BC_A(void) {
 }
 
 void OPC_LD_DE_A(void) {
+    LOG_DEBUG("OPC_LD_DE_A(void)");
     mmu_write_byte(CPU_DREG_DE, CPU_REG_A);
 
     cpu.cycle_count += 8;
@@ -414,6 +445,7 @@ void OPC_LD_DE_A(void) {
 }
 
 void OPC_LD_HL_PLUS_A(void) {
+    LOG_DEBUG("OPC_LD_HL_PLUS_A(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
     ++CPU_DREG_HL;
 
@@ -422,6 +454,7 @@ void OPC_LD_HL_PLUS_A(void) {
 }
 
 void OPC_LD_HL_MINUS_A(void) {
+    LOG_DEBUG("OPC_LD_HL_MINUS_A(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
     --CPU_DREG_HL;
 
@@ -430,6 +463,7 @@ void OPC_LD_HL_MINUS_A(void) {
 }
 
 void OPC_LD_A_BC(void) {
+    LOG_DEBUG("OPC_LD_A_BC(void)");
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_BC));
 
     cpu.cycle_count += 8;
@@ -437,6 +471,7 @@ void OPC_LD_A_BC(void) {
 }
 
 void OPC_LD_A_DE(void) {
+    LOG_DEBUG("OPC_LD_A_DE(void)");
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_DE));
 
     cpu.cycle_count += 8;
@@ -444,6 +479,7 @@ void OPC_LD_A_DE(void) {
 }
 
 void OPC_LD_A_HL_PLUS(void) {
+    LOG_DEBUG("OPC_LD_A_HL_PLUS(void)");
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
     ++CPU_DREG_HL;
 
@@ -452,6 +488,7 @@ void OPC_LD_A_HL_PLUS(void) {
 }
 
 void OPC_LD_A_HL_MINUS(void) {
+    LOG_DEBUG("OPC_LD_A_HL_MINUS(void)");
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
     --CPU_DREG_HL;
 
@@ -460,6 +497,7 @@ void OPC_LD_A_HL_MINUS(void) {
 }
 
 void OPC_LD_FF00a8_A(void) {
+    LOG_DEBUG("OPC_LD_FF00a8_A(void)");
     uint16_t intermediate = 0xFF00 + mmu_get_byte(cpu.PC + 1);
     mmu_write_byte(intermediate, CPU_REG_A);
 
@@ -468,6 +506,7 @@ void OPC_LD_FF00a8_A(void) {
 }
 
 void OPC_LD_A_FF00a8(void) {
+    LOG_DEBUG("OPC_LD_A_FF00a8(void)");
     uint16_t intermediate = 0xFF00 + mmu_get_byte(cpu.PC + 1);
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(intermediate));
 
@@ -476,6 +515,7 @@ void OPC_LD_A_FF00a8(void) {
 }
 
 void OPC_LD_FF00C_A(void) {
+    LOG_DEBUG("OPC_LD_FF00C_A(void)");
     uint16_t intermediate = 0xFF00 + CPU_REG_C;
     mmu_write_byte(intermediate, CPU_REG_A);
 
@@ -484,6 +524,7 @@ void OPC_LD_FF00C_A(void) {
 }
 
 void OPC_LD_A_FF00C(void) {
+    LOG_DEBUG("OPC_LD_A_FF00C(void)");
     uint16_t intermediate = 0xFF00 + CPU_REG_C;
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(intermediate));
 
@@ -492,6 +533,7 @@ void OPC_LD_A_FF00C(void) {
 }
 
 void OPC_LD_a16_A(void) {
+    LOG_DEBUG("OPC_LD_a16_A(void)");
     uint16_t intermediate = mmu_get_two_bytes(cpu.PC + 1);
 
     mmu_write_byte(intermediate, CPU_REG_A);
@@ -501,6 +543,7 @@ void OPC_LD_a16_A(void) {
 }
 
 void OPC_LD_A_a16(void) {
+    LOG_DEBUG("OPC_LD_A_a16(void)");
     uint16_t intermediate = mmu_get_two_bytes(cpu.PC + 1);
 
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(intermediate));
@@ -511,6 +554,7 @@ void OPC_LD_A_a16(void) {
 
 // LD B, n
 void OPC_LD_B_B(void) {
+    LOG_DEBUG("OPC_LD_B_B(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -518,6 +562,7 @@ void OPC_LD_B_B(void) {
 }
 
 void OPC_LD_B_C(void) {
+    LOG_DEBUG("OPC_LD_B_C(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -525,6 +570,7 @@ void OPC_LD_B_C(void) {
 }
 
 void OPC_LD_B_D(void) {
+    LOG_DEBUG("OPC_LD_B_D(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -532,6 +578,7 @@ void OPC_LD_B_D(void) {
 }
 
 void OPC_LD_B_E(void) {
+    LOG_DEBUG("OPC_LD_B_E(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -539,6 +586,7 @@ void OPC_LD_B_E(void) {
 }
 
 void OPC_LD_B_H(void) {
+    LOG_DEBUG("OPC_LD_B_H(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -546,6 +594,7 @@ void OPC_LD_B_H(void) {
 }
 
 void OPC_LD_B_L(void) {
+    LOG_DEBUG("OPC_LD_B_L(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -553,6 +602,7 @@ void OPC_LD_B_L(void) {
 }
 
 void OPC_LD_B_HL(void) {
+    LOG_DEBUG("OPC_LD_B_HL(void)");
     LD_REG_REG(&CPU_REG_B, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -560,6 +610,7 @@ void OPC_LD_B_HL(void) {
 }
 
 void OPC_LD_B_A(void) {
+    LOG_DEBUG("OPC_LD_B_A(void)");
     LD_REG_REG(&CPU_REG_B, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -567,6 +618,7 @@ void OPC_LD_B_A(void) {
 }
 
 void OPC_LD_B_d8(void) {
+    LOG_DEBUG("OPC_LD_B_d8(void)");
     LD_REG_d8(&CPU_REG_B);
 
     cpu.PC += 2;
@@ -575,6 +627,7 @@ void OPC_LD_B_d8(void) {
 
 // LD C, n
 void OPC_LD_C_B(void) {
+    LOG_DEBUG("OPC_LD_C_B(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -582,6 +635,7 @@ void OPC_LD_C_B(void) {
 }
 
 void OPC_LD_C_C(void) {
+    LOG_DEBUG("OPC_LD_C_C(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -589,6 +643,7 @@ void OPC_LD_C_C(void) {
 }
 
 void OPC_LD_C_D(void) {
+    LOG_DEBUG("OPC_LD_C_D(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -596,6 +651,7 @@ void OPC_LD_C_D(void) {
 }
 
 void OPC_LD_C_E(void) {
+    LOG_DEBUG("OPC_LD_C_E(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -603,6 +659,7 @@ void OPC_LD_C_E(void) {
 }
 
 void OPC_LD_C_H(void) {
+    LOG_DEBUG("OPC_LD_C_H(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -610,6 +667,7 @@ void OPC_LD_C_H(void) {
 }
 
 void OPC_LD_C_L(void) {
+    LOG_DEBUG("OPC_LD_C_L(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -617,6 +675,7 @@ void OPC_LD_C_L(void) {
 }
 
 void OPC_LD_C_HL(void) {
+    LOG_DEBUG("OPC_LD_C_HL(void)");
     LD_REG_REG(&CPU_REG_C, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -624,6 +683,7 @@ void OPC_LD_C_HL(void) {
 }
 
 void OPC_LD_C_A(void) {
+    LOG_DEBUG("OPC_LD_C_A(void)");
     LD_REG_REG(&CPU_REG_C, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -631,6 +691,7 @@ void OPC_LD_C_A(void) {
 }
 
 void OPC_LD_C_d8(void) {
+    LOG_DEBUG("OPC_LD_C_d8(void)");
     LD_REG_d8(&CPU_REG_C);
 
     cpu.PC += 2;
@@ -639,6 +700,7 @@ void OPC_LD_C_d8(void) {
 
 // LD D, n
 void OPC_LD_D_B(void) {
+    LOG_DEBUG("OPC_LD_D_B(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -646,6 +708,7 @@ void OPC_LD_D_B(void) {
 }
 
 void OPC_LD_D_C(void) {
+    LOG_DEBUG("OPC_LD_D_C(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -653,6 +716,7 @@ void OPC_LD_D_C(void) {
 }
 
 void OPC_LD_D_D(void) {
+    LOG_DEBUG("OPC_LD_D_D(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -660,6 +724,7 @@ void OPC_LD_D_D(void) {
 }
 
 void OPC_LD_D_E(void) {
+    LOG_DEBUG("OPC_LD_D_E(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -667,6 +732,7 @@ void OPC_LD_D_E(void) {
 }
 
 void OPC_LD_D_H(void) {
+    LOG_DEBUG("OPC_LD_D_H(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -674,6 +740,7 @@ void OPC_LD_D_H(void) {
 }
 
 void OPC_LD_D_L(void) {
+    LOG_DEBUG("OPC_LD_D_L(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -681,6 +748,7 @@ void OPC_LD_D_L(void) {
 }
 
 void OPC_LD_D_HL(void) {
+    LOG_DEBUG("OPC_LD_D_HL(void)");
     LD_REG_REG(&CPU_REG_D, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -688,6 +756,7 @@ void OPC_LD_D_HL(void) {
 }
 
 void OPC_LD_D_A(void) {
+    LOG_DEBUG("OPC_LD_D_A(void)");
     LD_REG_REG(&CPU_REG_D, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -695,6 +764,7 @@ void OPC_LD_D_A(void) {
 }
 
 void OPC_LD_D_d8(void) {
+    LOG_DEBUG("OPC_LD_D_d8(void)");
     LD_REG_d8(&CPU_REG_D);
 
     cpu.PC += 2;
@@ -703,6 +773,7 @@ void OPC_LD_D_d8(void) {
 
 // LD E, n
 void OPC_LD_E_B(void) {
+    LOG_DEBUG("OPC_LD_E_B(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -710,6 +781,7 @@ void OPC_LD_E_B(void) {
 }
 
 void OPC_LD_E_C(void) {
+    LOG_DEBUG("OPC_LD_E_C(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -717,6 +789,7 @@ void OPC_LD_E_C(void) {
 }
 
 void OPC_LD_E_D(void) {
+    LOG_DEBUG("OPC_LD_E_D(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -724,6 +797,7 @@ void OPC_LD_E_D(void) {
 }
 
 void OPC_LD_E_E(void) {
+    LOG_DEBUG("OPC_LD_E_E(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -731,6 +805,7 @@ void OPC_LD_E_E(void) {
 }
 
 void OPC_LD_E_H(void) {
+    LOG_DEBUG("OPC_LD_E_H(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -738,6 +813,7 @@ void OPC_LD_E_H(void) {
 }
 
 void OPC_LD_E_L(void) {
+    LOG_DEBUG("OPC_LD_E_L(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -745,6 +821,7 @@ void OPC_LD_E_L(void) {
 }
 
 void OPC_LD_E_HL(void) {
+    LOG_DEBUG("OPC_LD_E_HL(void)");
     LD_REG_REG(&CPU_REG_E, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -752,6 +829,7 @@ void OPC_LD_E_HL(void) {
 }
 
 void OPC_LD_E_A(void) {
+    LOG_DEBUG("OPC_LD_E_A(void)");
     LD_REG_REG(&CPU_REG_E, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -759,6 +837,7 @@ void OPC_LD_E_A(void) {
 }
 
 void OPC_LD_E_d8(void) {
+    LOG_DEBUG("OPC_LD_E_d8(void)");
     LD_REG_d8(&CPU_REG_E);
 
     cpu.PC += 2;
@@ -767,6 +846,7 @@ void OPC_LD_E_d8(void) {
 
 // LD H, n
 void OPC_LD_H_B(void) {
+    LOG_DEBUG("OPC_LD_H_B(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -774,6 +854,7 @@ void OPC_LD_H_B(void) {
 }
 
 void OPC_LD_H_C(void) {
+    LOG_DEBUG("OPC_LD_H_C(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -781,6 +862,7 @@ void OPC_LD_H_C(void) {
 }
 
 void OPC_LD_H_D(void) {
+    LOG_DEBUG("OPC_LD_H_D(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -788,6 +870,7 @@ void OPC_LD_H_D(void) {
 }
 
 void OPC_LD_H_E(void) {
+    LOG_DEBUG("OPC_LD_H_E(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -795,6 +878,7 @@ void OPC_LD_H_E(void) {
 }
 
 void OPC_LD_H_H(void) {
+    LOG_DEBUG("OPC_LD_H_H(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -802,6 +886,7 @@ void OPC_LD_H_H(void) {
 }
 
 void OPC_LD_H_L(void) {
+    LOG_DEBUG("OPC_LD_H_L(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -809,6 +894,7 @@ void OPC_LD_H_L(void) {
 }
 
 void OPC_LD_H_HL(void) {
+    LOG_DEBUG("OPC_LD_H_HL(void)");
     LD_REG_REG(&CPU_REG_H, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -816,6 +902,7 @@ void OPC_LD_H_HL(void) {
 }
 
 void OPC_LD_H_A(void) {
+    LOG_DEBUG("OPC_LD_H_A(void)");
     LD_REG_REG(&CPU_REG_H, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -823,6 +910,7 @@ void OPC_LD_H_A(void) {
 }
 
 void OPC_LD_H_d8(void) {
+    LOG_DEBUG("OPC_LD_H_d8(void)");
     LD_REG_d8(&CPU_REG_H);
 
     cpu.PC += 2;
@@ -831,6 +919,7 @@ void OPC_LD_H_d8(void) {
 
 // LD L, n
 void OPC_LD_L_B(void) {
+    LOG_DEBUG("OPC_LD_L_B(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -838,6 +927,7 @@ void OPC_LD_L_B(void) {
 }
 
 void OPC_LD_L_C(void) {
+    LOG_DEBUG("OPC_LD_L_C(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -845,6 +935,7 @@ void OPC_LD_L_C(void) {
 }
 
 void OPC_LD_L_D(void) {
+    LOG_DEBUG("OPC_LD_L_D(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -852,6 +943,7 @@ void OPC_LD_L_D(void) {
 }
 
 void OPC_LD_L_E(void) {
+    LOG_DEBUG("OPC_LD_L_E(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -859,6 +951,7 @@ void OPC_LD_L_E(void) {
 }
 
 void OPC_LD_L_H(void) {
+    LOG_DEBUG("OPC_LD_L_H(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -866,6 +959,7 @@ void OPC_LD_L_H(void) {
 }
 
 void OPC_LD_L_L(void) {
+    LOG_DEBUG("OPC_LD_L_L(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -873,6 +967,7 @@ void OPC_LD_L_L(void) {
 }
 
 void OPC_LD_L_HL(void) {
+    LOG_DEBUG("OPC_LD_L_HL(void)");
     LD_REG_REG(&CPU_REG_L, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -880,6 +975,7 @@ void OPC_LD_L_HL(void) {
 }
 
 void OPC_LD_L_A(void) {
+    LOG_DEBUG("OPC_LD_L_A(void)");
     LD_REG_REG(&CPU_REG_L, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -887,6 +983,7 @@ void OPC_LD_L_A(void) {
 }
 
 void OPC_LD_L_d8(void) {
+    LOG_DEBUG("OPC_LD_L_d8(void)");
     LD_REG_d8(&CPU_REG_L);
 
     cpu.PC += 2;
@@ -895,6 +992,7 @@ void OPC_LD_L_d8(void) {
 
 // LD HL, n
 void OPC_LD_HL_B(void) {
+    LOG_DEBUG("OPC_LD_HL_B(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_B);
 
     cpu.cycle_count += 8;
@@ -902,6 +1000,7 @@ void OPC_LD_HL_B(void) {
 }
 
 void OPC_LD_HL_C(void) {
+    LOG_DEBUG("OPC_LD_HL_C(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_C);
 
     cpu.cycle_count += 8;
@@ -909,6 +1008,7 @@ void OPC_LD_HL_C(void) {
 }
 
 void OPC_LD_HL_D(void) {
+    LOG_DEBUG("OPC_LD_HL_D(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_D);
 
     cpu.cycle_count += 8;
@@ -916,6 +1016,7 @@ void OPC_LD_HL_D(void) {
 }
 
 void OPC_LD_HL_E(void) {
+    LOG_DEBUG("OPC_LD_HL_E(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_E);
 
     cpu.cycle_count += 8;
@@ -923,6 +1024,7 @@ void OPC_LD_HL_E(void) {
 }
 
 void OPC_LD_HL_H(void) {
+    LOG_DEBUG("OPC_LD_HL_H(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_H);
 
     cpu.cycle_count += 8;
@@ -930,6 +1032,7 @@ void OPC_LD_HL_H(void) {
 }
 
 void OPC_LD_HL_L(void) {
+    LOG_DEBUG("OPC_LD_HL_L(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_L);
 
     cpu.cycle_count += 8;
@@ -937,6 +1040,7 @@ void OPC_LD_HL_L(void) {
 }
 
 void OPC_LD_HL_A(void) {
+    LOG_DEBUG("OPC_LD_HL_A(void)");
     mmu_write_byte(CPU_DREG_HL, CPU_REG_A);
 
     cpu.cycle_count += 8;
@@ -944,6 +1048,7 @@ void OPC_LD_HL_A(void) {
 }
 
 void OPC_LD_HL_d8(void) {
+    LOG_DEBUG("OPC_LD_HL_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     mmu_write_byte(CPU_DREG_HL, immediate);
 
@@ -953,6 +1058,7 @@ void OPC_LD_HL_d8(void) {
 
 // LD A, n
 void OPC_LD_A_B(void) {
+    LOG_DEBUG("OPC_LD_A_B(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -960,6 +1066,7 @@ void OPC_LD_A_B(void) {
 }
 
 void OPC_LD_A_C(void) {
+    LOG_DEBUG("OPC_LD_A_C(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -967,6 +1074,7 @@ void OPC_LD_A_C(void) {
 }
 
 void OPC_LD_A_D(void) {
+    LOG_DEBUG("OPC_LD_A_D(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -974,6 +1082,7 @@ void OPC_LD_A_D(void) {
 }
 
 void OPC_LD_A_E(void) {
+    LOG_DEBUG("OPC_LD_A_E(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -981,6 +1090,7 @@ void OPC_LD_A_E(void) {
 }
 
 void OPC_LD_A_H(void) {
+    LOG_DEBUG("OPC_LD_A_H(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -988,6 +1098,7 @@ void OPC_LD_A_H(void) {
 }
 
 void OPC_LD_A_L(void) {
+    LOG_DEBUG("OPC_LD_A_L(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -995,6 +1106,7 @@ void OPC_LD_A_L(void) {
 }
 
 void OPC_LD_A_HL(void) {
+    LOG_DEBUG("OPC_LD_A_HL(void)");
     LD_REG_REG(&CPU_REG_A, mmu_get_byte(CPU_DREG_HL));
 
     cpu.cycle_count += 8;
@@ -1002,6 +1114,7 @@ void OPC_LD_A_HL(void) {
 }
 
 void OPC_LD_A_A(void) {
+    LOG_DEBUG("OPC_LD_A_A(void)");
     LD_REG_REG(&CPU_REG_A, CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -1009,6 +1122,7 @@ void OPC_LD_A_A(void) {
 }
 
 void OPC_LD_A_d8(void) {
+    LOG_DEBUG("OPC_LD_A_d8(void)");
     LD_REG_d8(&CPU_REG_A);
 
     cpu.PC += 2;
@@ -1033,54 +1147,63 @@ static void ADD_A_n(uint8_t n) {
 }
 
 void OPC_ADD_A_A(void) {
+    LOG_DEBUG("OPC_ADD_A_A(void)");
     ADD_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_B(void) {
+    LOG_DEBUG("OPC_ADD_A_B(void)");
     ADD_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_C(void) {
+    LOG_DEBUG("OPC_ADD_A_C(void)");
     ADD_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_D(void) {
+    LOG_DEBUG("OPC_ADD_A_D(void)");
     ADD_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_E(void) {
+    LOG_DEBUG("OPC_ADD_A_E(void)");
     ADD_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_H(void) {
+    LOG_DEBUG("OPC_ADD_A_H(void)");
     ADD_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_L(void) {
+    LOG_DEBUG("OPC_ADD_A_L(void)");
     ADD_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_HL(void) {
+    LOG_DEBUG("OPC_ADD_A_HL(void)");
     ADD_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_ADD_A_d8(void) {
+    LOG_DEBUG("OPC_ADD_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     ADD_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1103,54 +1226,63 @@ static void ADC_A_n(uint8_t n) {
 }
 
 void OPC_ADC_A_A(void) {
+    LOG_DEBUG("OPC_ADC_A_A(void)");
     ADC_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_B(void) {
+    LOG_DEBUG("OPC_ADC_A_B(void)");
     ADC_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_C(void) {
+    LOG_DEBUG("OPC_ADC_A_C(void)");
     ADC_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_D(void) {
+    LOG_DEBUG("OPC_ADC_A_D(void)");
     ADC_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_E(void) {
+    LOG_DEBUG("OPC_ADC_A_E(void)");
     ADC_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_H(void) {
+    LOG_DEBUG("OPC_ADC_A_H(void)");
     ADC_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_L(void) {
+    LOG_DEBUG("OPC_ADC_A_L(void)");
     ADC_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_HL(void) {
+    LOG_DEBUG("OPC_ADC_A_HL(void)");
     ADC_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_ADC_A_d8(void) {
+    LOG_DEBUG("OPC_ADC_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     ADC_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1171,54 +1303,63 @@ static void SUB_A_n(uint8_t n) {
 }
 
 void OPC_SUB_A_A(void) {
+    LOG_DEBUG("OPC_SUB_A_A(void)");
     SUB_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_B(void) {
+    LOG_DEBUG("OPC_SUB_A_B(void)");
     SUB_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_C(void) {
+    LOG_DEBUG("OPC_SUB_A_C(void)");
     SUB_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_D(void) {
+    LOG_DEBUG("OPC_SUB_A_D(void)");
     SUB_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_E(void) {
+    LOG_DEBUG("OPC_SUB_A_E(void)");
     SUB_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_H(void) {
+    LOG_DEBUG("OPC_SUB_A_H(void)");
     SUB_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_L(void) {
+    LOG_DEBUG("OPC_SUB_A_L(void)");
     SUB_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_HL(void) {
+    LOG_DEBUG("OPC_SUB_A_HL(void)");
     SUB_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_SUB_A_d8(void) {
+    LOG_DEBUG("OPC_SUB_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     SUB_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1240,54 +1381,63 @@ static void SBC_A_n(uint8_t n) {
 }
 
 void OPC_SBC_A_A(void) {
+    LOG_DEBUG("OPC_SBC_A_A(void)");
     SBC_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_B(void) {
+    LOG_DEBUG("OPC_SBC_A_B(void)");
     SBC_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_C(void) {
+    LOG_DEBUG("OPC_SBC_A_C(void)");
     SBC_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_D(void) {
+    LOG_DEBUG("OPC_SBC_A_D(void)");
     SBC_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_E(void) {
+    LOG_DEBUG("OPC_SBC_A_E(void)");
     SBC_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_H(void) {
+    LOG_DEBUG("OPC_SBC_A_H(void)");
     SBC_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_L(void) {
+    LOG_DEBUG("OPC_SBC_A_L(void)");
     SBC_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_HL(void) {
+    LOG_DEBUG("OPC_SBC_A_HL(void)");
     SBC_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_SBC_A_d8(void) {
+    LOG_DEBUG("OPC_SBC_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     SBC_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1305,54 +1455,63 @@ static void AND_A_n(uint8_t n) {
 }
 
 void OPC_AND_A_A(void) {
+    LOG_DEBUG("OPC_AND_A_A(void)");
     AND_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_B(void) {
+    LOG_DEBUG("OPC_AND_A_B(void)");
     AND_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_C(void) {
+    LOG_DEBUG("OPC_AND_A_C(void)");
     AND_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_D(void) {
+    LOG_DEBUG("OPC_AND_A_D(void)");
     AND_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_E(void) {
+    LOG_DEBUG("OPC_AND_A_E(void)");
     AND_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_H(void) {
+    LOG_DEBUG("OPC_AND_A_H(void)");
     AND_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_L(void) {
+    LOG_DEBUG("OPC_AND_A_L(void)");
     AND_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_AND_A_HL(void) {
+    LOG_DEBUG("OPC_AND_A_HL(void)");
     AND_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_AND_A_d8(void) {
+    LOG_DEBUG("OPC_AND_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     AND_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1369,54 +1528,63 @@ static void OR_A_n(uint8_t n) {
 }
 
 void OPC_OR_A_A(void) {
+    LOG_DEBUG("OPC_OR_A_A(void)");
     OR_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_B(void) {
+    LOG_DEBUG("OPC_OR_A_B(void)");
     OR_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_C(void) {
+    LOG_DEBUG("OPC_OR_A_C(void)");
     OR_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_D(void) {
+    LOG_DEBUG("OPC_OR_A_D(void)");
     OR_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_E(void) {
+    LOG_DEBUG("OPC_OR_A_E(void)");
     OR_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_H(void) {
+    LOG_DEBUG("OPC_OR_A_H(void)");
     OR_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_L(void) {
+    LOG_DEBUG("OPC_OR_A_L(void)");
     OR_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_OR_A_HL(void) {
+    LOG_DEBUG("OPC_OR_A_HL(void)");
     OR_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_OR_A_d8(void) {
+    LOG_DEBUG("OPC_OR_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     OR_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1431,54 +1599,63 @@ static void XOR_A_n(uint8_t n) {
 }
 
 void OPC_XOR_A_A(void) {
+    LOG_DEBUG("OPC_XOR_A_A(void)");
     XOR_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_B(void) {
+    LOG_DEBUG("OPC_XOR_A_B(void)");
     XOR_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_C(void) {
+    LOG_DEBUG("OPC_XOR_A_C(void)");
     XOR_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_D(void) {
+    LOG_DEBUG("OPC_XOR_A_D(void)");
     XOR_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_E(void) {
+    LOG_DEBUG("OPC_XOR_A_E(void)");
     XOR_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_H(void) {
+    LOG_DEBUG("OPC_XOR_A_H(void)");
     XOR_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_L(void) {
+    LOG_DEBUG("OPC_XOR_A_L(void)");
     XOR_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_HL(void) {
+    LOG_DEBUG("OPC_XOR_A_HL(void)");
     XOR_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_XOR_A_d8(void) {
+    LOG_DEBUG("OPC_XOR_A_d8(void)");
     XOR_A_n(mmu_get_byte(cpu.PC + 1));
     cpu.cycle_count += 8;
     cpu.PC += 2;
@@ -1496,54 +1673,63 @@ static void CP_A_n(uint8_t n) {
 }
 
 void OPC_CP_A_A(void) {
+    LOG_DEBUG("OPC_CP_A_A(void)");
     CP_A_n(CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_B(void) {
+    LOG_DEBUG("OPC_CP_A_B(void)");
     CP_A_n(CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_C(void) {
+    LOG_DEBUG("OPC_CP_A_C(void)");
     CP_A_n(CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_D(void) {
+    LOG_DEBUG("OPC_CP_A_D(void)");
     CP_A_n(CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_E(void) {
+    LOG_DEBUG("OPC_CP_A_E(void)");
     CP_A_n(CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_H(void) {
+    LOG_DEBUG("OPC_CP_A_H(void)");
     CP_A_n(CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_L(void) {
+    LOG_DEBUG("OPC_CP_A_L(void)");
     CP_A_n(CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_CP_A_HL(void) {
+    LOG_DEBUG("OPC_CP_A_HL(void)");
     CP_A_n(mmu_get_byte(CPU_DREG_HL));
     cpu.cycle_count += 8;
     ++cpu.PC;
 }
 
 void OPC_CP_A_d8(void) {
+    LOG_DEBUG("OPC_CP_A_d8(void)");
     uint8_t immediate = mmu_get_byte(cpu.PC + 1);
     CP_A_n(immediate);
     cpu.cycle_count += 8;
@@ -1559,6 +1745,7 @@ static void INC_n(uint8_t *const reg) {
 }
 
 void OPC_INC_B(void) {
+    LOG_DEBUG("OPC_INC_B(void)");
     INC_n(&CPU_REG_B);
 
     cpu.cycle_count += 4;
@@ -1566,6 +1753,7 @@ void OPC_INC_B(void) {
 }
 
 void OPC_INC_C(void) {
+    LOG_DEBUG("OPC_INC_C(void)");
     INC_n(&CPU_REG_C);
 
     cpu.cycle_count += 4;
@@ -1573,6 +1761,7 @@ void OPC_INC_C(void) {
 }
 
 void OPC_INC_D(void) {
+    LOG_DEBUG("OPC_INC_D(void)");
     INC_n(&CPU_REG_D);
 
     cpu.cycle_count += 4;
@@ -1580,6 +1769,7 @@ void OPC_INC_D(void) {
 }
 
 void OPC_INC_E(void) {
+    LOG_DEBUG("OPC_INC_E(void)");
     INC_n(&CPU_REG_E);
 
     cpu.cycle_count += 4;
@@ -1587,6 +1777,7 @@ void OPC_INC_E(void) {
 }
 
 void OPC_INC_H(void) {
+    LOG_DEBUG("OPC_INC_H(void)");
     INC_n(&CPU_REG_H);
 
     cpu.cycle_count += 4;
@@ -1594,6 +1785,7 @@ void OPC_INC_H(void) {
 }
 
 void OPC_INC_L(void) {
+    LOG_DEBUG("OPC_INC_L(void)");
     INC_n(&CPU_REG_L);
 
     cpu.cycle_count += 4;
@@ -1601,6 +1793,7 @@ void OPC_INC_L(void) {
 }
 
 void OPC_INC_A(void) {
+    LOG_DEBUG("OPC_INC_A(void)");
     INC_n(&CPU_REG_A);
 
     cpu.cycle_count += 4;
@@ -1608,6 +1801,7 @@ void OPC_INC_A(void) {
 }
 
 void OPC_INC_HL(void) {
+    LOG_DEBUG("OPC_INC_HL(void)");
     uint8_t value = mmu_get_byte(CPU_DREG_HL);
     INC_n(&value);
     mmu_write_byte(CPU_DREG_HL, value);
@@ -1633,51 +1827,104 @@ static void DEC_n(uint8_t *const addr) {
 }
 
 void OPC_DEC_A(void) {
+    LOG_DEBUG("OPC_DEC_A(void)");
     DEC_n(&CPU_REG_A);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_B(void) {
+    LOG_DEBUG("OPC_DEC_B(void)");
     DEC_n(&CPU_REG_B);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_C(void) {
+    LOG_DEBUG("OPC_DEC_C(void)");
     DEC_n(&CPU_REG_C);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_D(void) {
+    LOG_DEBUG("OPC_DEC_D(void)");
     DEC_n(&CPU_REG_D);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_E(void) {
+    LOG_DEBUG("OPC_DEC_E(void)");
     DEC_n(&CPU_REG_E);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_H(void) {
+    LOG_DEBUG("OPC_DEC_H(void)");
     DEC_n(&CPU_REG_H);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_L(void) {
+    LOG_DEBUG("OPC_DEC_L(void)");
     DEC_n(&CPU_REG_L);
     cpu.cycle_count += 4;
     ++cpu.PC;
 }
 
 void OPC_DEC_HL(void) {
+    LOG_DEBUG("OPC_DEC_HL(void)");
     uint8_t value = mmu_get_byte(CPU_DREG_HL);
     DEC_n(&value);
     mmu_write_byte(CPU_DREG_HL, value);
     cpu.cycle_count += 12;
     ++cpu.PC;
+}
+
+void OPC_RST_x(uint16_t address) {
+    mmu_stack_push(cpu.PC);
+    cpu.PC = mmu_get_two_bytes(address);
+    cpu.cycle_count += 16;
+}
+
+void OPC_RST_00(void) {
+    LOG_DEBUG("OPC_RST_00");
+    OPC_RST_x(0x0000);
+}
+void OPC_RST_10(void) {
+    LOG_DEBUG("OPC_RST_10");
+    OPC_RST_x(0x0010);
+}
+void OPC_RST_20(void) {
+    LOG_DEBUG("OPC_RST_20");
+    OPC_RST_x(0x0020);
+}
+void OPC_RST_30(void) {
+    LOG_DEBUG("OPC_RST_30");
+    OPC_RST_x(0x0030);
+}
+void OPC_RST_08(void) {
+    LOG_DEBUG("OPC_RST_08");
+    OPC_RST_x(0x0008);
+}
+void OPC_RST_18(void) {
+    LOG_DEBUG("OPC_RST_18");
+    OPC_RST_x(0x0018);
+}
+void OPC_RST_28(void) {
+    LOG_DEBUG("OPC_RST_28");
+    OPC_RST_x(0x0028);
+}
+void OPC_RST_38(void) {
+    LOG_DEBUG("OPC_RST_38");
+    OPC_RST_x(0x0038);
+}
+
+// TODO: other registers, generalize function
+void OPC_LD_HL_u16(void) {
+    mmu_write_two_bytes(CPU_DREG_HL, mmu_get_two_bytes(cpu.PC));
+    cpu.cycle_count += 12;
 }
