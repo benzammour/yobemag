@@ -65,6 +65,8 @@ extern CPU cpu;
 #define CPU_REG_A   cpu.AF.words.hi
 #define CPU_REG_F   cpu.AF.words.lo
 
+#define CPU_SP cpu.SP
+
 void cpu_init(void);
 void cpu_step(void);
 
@@ -751,4 +753,26 @@ void OPC_RST_18(void);
  */
 void OPC_RST_28(void);
 
+/**
+ * @brief Push PC onto the stack and load 0x0028 into PC.
+ *
+ */
+void OPC_LD_BC_u16(void);
+void OPC_LD_DE_u16(void);
+void OPC_LD_HL_u16(void);
+void OPC_LD_SP_u16(void);
+
+/**
+ * @brief Adds i8 to PC and jumps to it
+ *
+ */
+void OPC_JR_i8(void);
+
+void OPC_CALL_u16(void);
+void OPC_CALL_Z_u16(void);
+void OPC_CALL_NZ_u16(void);
+void OPC_CALL_C_u16(void);
+void OPC_CALL_NC_u16(void);
+
+void OPC_DI(void);
 #endif // YOBEMAG_CPU_H
