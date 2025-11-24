@@ -2,7 +2,6 @@
 #include "cpu.h"
 #include "log.h"
 #include "rom.h"
-#include <cstdint>
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -59,9 +58,10 @@ uint8_t mmu_get_byte(uint16_t addr) {
 }
 
 void mmu_write_byte(uint16_t dest_addr, uint8_t value) {
-    if (dest_addr < ROM_LIMIT) {
-        LOG_ERROR("Cannot write 0x%02x into 0x%02x as it is reserved for ROM space", value, dest_addr);
-    }
+    // if (dest_addr < ROM_LIMIT) {
+    //     LOG_ERROR("Cannot write 0x%02x into 0x%02x as it is reserved for ROM space", value, dest_addr);
+    //     exit(1);
+    // }
 
     mem[dest_addr] = value;
 }
