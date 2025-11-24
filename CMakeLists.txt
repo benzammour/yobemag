@@ -3,6 +3,7 @@ project(YOBEMAG C)
 
 set(PRODUCT_NAME yobemag)
 string(TOUPPER ${PRODUCT_NAME} UPPER_PRODUCT_NAME)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(src)
 set(SRC_FILES
