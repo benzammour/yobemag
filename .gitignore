@@ -74,3 +74,5 @@ docs/_build
 # NeoVIM
 compile_commands.json
 .cache/
+
+opcode_gimp/
